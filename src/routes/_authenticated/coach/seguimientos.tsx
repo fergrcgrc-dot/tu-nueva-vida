@@ -13,7 +13,7 @@ const followUpsQuery = queryOptions({
 export const Route = createFileRoute("/_authenticated/coach/seguimientos")({
   loader: async ({ context }) => {
     const { role } = await getMyRole();
-    if (role !== "coach") throw redirect({ to: "/dashboard" });
+    if (role !== "coach" && role !== "platform_admin") throw redirect({ to: "/dashboard" });
     await context.queryClient.ensureQueryData(followUpsQuery);
   },
   errorComponent: ({ error }) => (
