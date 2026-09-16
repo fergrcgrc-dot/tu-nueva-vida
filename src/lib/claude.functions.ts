@@ -267,7 +267,21 @@ export const generateDeliverable = createServerFn({ method: "POST" })
         content.extractionPrompt,
         "Escribe en español, en formato de documento claro con títulos. No inventes datos que el cliente no haya dicho.",
       ].join("\n"),
-      [{ role: "user", content: `Conversación completa:\n\n${transcript}` }],
+      [
+        {
+          role: "user",
+          content:
+            `Conversación completa:\n\n${transcript}` +
+            (data.matrix && data.matrix.length > 0
+              ? `\n\nMatriz de decisión completada por el cliente:\n${data.matrix
+                  .map(
+                    (i) =>
+                      `- ${i.text} → ${i.nonNegotiable ? "INNEGOCIABLE" : "dispuesto a arriesgar"}`,
+                  )
+                  .join("\n")}`
+              : ""),
+        },
+      ],
       3000,
     );
 
