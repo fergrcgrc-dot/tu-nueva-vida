@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState, type FormEvent } from "react";
 import { toast } from "sonner";
@@ -792,9 +792,17 @@ function AssignmentsSection({ data }: { data: Overview }) {
 /* ------------------------------ Actividad ---------------------------- */
 
 function ActivitySection() {
-  const { data: logs } = useSuspenseQuery(auditQuery);
+  const { data: logs, isLoading } = useQuery(auditQuery);
 
-  if (logs.length === 0) {
+  if (isLoading) {
+    return (
+      <div className="card-depth rounded-2xl p-10 text-center text-sm text-muted-foreground">
+        Cargando actividad…
+      </div>
+    );
+  }
+
+  if (!logs || logs.length === 0) {
     return (
       <div className="card-depth rounded-2xl p-10 text-center text-sm text-muted-foreground">
         Todavía no hay actividad registrada.
