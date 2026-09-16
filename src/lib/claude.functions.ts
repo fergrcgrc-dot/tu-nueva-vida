@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { getModuleContent } from "@/lib/module-content";
+import { CHECKIN_CONTENT, getModuleContent } from "@/lib/module-content";
 import type { Database } from "@/integrations/supabase/types";
 
 /**
