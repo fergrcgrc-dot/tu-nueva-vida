@@ -92,6 +92,7 @@ export const getDashboard = createServerFn({ method: "GET" })
       profile: profileRes.data ?? null,
       modules,
       nextSession,
+      followUps: followUpsRes.data ?? [],
     };
   });
 
@@ -355,6 +356,10 @@ const UpdateSessionInput = z.object({
   scheduledAt: z.string().datetime({ offset: true }).nullable().optional(),
   status: z.enum(["pending", "scheduled", "completed"]).optional(),
   coachNotes: z.string().max(10000).optional(),
+  nextStepRecommended: z
+    .enum(["acompanamiento_1_1", "retiro_leon"])
+    .nullable()
+    .optional(),
 });
 
 export const updateSession = createServerFn({ method: "POST" })
