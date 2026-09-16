@@ -59,6 +59,8 @@ function ModulePage() {
   const callComplete = useServerFn(completeModule);
   const callSave = useServerFn(saveDeliverable);
   const callClaude = useServerFn(askModuleClaude);
+  const callGenerate = useServerFn(generateDeliverable);
+  const callHelp = useServerFn(requestHumanContact);
 
   const [chat, setChat] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -66,6 +68,38 @@ function ModulePage() {
   const [deliverable, setDeliverable] = useState("");
   const [saving, setSaving] = useState(false);
   const [completing, setCompleting] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [askingHelp, setAskingHelp] = useState(false);
+
+  async function handleHumanContact() {
+    if (askingHelp) return;
+    setAskingHelp(true);
+    try {
+      await callHelp({ data: { moduleId } });
+      toast.success("Aviso enviado. Tu coach te responderá en menos de 24 horas.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo enviar el aviso.");
+    } finally {
+      setAskingHelp(false);
+    }
+  }
+
+  async function handleGenerateDeliverable() {
+    if (generating || chat.length === 0) return;
+    setGenerating(true);
+    try {
+      const result = await callGenerate({ data: { moduleId, history: chat.slice(-60) } });
+      setDeliverable(result.content);
+      toast.success("Entregable generado y módulo completado.");
+      await queryClient.invalidateQueries();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "No se pudo generar el entregable.",
+      );
+    } finally {
+      setGenerating(false);
+    }
+  }
 
   const locked = module.status === "locked";
 
