@@ -270,11 +270,32 @@ function ModulePage() {
               </form>
             </section>
 
+            {/* Matriz de decisión (módulos 4 y 6) */}
+            {showMatrix && (
+              <section className="card-depth rounded-2xl p-6">
+                <h2 className="font-display text-lg font-semibold text-foreground">
+                  Matriz de decisión
+                </h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Añade cada elemento y decide si estás dispuesto a arriesgarlo o es
+                  innegociable. Puedes arrastrarlo de una columna a otra.
+                </p>
+                <div className="mt-4">
+                  <DecisionMatrix items={matrix} onChange={setMatrix} />
+                </div>
+              </section>
+            )}
+
             {/* Entregable */}
             <section className="card-depth rounded-2xl p-6">
               <h2 className="font-display text-lg font-semibold text-foreground">
                 Tu entregable
               </h2>
+              {showMatrix && matrix.length > 0 && (
+                <div className="mt-4">
+                  <DecisionMatrix items={matrix} onChange={setMatrix} readOnly />
+                </div>
+              )}
               <textarea
                 value={deliverable}
                 onChange={(e) => setDeliverable(e.target.value)}
