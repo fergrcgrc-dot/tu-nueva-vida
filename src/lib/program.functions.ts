@@ -37,7 +37,7 @@ export const getDashboard = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
 
-    const [profileRes, modulesRes, progressRes, sessionsRes] = await Promise.all([
+    const [profileRes, modulesRes, progressRes, sessionsRes, followUpsRes] = await Promise.all([
       supabase
         .from("profiles")
         .select("full_name, program_start_date")
@@ -56,9 +56,17 @@ export const getDashboard = createServerFn({ method: "GET" })
         .select("id, phase_number, scheduled_at, status")
         .eq("user_id", userId)
         .order("phase_number", { ascending: true }),
+      supabase
+        .from("follow_ups")
+        .select("id, day_offset, due_at, status")
+        .eq("user_id", userId)
+        .order("day_offset", { ascending: true }),
     ]);
 
-    if (profileRes.error || modulesRes.error || progressRes.error || sessionsRes.error) {
+    if (
+      profileRes.error || modulesRes.error || progressRes.error ||
+      sessionsRes.error || followUpsRes.error
+    ) {
       throw safeError("No se pudo cargar tu programa.");
     }
 
