@@ -231,11 +231,14 @@ export const requestHumanContact = createServerFn({ method: "POST" })
  * activa. Un coach desactivado o bloqueado no accede a ningún dato.
  */
 async function assertCoach(supabase: AuthedClient, userId: string) {
-  const [roleRes, profileRes] = await Promise.all([
+  const [roleRes, adminRes, profileRes] = await Promise.all([
     supabase.rpc("has_role", { _user_id: userId, _role: "coach" }),
+    supabase.rpc("is_platform_admin", { _user_id: userId }),
     supabase.from("profiles").select("status").eq("id", userId).maybeSingle(),
   ]);
-  if (!roleRes.data) throw safeError("No tienes permiso para ver esta sección.");
+  if (!roleRes.data && !adminRes.data) {
+    throw safeError("No tienes permiso para ver esta sección.");
+  }
   if (profileRes.data && profileRes.data.status !== "active") {
     throw safeError("Tu cuenta no está activa. Contacta con el administrador.");
   }
