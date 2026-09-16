@@ -15,6 +15,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedCoachIndexRouteImport } from './routes/_authenticated/coach/index'
 import { Route as AuthenticatedCoachSeguimientosRouteImport } from './routes/_authenticated/coach/seguimientos'
 import { Route as AuthenticatedModulosModuleIdRouteImport } from './routes/_authenticated/modulos/$moduleId'
@@ -50,6 +51,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedCoachIndexRoute = AuthenticatedCoachIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -83,23 +89,24 @@ const AuthenticatedCoachClientesClientIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
   '/coach/': typeof AuthenticatedCoachIndexRoute
   '/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
   '/coach': typeof AuthenticatedCoachIndexRoute
   '/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
 }
@@ -108,12 +115,13 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof LoginRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/coach': typeof AuthenticatedCoachRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/_authenticated/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/_authenticated/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/coach/': typeof AuthenticatedCoachIndexRoute
   '/_authenticated/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
 }
@@ -128,17 +136,18 @@ export interface FileRouteTypes {
     | '/coach/seguimientos'
     | '/modulos/$moduleId'
     | '/seguimientos/$followUpId'
+    | '/admin/'
     | '/coach/'
     | '/coach/clientes/$clientId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
-    | '/admin'
     | '/dashboard'
     | '/coach/seguimientos'
     | '/modulos/$moduleId'
     | '/seguimientos/$followUpId'
+    | '/admin'
     | '/coach'
     | '/coach/clientes/$clientId'
   id:
@@ -152,6 +161,7 @@ export interface FileRouteTypes {
     | '/_authenticated/coach/seguimientos'
     | '/_authenticated/modulos/$moduleId'
     | '/_authenticated/seguimientos/$followUpId'
+    | '/_authenticated/admin/'
     | '/_authenticated/coach/'
     | '/_authenticated/coach/clientes/$clientId'
   fileRoutesById: FileRoutesById
@@ -206,6 +216,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/coach/': {
       id: '/_authenticated/coach/'
       path: '/'
@@ -244,6 +261,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedCoachRouteChildren {
   AuthenticatedCoachSeguimientosRoute: typeof AuthenticatedCoachSeguimientosRoute
   AuthenticatedCoachIndexRoute: typeof AuthenticatedCoachIndexRoute
@@ -261,7 +289,7 @@ const AuthenticatedCoachRouteWithChildren =
   AuthenticatedCoachRoute._addFileChildren(AuthenticatedCoachRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedCoachRoute: typeof AuthenticatedCoachRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedModulosModuleIdRoute: typeof AuthenticatedModulosModuleIdRoute
@@ -269,7 +297,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedCoachRoute: AuthenticatedCoachRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedModulosModuleIdRoute: AuthenticatedModulosModuleIdRoute,
