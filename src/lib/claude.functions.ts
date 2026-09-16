@@ -234,9 +234,15 @@ export const askModuleClaude = createServerFn({ method: "POST" })
     return reply;
   });
 
+const MatrixItem = z.object({
+  text: z.string().min(1).max(500),
+  nonNegotiable: z.boolean(),
+});
+
 const GenerateDeliverableInput = z.object({
   moduleId: z.string().uuid(),
   history: z.array(HistoryMessage).min(1).max(60),
+  matrix: z.array(MatrixItem).max(40).optional(),
 });
 
 /**
