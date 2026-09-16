@@ -14,24 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          created_at: string
+          id: string
+          metadata: Json
+          target_id: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Relationships: []
+      }
       coach_clients: {
         Row: {
+          assigned_at: string
+          assigned_by: string | null
           client_id: string
           coach_id: string
           created_at: string
           id: string
+          status: Database["public"]["Enums"]["assignment_status"]
+          unassigned_at: string | null
+          updated_at: string
         }
         Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
           client_id: string
           coach_id: string
           created_at?: string
           id?: string
+          status?: Database["public"]["Enums"]["assignment_status"]
+          unassigned_at?: string | null
+          updated_at?: string
         }
         Update: {
+          assigned_at?: string
+          assigned_by?: string | null
           client_id?: string
           coach_id?: string
           created_at?: string
           id?: string
+          status?: Database["public"]["Enums"]["assignment_status"]
+          unassigned_at?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -260,27 +305,39 @@ export type Database = {
       }
       profiles: {
         Row: {
+          admin_notes: string | null
           created_at: string
           full_name: string | null
           id: string
+          last_active_at: string | null
           program_start_date: string | null
           role: Database["public"]["Enums"]["app_role"]
+          status: Database["public"]["Enums"]["account_status"]
+          timezone: string | null
           updated_at: string
         }
         Insert: {
+          admin_notes?: string | null
           created_at?: string
           full_name?: string | null
           id: string
+          last_active_at?: string | null
           program_start_date?: string | null
           role?: Database["public"]["Enums"]["app_role"]
+          status?: Database["public"]["Enums"]["account_status"]
+          timezone?: string | null
           updated_at?: string
         }
         Update: {
+          admin_notes?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
+          last_active_at?: string | null
           program_start_date?: string | null
           role?: Database["public"]["Enums"]["app_role"]
+          status?: Database["public"]["Enums"]["account_status"]
+          timezone?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -371,17 +428,24 @@ export type Database = {
         Args: { _user_id: string }
         Returns: undefined
       }
+      is_active_coach_of: {
+        Args: { _client_id: string; _coach_id: string }
+        Returns: boolean
+      }
       is_coach_of: {
         Args: { _client_id: string; _coach_id: string }
         Returns: boolean
       }
+      is_platform_admin: { Args: { _user_id: string }; Returns: boolean }
       start_module: {
         Args: { _module_id: string; _user_id: string }
         Returns: undefined
       }
     }
     Enums: {
+      account_status: "active" | "inactive" | "blocked"
       app_role: "client" | "coach" | "platform_admin"
+      assignment_status: "active" | "inactive"
       flag_status: "open" | "reviewed"
       follow_up_status: "pending" | "completed"
       module_status: "locked" | "unlocked" | "in_progress" | "completed"
@@ -514,7 +578,9 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      account_status: ["active", "inactive", "blocked"],
       app_role: ["client", "coach", "platform_admin"],
+      assignment_status: ["active", "inactive"],
       flag_status: ["open", "reviewed"],
       follow_up_status: ["pending", "completed"],
       module_status: ["locked", "unlocked", "in_progress", "completed"],
