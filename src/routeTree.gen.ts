@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCoachIndexRouteImport } from './routes/_authenticated/coach/index'
 import { Route as AuthenticatedModulosModuleIdRouteImport } from './routes/_authenticated/modulos/$moduleId'
 import { Route as AuthenticatedCoachClientesClientIdRouteImport } from './routes/_authenticated/coach/clientes/$clientId'
 
@@ -41,6 +42,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCoachIndexRoute = AuthenticatedCoachIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedCoachRoute,
+} as any)
 const AuthenticatedModulosModuleIdRoute =
   AuthenticatedModulosModuleIdRouteImport.update({
     id: '/modulos/$moduleId',
@@ -60,14 +66,15 @@ export interface FileRoutesByFullPath {
   '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
+  '/coach/': typeof AuthenticatedCoachIndexRoute
   '/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
+  '/coach': typeof AuthenticatedCoachIndexRoute
   '/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
 }
 export interface FileRoutesById {
@@ -78,6 +85,7 @@ export interface FileRoutesById {
   '/_authenticated/coach': typeof AuthenticatedCoachRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
+  '/_authenticated/coach/': typeof AuthenticatedCoachIndexRoute
   '/_authenticated/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
 }
 export interface FileRouteTypes {
@@ -88,14 +96,15 @@ export interface FileRouteTypes {
     | '/coach'
     | '/dashboard'
     | '/modulos/$moduleId'
+    | '/coach/'
     | '/coach/clientes/$clientId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
-    | '/coach'
     | '/dashboard'
     | '/modulos/$moduleId'
+    | '/coach'
     | '/coach/clientes/$clientId'
   id:
     | '__root__'
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/_authenticated/coach'
     | '/_authenticated/dashboard'
     | '/_authenticated/modulos/$moduleId'
+    | '/_authenticated/coach/'
     | '/_authenticated/coach/clientes/$clientId'
   fileRoutesById: FileRoutesById
 }
@@ -151,6 +161,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/coach/': {
+      id: '/_authenticated/coach/'
+      path: '/'
+      fullPath: '/coach/'
+      preLoaderRoute: typeof AuthenticatedCoachIndexRouteImport
+      parentRoute: typeof AuthenticatedCoachRoute
+    }
     '/_authenticated/modulos/$moduleId': {
       id: '/_authenticated/modulos/$moduleId'
       path: '/modulos/$moduleId'
@@ -169,10 +186,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedCoachRouteChildren {
+  AuthenticatedCoachIndexRoute: typeof AuthenticatedCoachIndexRoute
   AuthenticatedCoachClientesClientIdRoute: typeof AuthenticatedCoachClientesClientIdRoute
 }
 
 const AuthenticatedCoachRouteChildren: AuthenticatedCoachRouteChildren = {
+  AuthenticatedCoachIndexRoute: AuthenticatedCoachIndexRoute,
   AuthenticatedCoachClientesClientIdRoute:
     AuthenticatedCoachClientesClientIdRoute,
 }
