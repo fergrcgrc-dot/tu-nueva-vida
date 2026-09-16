@@ -293,6 +293,32 @@ function ClientDetailPage() {
                       }
                       className="w-full rounded-lg border border-input bg-secondary px-3 py-2 text-xs text-foreground outline-none placeholder:text-muted-foreground focus:border-primary"
                     />
+                    {s.phase_number === 4 && (
+                      <div className="space-y-1.5">
+                        <label
+                          htmlFor={`next-step-${s.id}`}
+                          className="text-xs font-medium text-gold"
+                        >
+                          Siguiente paso propuesto
+                        </label>
+                        <select
+                          id={`next-step-${s.id}`}
+                          value={
+                            nextStepDraft[s.id] ?? s.next_step_recommended ?? ""
+                          }
+                          onChange={(e) =>
+                            setNextStepDraft((d) => ({ ...d, [s.id]: e.target.value }))
+                          }
+                          className="w-full rounded-lg border border-input bg-secondary px-3 py-2 text-xs text-foreground outline-none focus:border-primary"
+                        >
+                          <option value="">Sin decidir</option>
+                          <option value="acompanamiento_1_1">
+                            Acompañamiento 1:1 completo
+                          </option>
+                          <option value="retiro_leon">Retiro en León</option>
+                        </select>
+                      </div>
+                    )}
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleSaveSession(s.id)}
