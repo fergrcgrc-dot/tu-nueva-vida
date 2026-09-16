@@ -41,6 +41,7 @@ const KNOWN_TRIGGERS: Record<string, string> = {
   malestar_emocional: "Hemos avisado a tu coach. Te responderá en menos de 24 horas.",
   bloqueo_emocional: "Hemos avisado a tu coach. Te contactará en 24 a 48 horas.",
   riesgo_cero: "Tu coach lo explorará contigo en la próxima sesión.",
+  empate_decision: "Lo resolveréis juntos en la sesión con tu coach.",
 };
 
 /**
@@ -189,7 +190,7 @@ export const askModuleClaude = createServerFn({ method: "POST" })
       '{"message": string, "should_save_deliverable": boolean, "deliverable_content": string | null, "flag": string | null}',
       "- message: tu respuesta al cliente, en español.",
       "- should_save_deliverable: true solo cuando la conversación del módulo esté completa; el cliente decide guardarlo con una acción explícita.",
-      "- flag: null normalmente. Usa exactamente \"malestar_emocional\" (desesperanza, indefensión total, deterioro grave de salud mental o relación en crisis), \"bloqueo_emocional\" (vergüenza intensa, bloqueo total del ejercicio o intento de cerrar la conversación sin completarla) o \"riesgo_cero\" (marca como innegociable prácticamente todo, sin margen de riesgo). Usa un texto breve para cualquier otra señal que el coach humano deba revisar.",
+      "- flag: null normalmente. Usa exactamente \"malestar_emocional\" (desesperanza, indefensión total, deterioro grave de salud mental o relación en crisis), \"bloqueo_emocional\" (vergüenza intensa, bloqueo total del ejercicio o intento de cerrar la conversación sin completarla), \"riesgo_cero\" (marca como innegociable prácticamente todo, sin margen de riesgo) o \"empate_decision\" (dos narrativas empatadas o resistencia clara a decidir). Usa un texto breve para cualquier otra señal que el coach humano deba revisar.",
     ].join("\n");
 
     const messages = [
