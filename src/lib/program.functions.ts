@@ -226,12 +226,31 @@ export const requestHumanContact = createServerFn({ method: "POST" })
 /* Panel del coach                                                     */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Autorización del panel de coach: rol comprobado en base de datos y cuenta
+ * activa. Un coach desactivado o bloqueado no accede a ningún dato.
+ */
 async function assertCoach(supabase: AuthedClient, userId: string) {
-  const { data: isCoach } = await supabase.rpc("has_role", {
-    _user_id: userId,
-    _role: "coach",
-  });
-  if (!isCoach) throw safeError("No tienes permiso para ver esta sección.");
+  const [roleRes, profileRes] = await Promise.all([
+    supabase.rpc("has_role", { _user_id: userId, _role: "coach" }),
+    supabase.from("profiles").select("status").eq("id", userId).maybeSingle(),
+  ]);
+  if (!roleRes.data) throw safeError("No tienes permiso para ver esta sección.");
+  if (profileRes.data && profileRes.data.status !== "active") {
+    throw safeError("Tu cuenta no está activa. Contacta con el administrador.");
+  }
+}
+
+/** Asignaciones activas del coach (el histórico inactivo no da acceso). */
+async function activeClientIds(supabase: AuthedClient, coachId: string) {
+  const { data, error } = await supabase
+    .from("coach_clients")
+    .select("client_id, profiles:client_id(full_name, program_start_date)")
+    .eq("coach_id", coachId)
+    .eq("status", "active")
+    .is("unassigned_at", null);
+  if (error) throw safeError("No se pudieron cargar los clientes.");
+  return data ?? [];
 }
 
 export const getCoachClients = createServerFn({ method: "GET" })
