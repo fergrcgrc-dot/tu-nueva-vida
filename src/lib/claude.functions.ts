@@ -226,6 +226,9 @@ export const askModuleClaude = createServerFn({ method: "POST" })
       });
       if (flagError) console.error("[claude] no se pudo registrar el aviso");
       reply.escalated = true;
+      reply.escalation_message =
+        KNOWN_TRIGGERS[triggerType] ??
+        "Hemos avisado a tu coach. Te responderá en menos de 24 horas.";
     }
 
     return reply;
