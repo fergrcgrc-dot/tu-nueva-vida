@@ -11,10 +11,11 @@ export const attachSupabaseAuth = createMiddleware({ type: "function" }).client(
       data: { session },
     } = await supabase.auth.getSession();
 
-    return next({
-      headers: session?.access_token
-        ? { Authorization: `Bearer ${session.access_token}` }
-        : undefined,
-    });
+    const headers = new Headers();
+    if (session?.access_token) {
+      headers.set("Authorization", `Bearer ${session.access_token}`);
+    }
+
+    return next({ headers });
   },
 );
