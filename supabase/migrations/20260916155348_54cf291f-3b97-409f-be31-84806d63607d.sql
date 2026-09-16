@@ -1,0 +1,10 @@
+REVOKE EXECUTE ON FUNCTION public.has_role(UUID, public.app_role) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.is_coach_of(UUID, UUID) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.initialize_client_progress(UUID) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.complete_module(UUID, UUID) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.start_module(UUID, UUID) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.update_updated_at_column() FROM anon, public;
+GRANT EXECUTE ON FUNCTION public.has_role(UUID, public.app_role) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.is_coach_of(UUID, UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.complete_module(UUID, UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.start_module(UUID, UUID) TO authenticated;
