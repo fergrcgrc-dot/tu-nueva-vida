@@ -1,15 +1,28 @@
-# Roadmap — Tu Nueva Vida (fase 1: cimientos)
+# Tu Nueva Vida — hoja de ruta
 
-- [x] Tablas, reglas de acceso y datos iniciales (8 módulos, 4 fases)
-- [x] Funciones seguras de progreso (iniciar/completar módulo, inicialización)
-- [x] Endurecimiento de permisos de funciones
-- [x] Identidad visual nocturna (fogata, ámbar sobre azul noche) y tipografías
-- [x] Inicio de sesión (sin registro público) y reparto por rol
-- [x] Panel del cliente (/dashboard): saludo, progreso, línea de tiempo 8 semanas/4 fases, módulo activo, entregables, próxima sesión
-- [x] Página de módulo (/modulos/:id): guía con Claude (backend), entregable, completar módulo
-- [x] Panel del coach (/coach): lista de clientes con métricas, invitación de clientes
-- [x] Detalle de cliente (/coach/clientes/:id): progreso, entregables, avisos, sesiones con notas privadas
-- [x] Función Claude segura: auth, acceso al módulo, contexto propio, modelo fijado en servidor, errores seguros
-- [ ] Prueba de humo en el navegador (login coach, alta de cliente, dashboard)
-- [ ] Crear la primera cuenta coach (bloqueado: la crea el usuario; yo le asigno el rol en la base de datos)
-- [ ] Pendiente (fase 2): contenido de módulos, tono y ejercicios, sistema de flags definitivo, guiones de sesiones 1:1
+## Fase 1 · Cimientos (COMPLETADA)
+- [x] Base de datos: profiles, user_roles, modules, module_progress, deliverables, flags, sessions_1_1, coach_clients
+- [x] Reglas de acceso (RLS): cliente solo sus datos, coach solo sus clientes, progreso solo vía servidor
+- [x] 8 módulos precargados (4 fases, 8 semanas)
+- [x] Funciones de avance: start_module, complete_module (desbloquea la semana siguiente), initialize_client_progress
+- [x] Endurecimiento: funciones internas no accesibles de forma anónima
+- [x] Login (sin registro público) y cabecera con sesión/cerrar sesión
+- [x] /dashboard del cliente (saludo, progreso, sesión 1:1, línea de tiempo de 8 módulos)
+- [x] /modulos/:id (guía Claude, entregable, completar módulo)
+- [x] /coach (lista de clientes, métricas, invitar cliente)
+- [x] /coach/clientes/:id (progreso, entregables, avisos, sesiones, notas privadas del coach)
+- [x] Integración Claude: askModuleClaude con claude-sonnet-5 fijo en servidor, contexto del programa, errores seguros
+- [x] Prueba de humo completa: coach → crea cliente → cliente entra → panel → módulo (sin errores)
+
+## Fase 2 · Contenido (pendiente de tu revisión)
+- [ ] Preguntas, guiones, tono y ejercicios por módulo (sistema de prompts por módulo)
+- [ ] Criterios del sistema de avisos (flags) automáticos
+- [ ] Guiones y contenido de las 4 sesiones 1:1
+
+## Operativa
+- [ ] Crear tu cuenta de coach real (necesito tu correo; asigno el rol en la base de datos)
+- [ ] (Opcional) Borrar cuentas de prueba: coach.prueba@… / ana.prueba@…
+- [ ] Publicar la app
+
+## Fuera de alcance (por la especificación)
+- Biblioteca de recursos, pagos, registro público, marketplace, funciones sociales
