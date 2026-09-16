@@ -3,15 +3,16 @@ import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-
 import { useServerFn } from "@tanstack/react-start";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Lock, Save, Send, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Lock, Save, Send, CheckCircle2, LifeBuoy, FileText } from "lucide-react";
 
 import { AppHeader } from "@/components/AppHeader";
-import { askModuleClaude } from "@/lib/claude.functions";
+import { askModuleClaude, generateDeliverable } from "@/lib/claude.functions";
 import {
   completeModule,
   getDashboard,
   getMyDeliverables,
   getMyRole,
+  requestHumanContact,
   saveDeliverable,
   startModule,
 } from "@/lib/program.functions";
