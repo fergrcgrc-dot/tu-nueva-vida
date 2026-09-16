@@ -77,10 +77,19 @@ function ClientDetailPage() {
     setBusy(sessionId);
     try {
       const rawDate = dateDraft[sessionId];
+      const rawNextStep = nextStepDraft[sessionId];
       await callUpdateSession({
         data: {
           sessionId,
           coachNotes: notesDraft[sessionId] ?? undefined,
+          ...(rawNextStep !== undefined
+            ? {
+                nextStepRecommended:
+                  rawNextStep === ""
+                    ? null
+                    : (rawNextStep as "acompanamiento_1_1" | "retiro_leon"),
+              }
+            : {}),
           ...(rawDate
             ? {
                 scheduledAt: new Date(rawDate).toISOString(),
