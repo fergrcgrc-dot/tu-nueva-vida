@@ -15,17 +15,27 @@ function safeError(message: string): Error {
 /* Rol y sesión                                                        */
 /* ------------------------------------------------------------------ */
 
-export type AppRole = "client" | "coach";
+export type AppRole = "client" | "coach" | "platform_admin";
 
 /** Rol real del usuario con sesión, leído desde user_roles. */
 export const getMyRole = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{ role: AppRole }> => {
-    const { data: isCoach } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "coach",
-    });
-    return { role: isCoach ? "coach" : "client" };
+  .handler(async ({ context }): Promise<{ role: AppRole; status: string }> => {
+    const [adminRes, coachRes, profileRes] = await Promise.all([
+      context.supabase.rpc("is_platform_admin", { _user_id: context.userId }),
+      context.supabase.rpc("has_role", { _user_id: context.userId, _role: "coach" }),
+      context.supabase
+        .from("profiles")
+        .select("status")
+        .eq("id", context.userId)
+        .maybeSingle(),
+    ]);
+    const role: AppRole = adminRes.data
+      ? "platform_admin"
+      : coachRes.data
+        ? "coach"
+        : "client";
+    return { role, status: profileRes.data?.status ?? "active" };
   });
 
 /* ------------------------------------------------------------------ */
@@ -216,12 +226,34 @@ export const requestHumanContact = createServerFn({ method: "POST" })
 /* Panel del coach                                                     */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Autorización del panel de coach: rol comprobado en base de datos y cuenta
+ * activa. Un coach desactivado o bloqueado no accede a ningún dato.
+ */
 async function assertCoach(supabase: AuthedClient, userId: string) {
-  const { data: isCoach } = await supabase.rpc("has_role", {
-    _user_id: userId,
-    _role: "coach",
-  });
-  if (!isCoach) throw safeError("No tienes permiso para ver esta sección.");
+  const [roleRes, adminRes, profileRes] = await Promise.all([
+    supabase.rpc("has_role", { _user_id: userId, _role: "coach" }),
+    supabase.rpc("is_platform_admin", { _user_id: userId }),
+    supabase.from("profiles").select("status").eq("id", userId).maybeSingle(),
+  ]);
+  if (!roleRes.data && !adminRes.data) {
+    throw safeError("No tienes permiso para ver esta sección.");
+  }
+  if (profileRes.data && profileRes.data.status !== "active") {
+    throw safeError("Tu cuenta no está activa. Contacta con el administrador.");
+  }
+}
+
+/** Asignaciones activas del coach (el histórico inactivo no da acceso). */
+async function activeClientIds(supabase: AuthedClient, coachId: string) {
+  const { data, error } = await supabase
+    .from("coach_clients")
+    .select("client_id, profiles:client_id(full_name, program_start_date)")
+    .eq("coach_id", coachId)
+    .eq("status", "active")
+    .is("unassigned_at", null);
+  if (error) throw safeError("No se pudieron cargar los clientes.");
+  return data ?? [];
 }
 
 export const getCoachClients = createServerFn({ method: "GET" })
@@ -230,11 +262,7 @@ export const getCoachClients = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     await assertCoach(supabase, userId);
 
-    const { data: assignments, error } = await supabase
-      .from("coach_clients")
-      .select("client_id, profiles:client_id(full_name, program_start_date)")
-      .eq("coach_id", userId);
-    if (error) throw safeError("No se pudieron cargar los clientes.");
+    const assignments = await activeClientIds(supabase, userId);
 
     const clientIds = (assignments ?? []).map((a) => a.client_id);
     if (clientIds.length === 0) return [];
@@ -280,7 +308,27 @@ export const getClientDetail = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => ClientIdInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertCoach(supabase, userId);
+
+    // El administrador puede supervisar cualquier ficha, pero queda registrado.
+    const { data: isAdmin } = await supabase.rpc("is_platform_admin", {
+      _user_id: userId,
+    });
+    if (isAdmin) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin.from("audit_logs").insert({
+        actor_user_id: userId,
+        action: "admin_viewed_client",
+        target_type: "profile",
+        target_id: data.clientId,
+      });
+    } else {
+      await assertCoach(supabase, userId);
+      const { data: assigned } = await supabase.rpc("is_active_coach_of", {
+        _coach_id: userId,
+        _client_id: data.clientId,
+      });
+      if (!assigned) throw safeError("Este cliente no está asignado a ti.");
+    }
 
     const [profileRes, progressRes, deliverablesRes, flagsRes, sessionsRes] =
       await Promise.all([
@@ -389,11 +437,7 @@ export const getCoachFollowUps = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     await assertCoach(supabase, userId);
 
-    const { data: assignments, error: assignError } = await supabase
-      .from("coach_clients")
-      .select("client_id, profiles:client_id(full_name)")
-      .eq("coach_id", userId);
-    if (assignError) throw safeError("No se pudieron cargar los seguimientos.");
+    const assignments = await activeClientIds(supabase, userId);
 
     const clientIds = (assignments ?? []).map((a) => a.client_id);
     if (clientIds.length === 0) return [];
@@ -418,91 +462,3 @@ export const getCoachFollowUps = createServerFn({ method: "GET" })
     }));
   });
 
-/* ------------------------------------------------------------------ */
-/* Alta de clientes (solo coach)                                       */
-/* ------------------------------------------------------------------ */
-
-const CreateClientInput = z.object({
-  email: z.string().email(),
-  password: z.string().min(8).max(128),
-  fullName: z.string().min(1).max(120),
-  programStartDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-});
-
-/**
- * Crea la cuenta de un cliente invitado. Privilegiada: verifica el rol de
- * coach del llamante antes de usar el cliente administrador. No existe
- * registro público en la app.
- */
-export const createClientAccount = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => CreateClientInput.parse(input))
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    await assertCoach(supabase, userId);
-
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    const { data: created, error: createError } =
-      await supabaseAdmin.auth.admin.createUser({
-        email: data.email,
-        password: data.password,
-        email_confirm: true,
-      });
-    if (createError || !created.user) {
-      // Log interno sin datos sensibles (nunca claves ni contraseñas).
-      console.error("[createClientAccount] admin.createUser", {
-        status: createError?.status,
-        code: createError?.code,
-        message: createError?.message,
-      });
-      const code = createError?.code ?? "";
-      const msg = (createError?.message ?? "").toLowerCase();
-      if (code === "email_exists" || msg.includes("already been registered") || msg.includes("already registered")) {
-        throw safeError("Ese correo ya tiene una cuenta. Usa otro correo.");
-      }
-      if (code === "weak_password" || msg.includes("password")) {
-        throw safeError("La contraseña no cumple los requisitos mínimos. Prueba con una más larga.");
-      }
-      throw safeError("No se pudo crear la cuenta. Revisa el correo e inténtalo de nuevo.");
-    }
-    const clientId = created.user.id;
-
-    const { error: profileError } = await supabaseAdmin.from("profiles").insert({
-      id: clientId,
-      role: "client",
-      full_name: data.fullName,
-      program_start_date: data.programStartDate,
-    });
-    if (profileError) {
-      await supabaseAdmin.auth.admin.deleteUser(clientId);
-      throw safeError("No se pudo crear el perfil del cliente.");
-    }
-
-    const { error: roleError } = await supabaseAdmin
-      .from("user_roles")
-      .insert({ user_id: clientId, role: "client" });
-    if (roleError) {
-      await supabaseAdmin.auth.admin.deleteUser(clientId);
-      throw safeError("No se pudo asignar el rol del cliente.");
-    }
-
-    const { error: assignError } = await supabase
-      .from("coach_clients")
-      .insert({ coach_id: userId, client_id: clientId });
-    if (assignError) {
-      await supabaseAdmin.auth.admin.deleteUser(clientId);
-      throw safeError("No se pudo asignar el cliente a tu lista.");
-    }
-
-    // Progreso inicial: semana 1 desbloqueada, resto bloqueadas, 4 sesiones.
-    const { error: initError } = await supabaseAdmin.rpc("initialize_client_progress", {
-      _user_id: clientId,
-    });
-    if (initError) {
-      await supabaseAdmin.auth.admin.deleteUser(clientId);
-      throw safeError("No se pudo inicializar el programa del cliente.");
-    }
-
-    return { ok: true, clientId };
-  });

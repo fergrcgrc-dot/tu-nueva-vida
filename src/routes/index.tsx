@@ -49,7 +49,11 @@ function Index() {
       try {
         const { role } = await fetchRole();
         if (cancelled) return;
-        navigate({ to: role === "coach" ? "/coach" : "/dashboard", replace: true });
+        navigate({
+          to:
+            role === "platform_admin" ? "/admin" : role === "coach" ? "/coach" : "/dashboard",
+          replace: true,
+        });
       } catch {
         if (!cancelled) navigate({ to: "/login", replace: true });
       }

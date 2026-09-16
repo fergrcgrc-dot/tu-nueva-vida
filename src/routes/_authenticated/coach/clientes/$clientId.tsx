@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/coach/clientes/$clientId")
   params: { parse: (p) => ({ clientId: String(p.clientId) }) },
   loader: async ({ context, params }) => {
     const { role } = await getMyRole();
-    if (role !== "coach") throw redirect({ to: "/dashboard" });
+    if (role !== "coach" && role !== "platform_admin") throw redirect({ to: "/dashboard" });
     await context.queryClient.ensureQueryData(detailQuery(params.clientId));
   },
   errorComponent: ({ error }) => (

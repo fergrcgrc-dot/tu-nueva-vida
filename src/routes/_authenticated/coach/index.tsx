@@ -1,12 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { useState, type FormEvent } from "react";
-import { toast } from "sonner";
-import { UserPlus, Flag, ArrowRight, CalendarClock } from "lucide-react";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { Flag, ArrowRight, CalendarClock } from "lucide-react";
 
 import { AppHeader } from "@/components/AppHeader";
-import { createClientAccount, getCoachClients } from "@/lib/program.functions";
+import { getCoachClients } from "@/lib/program.functions";
 
 const clientsQuery = queryOptions({
   queryKey: ["coach-clients"],
@@ -29,42 +26,6 @@ export const Route = createFileRoute("/_authenticated/coach/")({
 
 function CoachPage() {
   const { data: clients } = useSuspenseQuery(clientsQuery);
-  const queryClient = useQueryClient();
-  const callCreate = useServerFn(createClientAccount);
-
-  const [showForm, setShowForm] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [creating, setCreating] = useState(false);
-
-  async function handleCreate(event: FormEvent) {
-    event.preventDefault();
-    if (creating) return;
-    setCreating(true);
-    try {
-      await callCreate({
-        data: {
-          email: email.trim(),
-          password,
-          fullName: fullName.trim(),
-          programStartDate: startDate,
-        },
-      });
-      toast.success(`Cliente «${fullName.trim()}» creado y asignado.`);
-      setShowForm(false);
-      setEmail("");
-      setPassword("");
-      setFullName("");
-      setStartDate("");
-      await queryClient.invalidateQueries({ queryKey: ["coach-clients"] });
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "No se pudo crear el cliente.");
-    } finally {
-      setCreating(false);
-    }
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -86,99 +47,14 @@ function CoachPage() {
               <CalendarClock className="h-4 w-4 text-primary" aria-hidden />
               Seguimientos pendientes
             </Link>
-            <button
-              onClick={() => setShowForm((v) => !v)}
-              className="ember-glow inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-            >
-              <UserPlus className="h-4 w-4" aria-hidden />
-              Invitar cliente
-            </button>
           </div>
         </div>
 
-        {showForm && (
-          <form
-            onSubmit={handleCreate}
-            className="card-depth mb-10 grid gap-4 rounded-2xl p-6 sm:grid-cols-2"
-          >
-            <h2 className="font-display text-lg font-semibold text-foreground sm:col-span-2">
-              Nuevo cliente
-            </h2>
-            <div className="space-y-1.5">
-              <label htmlFor="fullName" className="text-sm font-medium text-foreground">
-                Nombre completo
-              </label>
-              <input
-                id="fullName"
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="w-full rounded-lg border border-input bg-secondary px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-ring"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label htmlFor="email" className="text-sm font-medium text-foreground">
-                Correo electrónico
-              </label>
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-input bg-secondary px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-ring"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label htmlFor="password" className="text-sm font-medium text-foreground">
-                Contraseña temporal
-              </label>
-              <input
-                id="password"
-                type="text"
-                required
-                minLength={8}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-input bg-secondary px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-ring"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label htmlFor="startDate" className="text-sm font-medium text-foreground">
-                Inicio del programa
-              </label>
-              <input
-                id="startDate"
-                type="date"
-                required
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="w-full rounded-lg border border-input bg-secondary px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-ring"
-              />
-            </div>
-            <div className="flex gap-3 sm:col-span-2">
-              <button
-                type="submit"
-                disabled={creating}
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
-              >
-                {creating ? "Creando…" : "Crear cliente"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowForm(false)}
-                className="rounded-lg border border-border px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-              >
-                Cancelar
-              </button>
-            </div>
-          </form>
-        )}
 
         {clients.length === 0 ? (
           <div className="card-depth rounded-2xl p-10 text-center">
             <p className="text-muted-foreground">
-              Todavía no tienes clientes. Invita al primero para empezar.
+              Todavía no tienes clientes asignados. El administrador te asignará los tuyos.
             </p>
           </div>
         ) : (
