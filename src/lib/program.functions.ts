@@ -185,6 +185,24 @@ export const getMyDeliverables = createServerFn({ method: "GET" })
     return data ?? [];
   });
 
+/** "Hablar con alguien": crea un aviso abierto para el coach humano. */
+export const requestHumanContact = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ moduleId: z.string().uuid().nullable().optional() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.from("flags").insert({
+      user_id: context.userId,
+      module_id: data.moduleId ?? null,
+      trigger_type: "solicitud_explicita",
+      status: "open",
+      note: "El cliente ha pedido hablar con una persona.",
+    });
+    if (error) throw safeError("No se pudo enviar tu solicitud. Inténtalo de nuevo.");
+    return { ok: true };
+  });
+
 /* ------------------------------------------------------------------ */
 /* Panel del coach                                                     */
 /* ------------------------------------------------------------------ */

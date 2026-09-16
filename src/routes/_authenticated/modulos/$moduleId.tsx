@@ -3,15 +3,16 @@ import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-
 import { useServerFn } from "@tanstack/react-start";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Lock, Save, Send, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Lock, Save, Send, CheckCircle2, LifeBuoy, FileText } from "lucide-react";
 
 import { AppHeader } from "@/components/AppHeader";
-import { askModuleClaude } from "@/lib/claude.functions";
+import { askModuleClaude, generateDeliverable } from "@/lib/claude.functions";
 import {
   completeModule,
   getDashboard,
   getMyDeliverables,
   getMyRole,
+  requestHumanContact,
   saveDeliverable,
   startModule,
 } from "@/lib/program.functions";
@@ -58,6 +59,8 @@ function ModulePage() {
   const callComplete = useServerFn(completeModule);
   const callSave = useServerFn(saveDeliverable);
   const callClaude = useServerFn(askModuleClaude);
+  const callGenerate = useServerFn(generateDeliverable);
+  const callHelp = useServerFn(requestHumanContact);
 
   const [chat, setChat] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -65,6 +68,38 @@ function ModulePage() {
   const [deliverable, setDeliverable] = useState("");
   const [saving, setSaving] = useState(false);
   const [completing, setCompleting] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [askingHelp, setAskingHelp] = useState(false);
+
+  async function handleHumanContact() {
+    if (askingHelp) return;
+    setAskingHelp(true);
+    try {
+      await callHelp({ data: { moduleId } });
+      toast.success("Aviso enviado. Tu coach te responderá en menos de 24 horas.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo enviar el aviso.");
+    } finally {
+      setAskingHelp(false);
+    }
+  }
+
+  async function handleGenerateDeliverable() {
+    if (generating || chat.length === 0) return;
+    setGenerating(true);
+    try {
+      const result = await callGenerate({ data: { moduleId, history: chat.slice(-60) } });
+      setDeliverable(result.content);
+      toast.success("Entregable generado y módulo completado.");
+      await queryClient.invalidateQueries();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "No se pudo generar el entregable.",
+      );
+    } finally {
+      setGenerating(false);
+    }
+  }
 
   const locked = module.status === "locked";
 
@@ -93,6 +128,9 @@ function ModulePage() {
       setChat((c) => [...c, { role: "assistant", content: reply.message }]);
       if (reply.deliverable_content && !deliverable) {
         setDeliverable(reply.deliverable_content);
+      }
+      if (reply.escalated) {
+        toast("Hemos avisado a tu coach. Te responderá en menos de 24 horas.");
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo hablar con la guía.");
@@ -148,7 +186,16 @@ function ModulePage() {
           </p>
           <h1 className="mt-2 text-3xl font-semibold text-foreground">{module.title}</h1>
           <p className="mt-3 text-muted-foreground">{module.objective}</p>
+          <button
+            onClick={handleHumanContact}
+            disabled={askingHelp}
+            className="mt-5 inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary/50 disabled:opacity-50"
+          >
+            <LifeBuoy className="h-4 w-4 text-primary" aria-hidden />
+            {askingHelp ? "Enviando…" : "Hablar con alguien"}
+          </button>
         </header>
+
 
         {locked ? (
           <div className="card-depth flex items-center gap-3 rounded-2xl p-6">
@@ -216,6 +263,14 @@ function ModulePage() {
                 className="mt-4 w-full rounded-lg border border-input bg-secondary px-3.5 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-ring"
               />
               <div className="mt-4 flex flex-wrap gap-3">
+                <button
+                  onClick={handleGenerateDeliverable}
+                  disabled={generating || chat.length === 0}
+                  className="ember-glow inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                >
+                  <FileText className="h-4 w-4" aria-hidden />
+                  {generating ? "Generando…" : "Generar entregable"}
+                </button>
                 <button
                   onClick={handleSaveDeliverable}
                   disabled={saving || !deliverable.trim()}
