@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { ArrowLeft, Lock, Save, Send, CheckCircle2, LifeBuoy, FileText } from "lucide-react";
 
 import { AppHeader } from "@/components/AppHeader";
+import { DecisionMatrix, type MatrixItem } from "@/components/DecisionMatrix";
+import { usesDecisionMatrix } from "@/lib/module-content";
 import { askModuleClaude, generateDeliverable } from "@/lib/claude.functions";
 import {
   completeModule,
