@@ -14,16 +14,326 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      coach_clients: {
+        Row: {
+          client_id: string
+          coach_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          client_id: string
+          coach_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          client_id?: string
+          coach_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_clients_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deliverables: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          module_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          module_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          module_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deliverables_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deliverables_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flags: {
+        Row: {
+          created_at: string
+          id: string
+          module_id: string | null
+          note: string | null
+          status: Database["public"]["Enums"]["flag_status"]
+          trigger_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          module_id?: string | null
+          note?: string | null
+          status?: Database["public"]["Enums"]["flag_status"]
+          trigger_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          module_id?: string | null
+          note?: string | null
+          status?: Database["public"]["Enums"]["flag_status"]
+          trigger_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flags_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flags_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      module_progress: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          module_id: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["module_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          module_id: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["module_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          module_id?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["module_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "module_progress_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "module_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      modules: {
+        Row: {
+          created_at: string
+          id: string
+          objective: string
+          phase_name: string
+          phase_number: number
+          title: string
+          updated_at: string
+          week_number: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          objective: string
+          phase_name: string
+          phase_number: number
+          title: string
+          updated_at?: string
+          week_number: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          objective?: string
+          phase_name?: string
+          phase_number?: number
+          title?: string
+          updated_at?: string
+          week_number?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          program_start_date: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id: string
+          program_start_date?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          program_start_date?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sessions_1_1: {
+        Row: {
+          coach_notes: string | null
+          created_at: string
+          id: string
+          phase_number: number
+          scheduled_at: string | null
+          status: Database["public"]["Enums"]["session_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          coach_notes?: string | null
+          created_at?: string
+          id?: string
+          phase_number: number
+          scheduled_at?: string | null
+          status?: Database["public"]["Enums"]["session_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          coach_notes?: string | null
+          created_at?: string
+          id?: string
+          phase_number?: number
+          scheduled_at?: string | null
+          status?: Database["public"]["Enums"]["session_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessions_1_1_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      complete_module: {
+        Args: { _module_id: string; _user_id: string }
+        Returns: undefined
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      initialize_client_progress: {
+        Args: { _user_id: string }
+        Returns: undefined
+      }
+      is_coach_of: {
+        Args: { _client_id: string; _coach_id: string }
+        Returns: boolean
+      }
+      start_module: {
+        Args: { _module_id: string; _user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "client" | "coach"
+      flag_status: "open" | "reviewed"
+      module_status: "locked" | "unlocked" | "in_progress" | "completed"
+      session_status: "pending" | "scheduled" | "completed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +460,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["client", "coach"],
+      flag_status: ["open", "reviewed"],
+      module_status: ["locked", "unlocked", "in_progress", "completed"],
+      session_status: ["pending", "scheduled", "completed"],
+    },
   },
 } as const
