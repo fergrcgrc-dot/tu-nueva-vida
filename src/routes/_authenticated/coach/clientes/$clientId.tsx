@@ -55,6 +55,7 @@ function ClientDetailPage() {
 
   const [notesDraft, setNotesDraft] = useState<Record<string, string>>({});
   const [dateDraft, setDateDraft] = useState<Record<string, string>>({});
+  const [nextStepDraft, setNextStepDraft] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string | null>(null);
 
   const completed = data.progress.filter((p) => p.status === "completed").length;
