@@ -147,7 +147,10 @@ function ModulePage() {
         setDeliverable(reply.deliverable_content);
       }
       if (reply.escalated) {
-        toast("Hemos avisado a tu coach. Te responderá en menos de 24 horas.");
+        toast(
+          reply.escalation_message ??
+            "Hemos avisado a tu coach. Te responderá en menos de 24 horas.",
+        );
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo hablar con la guía.");
