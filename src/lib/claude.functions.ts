@@ -11,7 +11,7 @@ const ClaudeInput = z.object({
     )
     .min(1),
   system: z.string().optional(),
-  model: z.string().default("claude-sonnet-4-5"),
+  model: z.string().default("claude-sonnet-5"),
   maxTokens: z.number().int().min(1).max(8192).default(1024),
 });
 
