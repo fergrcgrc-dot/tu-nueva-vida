@@ -380,6 +380,20 @@ export const createClientAccount = createServerFn({ method: "POST" })
         email_confirm: true,
       });
     if (createError || !created.user) {
+      // Log interno sin datos sensibles (nunca claves ni contraseñas).
+      console.error("[createClientAccount] admin.createUser", {
+        status: createError?.status,
+        code: createError?.code,
+        message: createError?.message,
+      });
+      const code = createError?.code ?? "";
+      const msg = (createError?.message ?? "").toLowerCase();
+      if (code === "email_exists" || msg.includes("already been registered") || msg.includes("already registered")) {
+        throw safeError("Ese correo ya tiene una cuenta. Usa otro correo.");
+      }
+      if (code === "weak_password" || msg.includes("password")) {
+        throw safeError("La contraseña no cumple los requisitos mínimos. Prueba con una más larga.");
+      }
       throw safeError("No se pudo crear la cuenta. Revisa el correo e inténtalo de nuevo.");
     }
     const clientId = created.user.id;
