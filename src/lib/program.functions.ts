@@ -305,7 +305,27 @@ export const getClientDetail = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => ClientIdInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertCoach(supabase, userId);
+
+    // El administrador puede supervisar cualquier ficha, pero queda registrado.
+    const { data: isAdmin } = await supabase.rpc("is_platform_admin", {
+      _user_id: userId,
+    });
+    if (isAdmin) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin.from("audit_logs").insert({
+        actor_user_id: userId,
+        action: "admin_viewed_client",
+        target_type: "profile",
+        target_id: data.clientId,
+      });
+    } else {
+      await assertCoach(supabase, userId);
+      const { data: assigned } = await supabase.rpc("is_active_coach_of", {
+        _coach_id: userId,
+        _client_id: data.clientId,
+      });
+      if (!assigned) throw safeError("Este cliente no está asignado a ti.");
+    }
 
     const [profileRes, progressRes, deliverablesRes, flagsRes, sessionsRes] =
       await Promise.all([
