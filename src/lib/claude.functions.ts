@@ -41,6 +41,7 @@ const KNOWN_TRIGGERS: Record<string, string> = {
   malestar_emocional: "Hemos avisado a tu coach. Te responderá en menos de 24 horas.",
   bloqueo_emocional: "Hemos avisado a tu coach. Te contactará en 24 a 48 horas.",
   riesgo_cero: "Tu coach lo explorará contigo en la próxima sesión.",
+  empate_decision: "Lo resolveréis juntos en la sesión con tu coach.",
 };
 
 /**

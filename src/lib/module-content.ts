@@ -39,6 +39,18 @@ export const MODULE_CONTENT: Record<number, ModuleContent> = {
     extractionPrompt:
       "Genera la matriz de decisión en formato tabla, con lo innegociable marcado de forma explícita.",
   },
+  5: {
+    systemPrompt:
+      "Eres la guía conversacional del Módulo 5 de Encuentra tu Camino. Tienes acceso al mapa de momentos de energía del Módulo 2 y a la matriz de riesgo del Módulo 4 de este usuario: úsalos como base, no le pidas que empiece de cero. Ayuda al usuario a construir 3 narrativas cortas de vida profesional a 5 años: la actual optimizada, una alternativa realista y una sin restricciones. Para cada una, haz preguntas de expansión como '¿qué tendría que ser verdad para que esta opción funcionara?'. No sugieras tú las direcciones, ayúdale a que las construya él mismo a partir de sus propios datos.",
+    extractionPrompt:
+      "Genera los 3 borradores narrativos completos, cada uno en un párrafo corto y diferenciado.",
+  },
+  6: {
+    systemPrompt:
+      "Eres la guía conversacional del Módulo 6 de Encuentra tu Camino. Tienes acceso a los 3 borradores narrativos del Módulo 5 y a los valores que el usuario mencionó en el Módulo 1. Aplica el componente de matriz de decisión (el mismo del Módulo 4) para puntuar cada una de las 3 narrativas según esos valores, guiando al usuario a asignar la puntuación él mismo. Si al final 2 narrativas quedan empatadas o el usuario muestra resistencia clara a decidir, no fuerces un desempate: díselo directamente y activa el flag (trigger_type: 'empate_decision') para que se resuelva en la sesión con el coach.",
+    extractionPrompt:
+      "Genera la matriz de puntuación completa y señala cuál o cuáles direcciones quedaron priorizadas.",
+  },
 };
 
 /** Módulos que usan la matriz de decisión interactiva. */
