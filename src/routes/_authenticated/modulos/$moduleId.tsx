@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { ArrowLeft, Lock, Save, Send, CheckCircle2, LifeBuoy, FileText } from "lucide-react";
 
 import { AppHeader } from "@/components/AppHeader";
+import { DecisionMatrix, type MatrixItem } from "@/components/DecisionMatrix";
+import { usesDecisionMatrix } from "@/lib/module-content";
 import { askModuleClaude, generateDeliverable } from "@/lib/claude.functions";
 import {
   completeModule,
@@ -70,6 +72,8 @@ function ModulePage() {
   const [completing, setCompleting] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [askingHelp, setAskingHelp] = useState(false);
+  const [matrix, setMatrix] = useState<MatrixItem[]>([]);
+  const showMatrix = usesDecisionMatrix(module.week_number);
 
   async function handleHumanContact() {
     if (askingHelp) return;
@@ -88,7 +92,20 @@ function ModulePage() {
     if (generating || chat.length === 0) return;
     setGenerating(true);
     try {
-      const result = await callGenerate({ data: { moduleId, history: chat.slice(-60) } });
+      const result = await callGenerate({
+        data: {
+          moduleId,
+          history: chat.slice(-60),
+          ...(showMatrix && matrix.length > 0
+            ? {
+                matrix: matrix.map((i) => ({
+                  text: i.text,
+                  nonNegotiable: i.nonNegotiable,
+                })),
+              }
+            : {}),
+        },
+      });
       setDeliverable(result.content);
       toast.success("Entregable generado y módulo completado.");
       await queryClient.invalidateQueries();
@@ -130,7 +147,10 @@ function ModulePage() {
         setDeliverable(reply.deliverable_content);
       }
       if (reply.escalated) {
-        toast("Hemos avisado a tu coach. Te responderá en menos de 24 horas.");
+        toast(
+          reply.escalation_message ??
+            "Hemos avisado a tu coach. Te responderá en menos de 24 horas.",
+        );
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo hablar con la guía.");
@@ -250,11 +270,32 @@ function ModulePage() {
               </form>
             </section>
 
+            {/* Matriz de decisión (módulos 4 y 6) */}
+            {showMatrix && (
+              <section className="card-depth rounded-2xl p-6">
+                <h2 className="font-display text-lg font-semibold text-foreground">
+                  Matriz de decisión
+                </h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Añade cada elemento y decide si estás dispuesto a arriesgarlo o es
+                  innegociable. Puedes arrastrarlo de una columna a otra.
+                </p>
+                <div className="mt-4">
+                  <DecisionMatrix items={matrix} onChange={setMatrix} />
+                </div>
+              </section>
+            )}
+
             {/* Entregable */}
             <section className="card-depth rounded-2xl p-6">
               <h2 className="font-display text-lg font-semibold text-foreground">
                 Tu entregable
               </h2>
+              {showMatrix && matrix.length > 0 && (
+                <div className="mt-4">
+                  <DecisionMatrix items={matrix} onChange={setMatrix} readOnly />
+                </div>
+              )}
               <textarea
                 value={deliverable}
                 onChange={(e) => setDeliverable(e.target.value)}

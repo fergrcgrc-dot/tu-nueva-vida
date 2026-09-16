@@ -33,6 +33,14 @@ const ModuleReply = z.object({
 
 export type ModuleClaudeReply = z.infer<typeof ModuleReply> & {
   escalated?: boolean;
+  escalation_message?: string;
+};
+
+/** Tipos de aviso reconocidos por el equipo de coaching. */
+const KNOWN_TRIGGERS: Record<string, string> = {
+  malestar_emocional: "Hemos avisado a tu coach. Te responderá en menos de 24 horas.",
+  bloqueo_emocional: "Hemos avisado a tu coach. Te contactará en 24 a 48 horas.",
+  riesgo_cero: "Tu coach lo explorará contigo en la próxima sesión.",
 };
 
 /**
@@ -181,7 +189,7 @@ export const askModuleClaude = createServerFn({ method: "POST" })
       '{"message": string, "should_save_deliverable": boolean, "deliverable_content": string | null, "flag": string | null}',
       "- message: tu respuesta al cliente, en español.",
       "- should_save_deliverable: true solo cuando la conversación del módulo esté completa; el cliente decide guardarlo con una acción explícita.",
-      "- flag: null normalmente. Usa exactamente \"malestar_emocional\" si detectas desesperanza, indefensión total, deterioro grave de salud mental o una relación en crisis. Usa un texto breve para cualquier otra señal que el coach humano deba revisar.",
+      "- flag: null normalmente. Usa exactamente \"malestar_emocional\" (desesperanza, indefensión total, deterioro grave de salud mental o relación en crisis), \"bloqueo_emocional\" (vergüenza intensa, bloqueo total del ejercicio o intento de cerrar la conversación sin completarla) o \"riesgo_cero\" (marca como innegociable prácticamente todo, sin margen de riesgo). Usa un texto breve para cualquier otra señal que el coach humano deba revisar.",
     ].join("\n");
 
     const messages = [
@@ -207,8 +215,8 @@ export const askModuleClaude = createServerFn({ method: "POST" })
 
     // Escalado automático al coach humano.
     if (reply.flag) {
-      const triggerType =
-        reply.flag.trim() === "malestar_emocional" ? "malestar_emocional" : "senal_guia";
+      const raw = reply.flag.trim();
+      const triggerType = raw in KNOWN_TRIGGERS ? raw : "senal_guia";
       const { error: flagError } = await supabase.from("flags").insert({
         user_id: userId,
         module_id: moduleRow.id,
@@ -218,14 +226,23 @@ export const askModuleClaude = createServerFn({ method: "POST" })
       });
       if (flagError) console.error("[claude] no se pudo registrar el aviso");
       reply.escalated = true;
+      reply.escalation_message =
+        KNOWN_TRIGGERS[triggerType] ??
+        "Hemos avisado a tu coach. Te responderá en menos de 24 horas.";
     }
 
     return reply;
   });
 
+const MatrixItem = z.object({
+  text: z.string().min(1).max(500),
+  nonNegotiable: z.boolean(),
+});
+
 const GenerateDeliverableInput = z.object({
   moduleId: z.string().uuid(),
   history: z.array(HistoryMessage).min(1).max(60),
+  matrix: z.array(MatrixItem).max(40).optional(),
 });
 
 /**
@@ -250,7 +267,21 @@ export const generateDeliverable = createServerFn({ method: "POST" })
         content.extractionPrompt,
         "Escribe en español, en formato de documento claro con títulos. No inventes datos que el cliente no haya dicho.",
       ].join("\n"),
-      [{ role: "user", content: `Conversación completa:\n\n${transcript}` }],
+      [
+        {
+          role: "user",
+          content:
+            `Conversación completa:\n\n${transcript}` +
+            (data.matrix && data.matrix.length > 0
+              ? `\n\nMatriz de decisión completada por el cliente:\n${data.matrix
+                  .map(
+                    (i) =>
+                      `- ${i.text} → ${i.nonNegotiable ? "INNEGOCIABLE" : "dispuesto a arriesgar"}`,
+                  )
+                  .join("\n")}`
+              : ""),
+        },
+      ],
       3000,
     );
 
