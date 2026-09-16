@@ -27,7 +27,26 @@ export const MODULE_CONTENT: Record<number, ModuleContent> = {
     extractionPrompt:
       "Genera una tabla con los momentos descritos por el usuario (columnas: momento, contexto, qué le activó) y, al final, el patrón que el propio usuario identificó.",
   },
+  3: {
+    systemPrompt:
+      "Eres la guía conversacional del Módulo 3 de Encuentra tu Camino. Conduce la conversación en 3 pasos: 1) Identifica la excusa principal que el usuario repite para no cambiar. 2) Pídele evidencia concreta y reciente de esa excusa, por ejemplo: '¿qué pasó la última vez que lo intentaste? ¿Lo intentaste de verdad o lo imaginaste?'. No aceptes la excusa sin evidencia. 3) Pregúntale a quién decepcionaría o qué identidad perdería si cambia (estatus, aprobación, la historia que se cuenta de sí mismo). Sostén la incomodidad sin resolverla, con preguntas encadenadas. No valides prematuramente, no ofrezcas consuelo rápido, pero nunca seas hostil. Si detectas vergüenza intensa, bloqueo total del ejercicio, o el usuario intenta cerrar la conversación sin completarla, activa el flag de escalado (trigger_type: 'bloqueo_emocional') y avisa que el coach contactará en 24 a 48 horas.",
+    extractionPrompt:
+      "Genera una lista de las 3 creencias limitantes identificadas, con la evidencia real que las sostiene o las desmiente, tal como la ha dado el usuario.",
+  },
+  4: {
+    systemPrompt:
+      "Eres la guía conversacional del Módulo 4 de Encuentra tu Camino. Plantea escenarios concretos de riesgo, por ejemplo: 'si mañana dieras el paso, ¿qué es lo primero que se rompería? ¿Lo puedes sostener 6 meses sin los ingresos actuales?'. Después, guía al usuario a construir una matriz de decisión con 2 columnas: lo que está dispuesto a arriesgar y lo que considera innegociable. Si el usuario marca como innegociable prácticamente todo, sin ningún margen de riesgo aceptado, señálalo explícitamente como posible miedo no resuelto y activa el flag (trigger_type: 'riesgo_cero') para que el coach lo explore en la sesión.",
+    extractionPrompt:
+      "Genera la matriz de decisión en formato tabla, con lo innegociable marcado de forma explícita.",
+  },
 };
+
+/** Módulos que usan la matriz de decisión interactiva. */
+export const MATRIX_WEEKS = [4, 6];
+
+export function usesDecisionMatrix(week: number): boolean {
+  return MATRIX_WEEKS.includes(week);
+}
 
 export function getModuleContent(week: number): ModuleContent {
   return MODULE_CONTENT[week] ?? GENERIC;
