@@ -72,6 +72,8 @@ function ModulePage() {
   const [completing, setCompleting] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [askingHelp, setAskingHelp] = useState(false);
+  const [matrix, setMatrix] = useState<MatrixItem[]>([]);
+  const showMatrix = usesDecisionMatrix(module.week_number);
 
   async function handleHumanContact() {
     if (askingHelp) return;
