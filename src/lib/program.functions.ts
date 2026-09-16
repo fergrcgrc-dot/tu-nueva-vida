@@ -15,17 +15,27 @@ function safeError(message: string): Error {
 /* Rol y sesión                                                        */
 /* ------------------------------------------------------------------ */
 
-export type AppRole = "client" | "coach";
+export type AppRole = "client" | "coach" | "platform_admin";
 
 /** Rol real del usuario con sesión, leído desde user_roles. */
 export const getMyRole = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{ role: AppRole }> => {
-    const { data: isCoach } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "coach",
-    });
-    return { role: isCoach ? "coach" : "client" };
+  .handler(async ({ context }): Promise<{ role: AppRole; status: string }> => {
+    const [adminRes, coachRes, profileRes] = await Promise.all([
+      context.supabase.rpc("is_platform_admin", { _user_id: context.userId }),
+      context.supabase.rpc("has_role", { _user_id: context.userId, _role: "coach" }),
+      context.supabase
+        .from("profiles")
+        .select("status")
+        .eq("id", context.userId)
+        .maybeSingle(),
+    ]);
+    const role: AppRole = adminRes.data
+      ? "platform_admin"
+      : coachRes.data
+        ? "coach"
+        : "client";
+    return { role, status: profileRes.data?.status ?? "active" };
   });
 
 /* ------------------------------------------------------------------ */
