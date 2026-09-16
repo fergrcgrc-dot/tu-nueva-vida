@@ -1,0 +1,423 @@
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+function safeError(message: string): Error {
+  return new Error(message);
+}
+
+/* ------------------------------------------------------------------ */
+/* Rol y sesión                                                        */
+/* ------------------------------------------------------------------ */
+
+export type AppRole = "client" | "coach";
+
+/** Rol real del usuario con sesión, leído desde user_roles. */
+export const getMyRole = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ role: AppRole }> => {
+    const { data: isCoach } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "coach",
+    });
+    return { role: isCoach ? "coach" : "client" };
+  });
+
+/* ------------------------------------------------------------------ */
+/* Panel del cliente                                                   */
+/* ------------------------------------------------------------------ */
+
+export const getDashboard = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+
+    const [profileRes, modulesRes, progressRes, sessionsRes] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("full_name, program_start_date")
+        .eq("id", userId)
+        .maybeSingle(),
+      supabase
+        .from("modules")
+        .select("id, phase_number, phase_name, week_number, title, objective")
+        .order("week_number", { ascending: true }),
+      supabase
+        .from("module_progress")
+        .select("module_id, status, started_at, completed_at")
+        .eq("user_id", userId),
+      supabase
+        .from("sessions_1_1")
+        .select("id, phase_number, scheduled_at, status")
+        .eq("user_id", userId)
+        .order("phase_number", { ascending: true }),
+    ]);
+
+    if (profileRes.error || modulesRes.error || progressRes.error || sessionsRes.error) {
+      throw safeError("No se pudo cargar tu programa.");
+    }
+
+    const progressByModule = new Map(
+      (progressRes.data ?? []).map((p) => [p.module_id, p]),
+    );
+
+    const modules = (modulesRes.data ?? []).map((m) => ({
+      ...m,
+      status: progressByModule.get(m.id)?.status ?? "locked",
+      started_at: progressByModule.get(m.id)?.started_at ?? null,
+      completed_at: progressByModule.get(m.id)?.completed_at ?? null,
+    }));
+
+    const nextSession =
+      (sessionsRes.data ?? []).find(
+        (s) => s.status === "scheduled" && s.scheduled_at && new Date(s.scheduled_at) >= new Date(),
+      ) ??
+      (sessionsRes.data ?? []).find((s) => s.status === "pending") ??
+      null;
+
+    return {
+      profile: profileRes.data ?? null,
+      modules,
+      nextSession,
+    };
+  });
+
+const ModuleIdInput = z.object({ moduleId: z.string().uuid() });
+
+/** Marca un módulo desbloqueado como en curso (validado en base de datos). */
+export const startModule = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ModuleIdInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("start_module", {
+      _user_id: context.userId,
+      _module_id: data.moduleId,
+    });
+    if (error) throw safeError("No se pudo iniciar el módulo.");
+    return { ok: true };
+  });
+
+/**
+ * Completa un módulo. La lógica (estado válido, desbloqueo de la semana
+ * siguiente) vive íntegramente en la función de base de datos; desde el
+ * navegador no se puede saltar ninguna semana.
+ */
+export const completeModule = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ModuleIdInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("complete_module", {
+      _user_id: context.userId,
+      _module_id: data.moduleId,
+    });
+    if (error) {
+      if (error.message.includes("module_locked")) {
+        throw safeError("Este módulo todavía está bloqueado.");
+      }
+      throw safeError("No se pudo completar el módulo.");
+    }
+    return { ok: true };
+  });
+
+const SaveDeliverableInput = z.object({
+  moduleId: z.string().uuid(),
+  content: z.string().min(1).max(20000),
+});
+
+/** Guarda el entregable del módulo (acción explícita del cliente). */
+export const saveDeliverable = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => SaveDeliverableInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    // Solo en módulos no bloqueados.
+    const { data: progress } = await supabase
+      .from("module_progress")
+      .select("status")
+      .eq("user_id", userId)
+      .eq("module_id", data.moduleId)
+      .maybeSingle();
+    if (!progress || progress.status === "locked") {
+      throw safeError("Este módulo todavía está bloqueado.");
+    }
+
+    const { data: existing } = await supabase
+      .from("deliverables")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("module_id", data.moduleId)
+      .maybeSingle();
+
+    if (existing) {
+      const { error } = await supabase
+        .from("deliverables")
+        .update({ content: data.content })
+        .eq("id", existing.id);
+      if (error) throw safeError("No se pudo guardar el entregable.");
+      return { ok: true, deliverableId: existing.id };
+    }
+
+    const { data: inserted, error } = await supabase
+      .from("deliverables")
+      .insert({ user_id: userId, module_id: data.moduleId, content: data.content })
+      .select("id")
+      .single();
+    if (error) throw safeError("No se pudo guardar el entregable.");
+    return { ok: true, deliverableId: inserted.id as string };
+  });
+
+/** Entregables del propio cliente (para saber cuáles módulos tienen trabajo guardado). */
+export const getMyDeliverables = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("deliverables")
+      .select("id, module_id, content, updated_at")
+      .eq("user_id", context.userId)
+      .order("created_at", { ascending: true });
+    if (error) throw safeError("No se pudieron cargar tus entregables.");
+    return data ?? [];
+  });
+
+/* ------------------------------------------------------------------ */
+/* Panel del coach                                                     */
+/* ------------------------------------------------------------------ */
+
+async function assertCoach(
+  supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> },
+  userId: string,
+) {
+  const { data: isCoach } = await supabase.rpc("has_role", {
+    _user_id: userId,
+    _role: "coach",
+  });
+  if (!isCoach) throw safeError("No tienes permiso para ver esta sección.");
+}
+
+export const getCoachClients = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    await assertCoach(supabase, userId);
+
+    const { data: assignments, error } = await supabase
+      .from("coach_clients")
+      .select("client_id, profiles:client_id(full_name, program_start_date)")
+      .eq("coach_id", userId);
+    if (error) throw safeError("No se pudieron cargar los clientes.");
+
+    const clientIds = (assignments ?? []).map((a) => a.client_id);
+    if (clientIds.length === 0) return [];
+
+    const [progressRes, flagsRes] = await Promise.all([
+      supabase
+        .from("module_progress")
+        .select("user_id, status, modules:module_id(week_number)")
+        .in("user_id", clientIds),
+      supabase.from("flags").select("user_id, status").in("user_id", clientIds),
+    ]);
+    if (progressRes.error || flagsRes.error) {
+      throw safeError("No se pudieron cargar las métricas.");
+    }
+
+    return (assignments ?? []).map((a) => {
+      const rows = (progressRes.data ?? []).filter((p) => p.user_id === a.client_id);
+      const completed = rows.filter((p) => p.status === "completed");
+      const currentWeek =
+        rows
+          .filter((p) => p.status === "in_progress" || p.status === "unlocked")
+          .map((p) => (p.modules as { week_number: number } | null)?.week_number ?? 0)
+          .sort((x, y) => x - y)[0] ?? null;
+      const openFlags = (flagsRes.data ?? []).filter(
+        (f) => f.user_id === a.client_id && f.status === "open",
+      ).length;
+      const profile = a.profiles as { full_name: string | null; program_start_date: string | null } | null;
+      return {
+        clientId: a.client_id,
+        fullName: profile?.full_name ?? null,
+        programStartDate: profile?.program_start_date ?? null,
+        completedCount: completed.length,
+        currentWeek,
+        openFlags,
+      };
+    });
+  });
+
+const ClientIdInput = z.object({ clientId: z.string().uuid() });
+
+export const getClientDetail = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ClientIdInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCoach(supabase, userId);
+
+    const [profileRes, progressRes, deliverablesRes, flagsRes, sessionsRes] =
+      await Promise.all([
+        supabase
+          .from("profiles")
+          .select("full_name, program_start_date")
+          .eq("id", data.clientId)
+          .maybeSingle(),
+        supabase
+          .from("module_progress")
+          .select("status, started_at, completed_at, modules:module_id(id, week_number, phase_number, title)")
+          .eq("user_id", data.clientId),
+        supabase
+          .from("deliverables")
+          .select("id, content, updated_at, modules:module_id(week_number, title)")
+          .eq("user_id", data.clientId)
+          .order("created_at", { ascending: true }),
+        supabase
+          .from("flags")
+          .select("id, trigger_type, status, note, created_at, modules:module_id(week_number, title)")
+          .eq("user_id", data.clientId)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("sessions_1_1")
+          .select("id, phase_number, scheduled_at, status, coach_notes")
+          .eq("user_id", data.clientId)
+          .order("phase_number", { ascending: true }),
+      ]);
+
+    if (
+      profileRes.error || progressRes.error || deliverablesRes.error ||
+      flagsRes.error || sessionsRes.error
+    ) {
+      throw safeError("No se pudo cargar el detalle del cliente.");
+    }
+    if (!profileRes.data) throw safeError("Este cliente no existe o no está asignado a ti.");
+
+    return {
+      profile: profileRes.data,
+      progress: (progressRes.data ?? [])
+        .map((p) => ({
+          status: p.status,
+          startedAt: p.started_at,
+          completedAt: p.completed_at,
+          module: p.modules as {
+            id: string; week_number: number; phase_number: number; title: string;
+          } | null,
+        }))
+        .filter((p) => p.module)
+        .sort((a, b) => (a.module!.week_number ?? 0) - (b.module!.week_number ?? 0)),
+      deliverables: deliverablesRes.data ?? [],
+      flags: flagsRes.data ?? [],
+      sessions: sessionsRes.data ?? [],
+    };
+  });
+
+const ReviewFlagInput = z.object({ flagId: z.string().uuid() });
+
+export const reviewFlag = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ReviewFlagInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("flags")
+      .update({ status: "reviewed" })
+      .eq("id", data.flagId);
+    if (error) throw safeError("No se pudo actualizar el aviso.");
+    return { ok: true };
+  });
+
+const UpdateSessionInput = z.object({
+  sessionId: z.string().uuid(),
+  scheduledAt: z.string().datetime({ offset: true }).nullable().optional(),
+  status: z.enum(["pending", "scheduled", "completed"]).optional(),
+  coachNotes: z.string().max(10000).optional(),
+});
+
+export const updateSession = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => UpdateSessionInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const patch: Record<string, unknown> = {};
+    if (data.scheduledAt !== undefined) patch.scheduled_at = data.scheduledAt;
+    if (data.status !== undefined) patch.status = data.status;
+    if (data.coachNotes !== undefined) patch.coach_notes = data.coachNotes;
+
+    const { error } = await context.supabase
+      .from("sessions_1_1")
+      .update(patch)
+      .eq("id", data.sessionId);
+    if (error) throw safeError("No se pudo actualizar la sesión.");
+    return { ok: true };
+  });
+
+/* ------------------------------------------------------------------ */
+/* Alta de clientes (solo coach)                                       */
+/* ------------------------------------------------------------------ */
+
+const CreateClientInput = z.object({
+  email: z.string().email(),
+  password: z.string().min(8).max(128),
+  fullName: z.string().min(1).max(120),
+  programStartDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+});
+
+/**
+ * Crea la cuenta de un cliente invitado. Privilegiada: verifica el rol de
+ * coach del llamante antes de usar el cliente administrador. No existe
+ * registro público en la app.
+ */
+export const createClientAccount = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => CreateClientInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCoach(supabase, userId);
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: created, error: createError } =
+      await supabaseAdmin.auth.admin.createUser({
+        email: data.email,
+        password: data.password,
+        email_confirm: true,
+      });
+    if (createError || !created.user) {
+      throw safeError("No se pudo crear la cuenta. Revisa el correo e inténtalo de nuevo.");
+    }
+    const clientId = created.user.id;
+
+    const { error: profileError } = await supabaseAdmin.from("profiles").insert({
+      id: clientId,
+      role: "client",
+      full_name: data.fullName,
+      program_start_date: data.programStartDate,
+    });
+    if (profileError) {
+      await supabaseAdmin.auth.admin.deleteUser(clientId);
+      throw safeError("No se pudo crear el perfil del cliente.");
+    }
+
+    const { error: roleError } = await supabaseAdmin
+      .from("user_roles")
+      .insert({ user_id: clientId, role: "client" });
+    if (roleError) {
+      await supabaseAdmin.auth.admin.deleteUser(clientId);
+      throw safeError("No se pudo asignar el rol del cliente.");
+    }
+
+    const { error: assignError } = await supabase
+      .from("coach_clients")
+      .insert({ coach_id: userId, client_id: clientId });
+    if (assignError) {
+      await supabaseAdmin.auth.admin.deleteUser(clientId);
+      throw safeError("No se pudo asignar el cliente a tu lista.");
+    }
+
+    // Progreso inicial: semana 1 desbloqueada, resto bloqueadas, 4 sesiones.
+    const { error: initError } = await supabaseAdmin.rpc("initialize_client_progress", {
+      _user_id: clientId,
+    });
+    if (initError) {
+      await supabaseAdmin.auth.admin.deleteUser(clientId);
+      throw safeError("No se pudo inicializar el programa del cliente.");
+    }
+
+    return { ok: true, clientId };
+  });
