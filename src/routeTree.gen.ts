@@ -15,7 +15,9 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCoachIndexRouteImport } from './routes/_authenticated/coach/index'
+import { Route as AuthenticatedCoachSeguimientosRouteImport } from './routes/_authenticated/coach/seguimientos'
 import { Route as AuthenticatedModulosModuleIdRouteImport } from './routes/_authenticated/modulos/$moduleId'
+import { Route as AuthenticatedSeguimientosFollowUpIdRouteImport } from './routes/_authenticated/seguimientos/$followUpId'
 import { Route as AuthenticatedCoachClientesClientIdRouteImport } from './routes/_authenticated/coach/clientes/$clientId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -47,10 +49,22 @@ const AuthenticatedCoachIndexRoute = AuthenticatedCoachIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedCoachRoute,
 } as any)
+const AuthenticatedCoachSeguimientosRoute =
+  AuthenticatedCoachSeguimientosRouteImport.update({
+    id: '/seguimientos',
+    path: '/seguimientos',
+    getParentRoute: () => AuthenticatedCoachRoute,
+  } as any)
 const AuthenticatedModulosModuleIdRoute =
   AuthenticatedModulosModuleIdRouteImport.update({
     id: '/modulos/$moduleId',
     path: '/modulos/$moduleId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSeguimientosFollowUpIdRoute =
+  AuthenticatedSeguimientosFollowUpIdRouteImport.update({
+    id: '/seguimientos/$followUpId',
+    path: '/seguimientos/$followUpId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedCoachClientesClientIdRoute =
@@ -65,7 +79,9 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
+  '/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
   '/coach/': typeof AuthenticatedCoachIndexRoute
   '/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
 }
@@ -73,7 +89,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
+  '/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
   '/coach': typeof AuthenticatedCoachIndexRoute
   '/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
 }
@@ -84,7 +102,9 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/coach': typeof AuthenticatedCoachRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/_authenticated/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
+  '/_authenticated/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
   '/_authenticated/coach/': typeof AuthenticatedCoachIndexRoute
   '/_authenticated/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
 }
@@ -95,7 +115,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/coach'
     | '/dashboard'
+    | '/coach/seguimientos'
     | '/modulos/$moduleId'
+    | '/seguimientos/$followUpId'
     | '/coach/'
     | '/coach/clientes/$clientId'
   fileRoutesByTo: FileRoutesByTo
@@ -103,7 +125,9 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/dashboard'
+    | '/coach/seguimientos'
     | '/modulos/$moduleId'
+    | '/seguimientos/$followUpId'
     | '/coach'
     | '/coach/clientes/$clientId'
   id:
@@ -113,7 +137,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/_authenticated/coach'
     | '/_authenticated/dashboard'
+    | '/_authenticated/coach/seguimientos'
     | '/_authenticated/modulos/$moduleId'
+    | '/_authenticated/seguimientos/$followUpId'
     | '/_authenticated/coach/'
     | '/_authenticated/coach/clientes/$clientId'
   fileRoutesById: FileRoutesById
@@ -168,11 +194,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCoachIndexRouteImport
       parentRoute: typeof AuthenticatedCoachRoute
     }
+    '/_authenticated/coach/seguimientos': {
+      id: '/_authenticated/coach/seguimientos'
+      path: '/seguimientos'
+      fullPath: '/coach/seguimientos'
+      preLoaderRoute: typeof AuthenticatedCoachSeguimientosRouteImport
+      parentRoute: typeof AuthenticatedCoachRoute
+    }
     '/_authenticated/modulos/$moduleId': {
       id: '/_authenticated/modulos/$moduleId'
       path: '/modulos/$moduleId'
       fullPath: '/modulos/$moduleId'
       preLoaderRoute: typeof AuthenticatedModulosModuleIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/seguimientos/$followUpId': {
+      id: '/_authenticated/seguimientos/$followUpId'
+      path: '/seguimientos/$followUpId'
+      fullPath: '/seguimientos/$followUpId'
+      preLoaderRoute: typeof AuthenticatedSeguimientosFollowUpIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/coach/clientes/$clientId': {
@@ -186,11 +226,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedCoachRouteChildren {
+  AuthenticatedCoachSeguimientosRoute: typeof AuthenticatedCoachSeguimientosRoute
   AuthenticatedCoachIndexRoute: typeof AuthenticatedCoachIndexRoute
   AuthenticatedCoachClientesClientIdRoute: typeof AuthenticatedCoachClientesClientIdRoute
 }
 
 const AuthenticatedCoachRouteChildren: AuthenticatedCoachRouteChildren = {
+  AuthenticatedCoachSeguimientosRoute: AuthenticatedCoachSeguimientosRoute,
   AuthenticatedCoachIndexRoute: AuthenticatedCoachIndexRoute,
   AuthenticatedCoachClientesClientIdRoute:
     AuthenticatedCoachClientesClientIdRoute,
@@ -203,12 +245,15 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCoachRoute: typeof AuthenticatedCoachRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedModulosModuleIdRoute: typeof AuthenticatedModulosModuleIdRoute
+  AuthenticatedSeguimientosFollowUpIdRoute: typeof AuthenticatedSeguimientosFollowUpIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCoachRoute: AuthenticatedCoachRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedModulosModuleIdRoute: AuthenticatedModulosModuleIdRoute,
+  AuthenticatedSeguimientosFollowUpIdRoute:
+    AuthenticatedSeguimientosFollowUpIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
