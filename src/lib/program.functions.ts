@@ -1,7 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
+
+type AuthedClient = SupabaseClient<Database>;
 
 function safeError(message: string): Error {
   return new Error(message);
@@ -185,10 +189,7 @@ export const getMyDeliverables = createServerFn({ method: "GET" })
 /* Panel del coach                                                     */
 /* ------------------------------------------------------------------ */
 
-async function assertCoach(
-  supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> },
-  userId: string,
-) {
+async function assertCoach(supabase: AuthedClient, userId: string) {
   const { data: isCoach } = await supabase.rpc("has_role", {
     _user_id: userId,
     _role: "coach",
@@ -334,7 +335,7 @@ export const updateSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => UpdateSessionInput.parse(input))
   .handler(async ({ data, context }) => {
-    const patch: Record<string, unknown> = {};
+    const patch: Database["public"]["Tables"]["sessions_1_1"]["Update"] = {};
     if (data.scheduledAt !== undefined) patch.scheduled_at = data.scheduledAt;
     if (data.status !== undefined) patch.status = data.status;
     if (data.coachNotes !== undefined) patch.coach_notes = data.coachNotes;
