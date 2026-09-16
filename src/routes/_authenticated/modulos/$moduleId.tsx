@@ -261,6 +261,14 @@ function ModulePage() {
               />
               <div className="mt-4 flex flex-wrap gap-3">
                 <button
+                  onClick={handleGenerateDeliverable}
+                  disabled={generating || chat.length === 0}
+                  className="ember-glow inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                >
+                  <FileText className="h-4 w-4" aria-hidden />
+                  {generating ? "Generando…" : "Generar entregable"}
+                </button>
+                <button
                   onClick={handleSaveDeliverable}
                   disabled={saving || !deliverable.trim()}
                   className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary/50 disabled:opacity-50"
