@@ -215,8 +215,8 @@ export const askModuleClaude = createServerFn({ method: "POST" })
 
     // Escalado automático al coach humano.
     if (reply.flag) {
-      const triggerType =
-        reply.flag.trim() === "malestar_emocional" ? "malestar_emocional" : "senal_guia";
+      const raw = reply.flag.trim();
+      const triggerType = raw in KNOWN_TRIGGERS ? raw : "senal_guia";
       const { error: flagError } = await supabase.from("flags").insert({
         user_id: userId,
         module_id: moduleRow.id,
