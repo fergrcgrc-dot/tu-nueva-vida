@@ -259,11 +259,7 @@ export const getCoachClients = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     await assertCoach(supabase, userId);
 
-    const { data: assignments, error } = await supabase
-      .from("coach_clients")
-      .select("client_id, profiles:client_id(full_name, program_start_date)")
-      .eq("coach_id", userId);
-    if (error) throw safeError("No se pudieron cargar los clientes.");
+    const assignments = await activeClientIds(supabase, userId);
 
     const clientIds = (assignments ?? []).map((a) => a.client_id);
     if (clientIds.length === 0) return [];
