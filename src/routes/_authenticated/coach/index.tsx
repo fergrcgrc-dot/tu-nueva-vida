@@ -3,7 +3,7 @@ import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-
 import { useServerFn } from "@tanstack/react-start";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
-import { UserPlus, Flag, ArrowRight } from "lucide-react";
+import { UserPlus, Flag, ArrowRight, CalendarClock } from "lucide-react";
 
 import { AppHeader } from "@/components/AppHeader";
 import { createClientAccount, getCoachClients } from "@/lib/program.functions";
@@ -78,13 +78,22 @@ function CoachPage() {
               {clients.length} {clients.length === 1 ? "cliente asignado" : "clientes asignados"}
             </p>
           </div>
-          <button
-            onClick={() => setShowForm((v) => !v)}
-            className="ember-glow inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            <UserPlus className="h-4 w-4" aria-hidden />
-            Invitar cliente
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              to="/coach/seguimientos"
+              className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-primary/50"
+            >
+              <CalendarClock className="h-4 w-4 text-primary" aria-hidden />
+              Seguimientos pendientes
+            </Link>
+            <button
+              onClick={() => setShowForm((v) => !v)}
+              className="ember-glow inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              <UserPlus className="h-4 w-4" aria-hidden />
+              Invitar cliente
+            </button>
+          </div>
         </div>
 
         {showForm && (

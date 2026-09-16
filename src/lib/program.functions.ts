@@ -37,7 +37,7 @@ export const getDashboard = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
 
-    const [profileRes, modulesRes, progressRes, sessionsRes] = await Promise.all([
+    const [profileRes, modulesRes, progressRes, sessionsRes, followUpsRes] = await Promise.all([
       supabase
         .from("profiles")
         .select("full_name, program_start_date")
@@ -56,9 +56,17 @@ export const getDashboard = createServerFn({ method: "GET" })
         .select("id, phase_number, scheduled_at, status")
         .eq("user_id", userId)
         .order("phase_number", { ascending: true }),
+      supabase
+        .from("follow_ups")
+        .select("id, day_offset, due_at, status")
+        .eq("user_id", userId)
+        .order("day_offset", { ascending: true }),
     ]);
 
-    if (profileRes.error || modulesRes.error || progressRes.error || sessionsRes.error) {
+    if (
+      profileRes.error || modulesRes.error || progressRes.error ||
+      sessionsRes.error || followUpsRes.error
+    ) {
       throw safeError("No se pudo cargar tu programa.");
     }
 
@@ -84,6 +92,7 @@ export const getDashboard = createServerFn({ method: "GET" })
       profile: profileRes.data ?? null,
       modules,
       nextSession,
+      followUps: followUpsRes.data ?? [],
     };
   });
 
@@ -296,7 +305,7 @@ export const getClientDetail = createServerFn({ method: "GET" })
           .order("created_at", { ascending: false }),
         supabase
           .from("sessions_1_1")
-          .select("id, phase_number, scheduled_at, status, coach_notes")
+          .select("id, phase_number, scheduled_at, status, coach_notes, next_step_recommended")
           .eq("user_id", data.clientId)
           .order("phase_number", { ascending: true }),
       ]);
@@ -347,6 +356,10 @@ const UpdateSessionInput = z.object({
   scheduledAt: z.string().datetime({ offset: true }).nullable().optional(),
   status: z.enum(["pending", "scheduled", "completed"]).optional(),
   coachNotes: z.string().max(10000).optional(),
+  nextStepRecommended: z
+    .enum(["acompanamiento_1_1", "retiro_leon"])
+    .nullable()
+    .optional(),
 });
 
 export const updateSession = createServerFn({ method: "POST" })
@@ -357,6 +370,9 @@ export const updateSession = createServerFn({ method: "POST" })
     if (data.scheduledAt !== undefined) patch.scheduled_at = data.scheduledAt;
     if (data.status !== undefined) patch.status = data.status;
     if (data.coachNotes !== undefined) patch.coach_notes = data.coachNotes;
+    if (data.nextStepRecommended !== undefined) {
+      patch.next_step_recommended = data.nextStepRecommended;
+    }
 
     const { error } = await context.supabase
       .from("sessions_1_1")
@@ -364,6 +380,42 @@ export const updateSession = createServerFn({ method: "POST" })
       .eq("id", data.sessionId);
     if (error) throw safeError("No se pudo actualizar la sesión.");
     return { ok: true };
+  });
+
+/** Seguimientos de 30 y 60 días de todos los clientes del coach. */
+export const getCoachFollowUps = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    await assertCoach(supabase, userId);
+
+    const { data: assignments, error: assignError } = await supabase
+      .from("coach_clients")
+      .select("client_id, profiles:client_id(full_name)")
+      .eq("coach_id", userId);
+    if (assignError) throw safeError("No se pudieron cargar los seguimientos.");
+
+    const clientIds = (assignments ?? []).map((a) => a.client_id);
+    if (clientIds.length === 0) return [];
+
+    const { data: followUps, error } = await supabase
+      .from("follow_ups")
+      .select("id, user_id, day_offset, due_at, status, summary, completed_at")
+      .in("user_id", clientIds)
+      .order("due_at", { ascending: true });
+    if (error) throw safeError("No se pudieron cargar los seguimientos.");
+
+    const nameById = new Map(
+      (assignments ?? []).map((a) => [
+        a.client_id,
+        (a.profiles as { full_name: string | null } | null)?.full_name ?? null,
+      ]),
+    );
+
+    return (followUps ?? []).map((f) => ({
+      ...f,
+      fullName: nameById.get(f.user_id) ?? null,
+    }));
   });
 
 /* ------------------------------------------------------------------ */

@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { getModuleContent } from "@/lib/module-content";
+import { CHECKIN_CONTENT, getModuleContent } from "@/lib/module-content";
 import type { Database } from "@/integrations/supabase/types";
 
 /**
@@ -42,6 +42,7 @@ const KNOWN_TRIGGERS: Record<string, string> = {
   bloqueo_emocional: "Hemos avisado a tu coach. Te contactará en 24 a 48 horas.",
   riesgo_cero: "Tu coach lo explorará contigo en la próxima sesión.",
   empate_decision: "Lo resolveréis juntos en la sesión con tu coach.",
+  seguimiento_estancado: "Se lo hemos trasladado a tu coach para retomarlo contigo.",
 };
 
 /**
@@ -331,5 +332,144 @@ export const generateDeliverable = createServerFn({ method: "POST" })
       }
     }
 
+    // Cierre del programa: seguimientos automáticos a 30 y 60 días.
+    if (moduleRow.week_number === 8) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const base = Date.now();
+      for (const offset of [30, 60]) {
+        await supabaseAdmin.from("follow_ups").upsert(
+          {
+            user_id: userId,
+            day_offset: offset,
+            due_at: new Date(base + offset * 86_400_000).toISOString(),
+            status: "pending" as const,
+          },
+          { onConflict: "user_id,day_offset", ignoreDuplicates: true },
+        );
+      }
+    }
+
     return { content: text };
+  });
+
+/* ------------------------------------------------------------------ */
+/* Seguimientos a 30 y 60 días                                         */
+/* ------------------------------------------------------------------ */
+
+const FollowUpChatInput = z.object({
+  followUpId: z.string().uuid(),
+  message: z.string().min(1).max(8000),
+  history: z.array(HistoryMessage).max(40).optional(),
+});
+
+/** Comprueba que el seguimiento es del propio cliente y está disponible. */
+async function loadFollowUp(supabase: AuthedClient, userId: string, id: string) {
+  const { data, error } = await supabase
+    .from("follow_ups")
+    .select("id, day_offset, due_at, status")
+    .eq("id", id)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw safeError("No se pudo cargar el seguimiento.");
+  if (!data) throw safeError("Este seguimiento no existe.");
+  return data;
+}
+
+/** Check-in breve por IA sobre el plan a 90 días. */
+export const askFollowUpClaude = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => FollowUpChatInput.parse(input))
+  .handler(async ({ data, context }): Promise<ModuleClaudeReply> => {
+    const { supabase, userId } = context;
+    const followUp = await loadFollowUp(supabase, userId, data.followUpId);
+
+    const previous = await loadPreviousDeliverables(supabase, userId, 9);
+
+    const systemPrompt = [
+      CHECKIN_CONTENT.systemPrompt,
+      "",
+      `Este es el check-in de los ${followUp.day_offset} días posteriores al cierre del programa «Tu Nueva Vida».`,
+      previous.length > 0
+        ? `Entregables del propio cliente, incluida su hoja de ruta a 90 días:\n${previous.join("\n\n")}`
+        : "El cliente no tiene entregables guardados.",
+      "",
+      "Responde SIEMPRE con un JSON válido y nada más, con esta forma exacta:",
+      '{"message": string, "should_save_deliverable": boolean, "deliverable_content": string | null, "flag": string | null}',
+      "- message: tu respuesta al cliente, en español.",
+      '- flag: null normalmente, o exactamente "seguimiento_estancado" si el plan está parado o hay hitos estancados.',
+    ].join("\n");
+
+    const text = await callClaude(systemPrompt, [
+      ...(data.history ?? []).map((m) => ({ role: m.role, content: m.content })),
+      { role: "user" as const, content: data.message },
+    ]);
+
+    const jsonCandidate = text.replace(/^```(?:json)?\s*|\s*```$/g, "").trim();
+    let reply: ModuleClaudeReply = {
+      message: text,
+      should_save_deliverable: false,
+      deliverable_content: null,
+      flag: null,
+    };
+    try {
+      const parsed = ModuleReply.safeParse(JSON.parse(jsonCandidate));
+      if (parsed.success) reply = parsed.data;
+    } catch {
+      // respaldo de texto plano
+    }
+
+    if (reply.flag) {
+      const raw = reply.flag.trim();
+      const triggerType = raw in KNOWN_TRIGGERS ? raw : "seguimiento_estancado";
+      const { error: flagError } = await supabase.from("flags").insert({
+        user_id: userId,
+        module_id: null,
+        trigger_type: triggerType,
+        status: "open",
+        note: `Seguimiento de ${followUp.day_offset} días: ${reply.flag.slice(0, 1800)}`,
+      });
+      if (flagError) console.error("[claude] no se pudo registrar el aviso de seguimiento");
+      reply.escalated = true;
+      reply.escalation_message =
+        KNOWN_TRIGGERS[triggerType] ??
+        "Se lo hemos trasladado a tu coach para retomarlo contigo.";
+    }
+
+    return reply;
+  });
+
+const CloseFollowUpInput = z.object({
+  followUpId: z.string().uuid(),
+  history: z.array(HistoryMessage).min(1).max(40),
+});
+
+/** Cierra el check-in guardando un resumen breve para el coach. */
+export const closeFollowUp = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => CloseFollowUpInput.parse(input))
+  .handler(async ({ data, context }): Promise<{ summary: string }> => {
+    const { supabase, userId } = context;
+    const followUp = await loadFollowUp(supabase, userId, data.followUpId);
+
+    const transcript = data.history
+      .map((m) => `${m.role === "user" ? "Cliente" : "Guía"}: ${m.content}`)
+      .join("\n\n");
+
+    const summary = await callClaude(
+      CHECKIN_CONTENT.extractionPrompt,
+      [{ role: "user", content: `Conversación del check-in:\n\n${transcript}` }],
+      800,
+    );
+
+    const { error } = await supabase
+      .from("follow_ups")
+      .update({
+        status: "completed",
+        completed_at: new Date().toISOString(),
+        summary,
+      })
+      .eq("id", followUp.id);
+    if (error) throw safeError("No se pudo cerrar el seguimiento.");
+
+    return { summary };
   });

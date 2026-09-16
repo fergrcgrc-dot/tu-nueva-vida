@@ -133,6 +133,50 @@ export type Database = {
           },
         ]
       }
+      follow_ups: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          day_offset: number
+          due_at: string
+          id: string
+          status: Database["public"]["Enums"]["follow_up_status"]
+          summary: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          day_offset: number
+          due_at: string
+          id?: string
+          status?: Database["public"]["Enums"]["follow_up_status"]
+          summary?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          day_offset?: number
+          due_at?: string
+          id?: string
+          status?: Database["public"]["Enums"]["follow_up_status"]
+          summary?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "follow_ups_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       module_progress: {
         Row: {
           completed_at: string | null
@@ -246,6 +290,7 @@ export type Database = {
           coach_notes: string | null
           created_at: string
           id: string
+          next_step_recommended: Database["public"]["Enums"]["next_step"] | null
           phase_number: number
           scheduled_at: string | null
           status: Database["public"]["Enums"]["session_status"]
@@ -256,6 +301,9 @@ export type Database = {
           coach_notes?: string | null
           created_at?: string
           id?: string
+          next_step_recommended?:
+            | Database["public"]["Enums"]["next_step"]
+            | null
           phase_number: number
           scheduled_at?: string | null
           status?: Database["public"]["Enums"]["session_status"]
@@ -266,6 +314,9 @@ export type Database = {
           coach_notes?: string | null
           created_at?: string
           id?: string
+          next_step_recommended?:
+            | Database["public"]["Enums"]["next_step"]
+            | null
           phase_number?: number
           scheduled_at?: string | null
           status?: Database["public"]["Enums"]["session_status"]
@@ -332,7 +383,9 @@ export type Database = {
     Enums: {
       app_role: "client" | "coach"
       flag_status: "open" | "reviewed"
+      follow_up_status: "pending" | "completed"
       module_status: "locked" | "unlocked" | "in_progress" | "completed"
+      next_step: "acompanamiento_1_1" | "retiro_leon"
       session_status: "pending" | "scheduled" | "completed"
     }
     CompositeTypes: {
@@ -463,7 +516,9 @@ export const Constants = {
     Enums: {
       app_role: ["client", "coach"],
       flag_status: ["open", "reviewed"],
+      follow_up_status: ["pending", "completed"],
       module_status: ["locked", "unlocked", "in_progress", "completed"],
+      next_step: ["acompanamiento_1_1", "retiro_leon"],
       session_status: ["pending", "scheduled", "completed"],
     },
   },

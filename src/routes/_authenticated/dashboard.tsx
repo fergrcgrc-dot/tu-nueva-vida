@@ -113,6 +113,35 @@ function DashboardPage() {
           </section>
         )}
 
+        {/* Seguimientos de 30 y 60 días */}
+        {data.followUps.filter((f) => f.status === "pending").length > 0 && (
+          <section className="mb-10 space-y-3">
+            {data.followUps
+              .filter((f) => f.status === "pending")
+              .map((f) => (
+                <Link
+                  key={f.id}
+                  to="/seguimientos/$followUpId"
+                  params={{ followUpId: f.id }}
+                  className="card-depth flex items-center gap-4 rounded-2xl p-5 transition-all hover:border-primary/40"
+                >
+                  <CalendarDays className="h-5 w-5 shrink-0 text-gold" aria-hidden />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-foreground">
+                      Seguimiento de {f.day_offset} días
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(f.due_at) > new Date()
+                        ? `Disponible a partir del ${new Date(f.due_at).toLocaleDateString("es-ES", { dateStyle: "medium", timeZone: "UTC" })}`
+                        : "Cuéntanos cómo va tu plan a 90 días"}
+                    </p>
+                  </div>
+                  <ArrowRight className="h-5 w-5 shrink-0 text-primary" aria-hidden />
+                </Link>
+              ))}
+          </section>
+        )}
+
         {/* Continuar */}
         {activeModule && (
           <Link
