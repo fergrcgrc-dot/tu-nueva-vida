@@ -92,7 +92,20 @@ function ModulePage() {
     if (generating || chat.length === 0) return;
     setGenerating(true);
     try {
-      const result = await callGenerate({ data: { moduleId, history: chat.slice(-60) } });
+      const result = await callGenerate({
+        data: {
+          moduleId,
+          history: chat.slice(-60),
+          ...(showMatrix && matrix.length > 0
+            ? {
+                matrix: matrix.map((i) => ({
+                  text: i.text,
+                  nonNegotiable: i.nonNegotiable,
+                })),
+              }
+            : {}),
+        },
+      });
       setDeliverable(result.content);
       toast.success("Entregable generado y módulo completado.");
       await queryClient.invalidateQueries();
