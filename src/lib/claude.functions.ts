@@ -33,6 +33,14 @@ const ModuleReply = z.object({
 
 export type ModuleClaudeReply = z.infer<typeof ModuleReply> & {
   escalated?: boolean;
+  escalation_message?: string;
+};
+
+/** Tipos de aviso reconocidos por el equipo de coaching. */
+const KNOWN_TRIGGERS: Record<string, string> = {
+  malestar_emocional: "Hemos avisado a tu coach. Te responderá en menos de 24 horas.",
+  bloqueo_emocional: "Hemos avisado a tu coach. Te contactará en 24 a 48 horas.",
+  riesgo_cero: "Tu coach lo explorará contigo en la próxima sesión.",
 };
 
 /**
