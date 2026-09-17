@@ -141,16 +141,16 @@
 
 @layer utilities {
   .card-depth {
-    background: linear-gradient(180deg, oklch(0.215 0.026 266), oklch(0.185 0.024 266));
+    background: var(--color-card);
     border: 1px solid var(--color-border);
-    box-shadow: 0 1px 0 oklch(1 0 0 / 4%) inset, 0 12px 32px -16px oklch(0 0 0 / 60%);
+    box-shadow: 0 18px 40px -28px oklch(0.4 0.09 45 / 55%);
   }
 
   .ember-glow {
-    box-shadow: 0 0 24px -6px oklch(0.72 0.14 65 / 45%);
+    box-shadow: 0 10px 28px -14px oklch(0.63 0.17 45 / 55%);
   }
 
   .text-glow {
-    text-shadow: 0 0 28px oklch(0.72 0.14 65 / 35%);
+    text-shadow: none;
   }
 }
