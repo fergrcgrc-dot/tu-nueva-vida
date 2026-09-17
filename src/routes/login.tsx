@@ -1,7 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState, type FormEvent } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { getMyRole } from "@/lib/program.functions";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -29,6 +31,7 @@ export const Route = createFileRoute("/login")({
  */
 function LoginPage() {
   const navigate = useNavigate();
+  const fetchRole = useServerFn(getMyRole);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -42,12 +45,22 @@ function LoginPage() {
       email,
       password,
     });
-    setLoading(false);
     if (signInError) {
+      setLoading(false);
       setError("Correo o contraseña incorrectos.");
       return;
     }
-    navigate({ to: "/", replace: true });
+    try {
+      const { role } = await fetchRole();
+      navigate({
+        to: role === "platform_admin" ? "/admin" : role === "coach" ? "/coach" : "/dashboard",
+        replace: true,
+      });
+    } catch {
+      navigate({ to: "/dashboard", replace: true });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -63,7 +76,7 @@ function LoginPage() {
       />
       <div className="card-depth relative w-full max-w-md rounded-2xl p-8 sm:p-10">
         <div className="mb-8 text-center">
-          <div className="ember-glow mx-auto mb-5 h-2.5 w-2.5 rounded-full bg-primary" />
+          <div className="ember-glow mx-auto mb-5 h-2.5 w-2.5 rounded-full bg-ember" />
           <h1 className="text-3xl font-semibold text-foreground">Tu Nueva Vida</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Un espacio privado. Accede con tu invitación.

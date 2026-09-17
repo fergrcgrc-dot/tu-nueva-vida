@@ -26,3 +26,5 @@
 
 ## Fuera de alcance (por la especificación)
 - Biblioteca de recursos, pagos, registro público, marketplace, funciones sociales
+
+- [ ] Unificar la paleta clara/cálida de la landing en toda la plataforma (cliente, coach, admin)
