@@ -135,14 +135,43 @@
   .landing-soft-card {
     background: var(--color-card);
     border: 1px solid var(--color-border);
-    box-shadow: 0 18px 40px -28px oklch(0.4 0.09 45 / 55%);
+    box-shadow: 0 18px 40px -28px oklch(0.55 0.09 350 / 40%);
   }
 
+  /* Gradientes pastel de la portada (rosa, melocotón, menta, lavanda) */
   .landing-hero-bg {
     background:
-      radial-gradient(ellipse 70% 60% at 50% -10%, oklch(0.9 0.09 70 / 90%), transparent 70%),
-      radial-gradient(ellipse 50% 50% at 90% 10%, oklch(0.88 0.08 40 / 70%), transparent 70%),
+      radial-gradient(ellipse 55% 55% at 10% 5%, oklch(0.91 0.09 350 / 90%), transparent 65%),
+      radial-gradient(ellipse 55% 50% at 90% 10%, oklch(0.91 0.08 55 / 90%), transparent 65%),
+      radial-gradient(ellipse 60% 45% at 15% 100%, oklch(0.92 0.07 160 / 55%), transparent 65%),
+      radial-gradient(ellipse 55% 45% at 88% 95%, oklch(0.89 0.06 300 / 55%), transparent 65%),
       var(--color-background);
+  }
+
+  .landing-band-mint {
+    background:
+      radial-gradient(ellipse 55% 70% at 85% 15%, oklch(0.92 0.07 160 / 70%), transparent 70%),
+      radial-gradient(ellipse 55% 60% at 5% 90%, oklch(0.89 0.06 300 / 45%), transparent 70%),
+      var(--color-background);
+  }
+
+  .landing-band-pink {
+    background:
+      radial-gradient(ellipse 55% 70% at 10% 10%, oklch(0.91 0.08 350 / 65%), transparent 70%),
+      radial-gradient(ellipse 55% 60% at 92% 85%, oklch(0.91 0.08 55 / 55%), transparent 70%),
+      var(--color-background);
+  }
+
+  .landing-footer-bg {
+    background:
+      radial-gradient(ellipse 60% 90% at 20% 0%, oklch(0.92 0.08 55 / 90%), transparent 75%),
+      radial-gradient(ellipse 60% 90% at 80% 20%, oklch(0.9 0.09 350 / 75%), transparent 75%),
+      radial-gradient(ellipse 55% 60% at 55% 100%, oklch(0.89 0.06 300 / 55%), transparent 75%),
+      var(--color-background);
+  }
+
+  .landing-card-gradient {
+    background: linear-gradient(150deg, oklch(0.74 0.11 45), oklch(0.68 0.14 25));
   }
 }
 
