@@ -124,6 +124,13 @@
   color: var(--color-foreground);
 }
 
+.landing h1,
+.landing h2,
+.landing h3 {
+  font-family: var(--font-body);
+  letter-spacing: -0.02em;
+}
+
 @layer utilities {
   .landing-soft-card {
     background: var(--color-card);
