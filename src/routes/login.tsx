@@ -45,12 +45,22 @@ function LoginPage() {
       email,
       password,
     });
-    setLoading(false);
     if (signInError) {
+      setLoading(false);
       setError("Correo o contraseña incorrectos.");
       return;
     }
-    navigate({ to: "/", replace: true });
+    try {
+      const { role } = await fetchRole();
+      navigate({
+        to: role === "platform_admin" ? "/admin" : role === "coach" ? "/coach" : "/dashboard",
+        replace: true,
+      });
+    } catch {
+      navigate({ to: "/dashboard", replace: true });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
