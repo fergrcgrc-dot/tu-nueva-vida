@@ -209,11 +209,7 @@ function Landing() {
               </article>
             ))}
             <article
-              className="rounded-3xl p-7"
-              style={{
-                background:
-                  "linear-gradient(150deg, oklch(0.72 0.16 60), oklch(0.6 0.18 38))",
-              }}
+              className="landing-card-gradient rounded-3xl p-7"
             >
               <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-card/25">
                 <Flame className="h-5 w-5 text-card" aria-hidden />
@@ -233,7 +229,7 @@ function Landing() {
         </div>
       </section>
 
-      <section id="metodo" className="bg-secondary/50 px-5 py-20">
+      <section id="metodo" className="landing-band-mint px-5 py-20">
         <div className="mx-auto max-w-6xl">
           <h2 className="max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">
             Cómo funciona
@@ -269,7 +265,7 @@ function Landing() {
         </div>
       </section>
 
-      <section id="testimonios" className="px-5 py-20">
+      <section id="testimonios" className="landing-band-pink px-5 py-20">
         <div className="mx-auto max-w-6xl">
           <h2 className="max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">
             Lo que cuentan quienes ya lo han hecho
@@ -309,7 +305,7 @@ function Landing() {
         </div>
       </section>
 
-      <footer className="border-t border-border px-5 py-10">
+      <footer className="landing-footer-bg px-5 py-10">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground">
           <p>Tu nueva vida — por Fernando García, fundador de Encuentra tu Camino.</p>
           <Link to="/login" className="font-medium transition-colors hover:text-foreground">
