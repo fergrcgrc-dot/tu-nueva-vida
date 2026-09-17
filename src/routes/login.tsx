@@ -76,7 +76,7 @@ function LoginPage() {
       />
       <div className="card-depth relative w-full max-w-md rounded-2xl p-8 sm:p-10">
         <div className="mb-8 text-center">
-          <div className="ember-glow mx-auto mb-5 h-2.5 w-2.5 rounded-full bg-primary" />
+          <div className="ember-glow mx-auto mb-5 h-2.5 w-2.5 rounded-full bg-ember" />
           <h1 className="text-3xl font-semibold text-foreground">Tu Nueva Vida</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Un espacio privado. Accede con tu invitación.
