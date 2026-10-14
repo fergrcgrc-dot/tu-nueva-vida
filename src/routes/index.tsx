@@ -1,13 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
+  BrainCircuit,
   CalendarClock,
-  Compass,
   Flame,
-  Laptop,
+  Gauge,
+  ListChecks,
   MessageCircleHeart,
   Mountain,
-  Sparkles,
 } from "lucide-react";
 
 import people from "@/assets/landing-people.jpg";
@@ -52,17 +52,17 @@ const FEATURES = [
     text: "Cada semana se desbloquea un módulo nuevo, sin agobios ni maratones de contenido.",
   },
   {
-    icon: Sparkles,
+    icon: BrainCircuit,
     title: "Ejercicios guiados por IA",
     text: "Un acompañante conversacional te ayuda a explorar tus valores, deseos y convicciones a tu ritmo.",
   },
   {
-    icon: Compass,
+    icon: ListChecks,
     title: "Metodología estructurada",
     text: "Basado en un proceso real de reinvención profesional, no en teoría genérica de autoayuda.",
   },
   {
-    icon: Laptop,
+    icon: Gauge,
     title: "A tu ritmo",
     text: "Accede desde cualquier dispositivo y avanza cuando tengas tiempo real.",
   },
@@ -121,9 +121,7 @@ function Landing() {
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
           <a href="#inicio" className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent">
-              <Flame className="h-4 w-4 text-ember" aria-hidden />
-            </span>
+            <img src="/logo.svg" alt="" width={32} height={32} className="h-8 w-8" aria-hidden />
             <span className="text-lg font-bold tracking-tight">Tu nueva vida</span>
           </a>
           <div className="hidden items-center gap-7 md:flex">
@@ -159,7 +157,7 @@ function Landing() {
           <p className="text-xs font-semibold tracking-[0.2em] text-accent-foreground uppercase">
             Programa de transformación profesional
           </p>
-          <h1 className="mx-auto mt-6 max-w-3xl text-5xl leading-[1.05] font-bold tracking-tight sm:text-6xl md:text-7xl">
+          <h1 className="landing-hero-title-gradient mx-auto mt-6 max-w-3xl text-5xl leading-[1.05] font-bold tracking-tight sm:text-6xl md:text-7xl">
             Tu nueva vida empieza cuando la actual ya no tiene sentido
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">

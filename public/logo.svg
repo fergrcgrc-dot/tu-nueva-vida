@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Tu nueva vida">
+  <defs>
+    <linearGradient id="brandFlame" x1="10%" y1="0%" x2="90%" y2="100%">
+      <stop offset="0%" stop-color="#C2652E"/>
+      <stop offset="55%" stop-color="#CC7A3B"/>
+      <stop offset="100%" stop-color="#D9A84E"/>
+    </linearGradient>
+  </defs>
+  <path
+    fill="url(#brandFlame)"
+    d="M32.4 4.8c1 6.9 3.9 11.4 7.9 15.9 5.1 5.8 10.5 11.9 10.5 21.6 0 11.9-9.6 20.9-21.2 20.9S8.4 54.2 8.4 42.3c0-7 2.9-12.1 6.4-16.9 1.1-1.5 2.3-3 3.4-4.6.8 4.6 3 8.1 6.2 9.1.9.3 1.8-.5 1.6-1.4-1.6-6.8-1.2-11.4 1-15.6 1.8-3.4 4.4-6 5.4-8.1Z"
+  />
+</svg>
