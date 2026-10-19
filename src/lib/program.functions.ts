@@ -55,10 +55,12 @@ export const getDashboard = createServerFn({ method: "GET" })
         .maybeSingle(),
       supabase
         .from("modules")
-        .select(
-          "id, phase_number, phase_name, week_number, title, objective, theory_content, slides_content, exercise_content",
-        )
-        .order("week_number", { ascending: true }),
+        .select("*")
+        .order("week_number", { ascending: true })
+        .overrideTypes<
+          Array<{ theory_content?: string | null; slides_content?: import("@/integrations/supabase/types").Json; exercise_content?: string | null }>,
+          { merge: true }
+        >(),
       supabase
         .from("module_progress")
         .select("module_id, status, started_at, completed_at")
