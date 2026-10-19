@@ -58,7 +58,7 @@ export const getDashboard = createServerFn({ method: "GET" })
         .select("*")
         .order("week_number", { ascending: true })
         .overrideTypes<
-          Array<{ theory_content?: string | null; slides_content?: unknown; exercise_content?: string | null }>,
+          Array<{ theory_content?: string | null; slides_content?: import("@/integrations/supabase/types").Json; exercise_content?: string | null }>,
           { merge: true }
         >(),
       supabase
