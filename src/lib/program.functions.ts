@@ -55,7 +55,9 @@ export const getDashboard = createServerFn({ method: "GET" })
         .maybeSingle(),
       supabase
         .from("modules")
-        .select("id, phase_number, phase_name, week_number, title, objective")
+        .select(
+          "id, phase_number, phase_name, week_number, title, objective, theory_content, slides_content, exercise_content",
+        )
         .order("week_number", { ascending: true }),
       supabase
         .from("module_progress")

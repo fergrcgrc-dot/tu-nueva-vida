@@ -7,6 +7,8 @@ import { ArrowLeft, Lock, Save, Send, CheckCircle2, LifeBuoy, FileText } from "l
 
 import { AppHeader } from "@/components/AppHeader";
 import { DecisionMatrix, type MatrixItem } from "@/components/DecisionMatrix";
+import { Markdown } from "@/components/Markdown";
+import { SlideDeck, type Slide } from "@/components/SlideDeck";
 import { usesDecisionMatrix } from "@/lib/module-content";
 import { askModuleClaude, generateDeliverable } from "@/lib/claude.functions";
 import {
@@ -74,6 +76,9 @@ function ModulePage() {
   const [askingHelp, setAskingHelp] = useState(false);
   const [matrix, setMatrix] = useState<MatrixItem[]>([]);
   const showMatrix = usesDecisionMatrix(module.week_number);
+  const slides = Array.isArray(module.slides_content)
+    ? (module.slides_content as unknown as Slide[])
+    : [];
 
   async function handleHumanContact() {
     if (askingHelp) return;
@@ -226,6 +231,43 @@ function ModulePage() {
           </div>
         ) : (
           <div className="space-y-8">
+            {/* Teoría de la semana */}
+            {module.theory_content && (
+              <section className="card-depth rounded-2xl p-6">
+                <h2 className="font-display text-lg font-semibold text-foreground">Teoría</h2>
+                <div className="mt-4">
+                  <Markdown content={module.theory_content} />
+                </div>
+              </section>
+            )}
+
+            {/* Guion de slides (apoyo visual en PDF) */}
+            {slides.length > 0 && (
+              <section className="card-depth rounded-2xl p-6">
+                <h2 className="font-display text-lg font-semibold text-foreground">
+                  Guion de slides
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Apoyo visual del concepto de esta semana.
+                </p>
+                <div className="mt-4">
+                  <SlideDeck slides={slides} />
+                </div>
+              </section>
+            )}
+
+            {/* Ejercicio práctico */}
+            {module.exercise_content && (
+              <section className="card-depth rounded-2xl p-6">
+                <h2 className="font-display text-lg font-semibold text-foreground">
+                  Ejercicio práctico
+                </h2>
+                <div className="mt-4">
+                  <Markdown content={module.exercise_content} />
+                </div>
+              </section>
+            )}
+
             {/* Guía del módulo (Claude, solo backend) */}
             <section className="card-depth rounded-2xl p-6">
               <h2 className="font-display text-lg font-semibold text-foreground">

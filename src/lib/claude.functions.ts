@@ -36,12 +36,16 @@ export type ModuleClaudeReply = z.infer<typeof ModuleReply> & {
   escalation_message?: string;
 };
 
-/** Tipos de aviso reconocidos por el equipo de coaching. */
+/**
+ * Triggers de escalado IA → coach, los 4 definidos para todo el programa
+ * (documento base, sección 5). "inactividad" no aparece aquí porque no es
+ * detectable dentro de un mensaje: se calcula por fecha de última actividad,
+ * a nivel de sistema, no por el modelo.
+ */
 const KNOWN_TRIGGERS: Record<string, string> = {
-  malestar_emocional: "Hemos avisado a tu coach. Te responderá en menos de 24 horas.",
-  bloqueo_emocional: "Hemos avisado a tu coach. Te contactará en 24 a 48 horas.",
-  riesgo_cero: "Tu coach lo explorará contigo en la próxima sesión.",
-  empate_decision: "Lo resolveréis juntos en la sesión con tu coach.",
+  lenguaje_crisis: "Hemos avisado a tu coach. Te responderá en menos de 24 horas.",
+  bloqueo_repetido: "Hemos avisado a tu coach. Te contactará en 24 a 48 horas.",
+  contradiccion_no_resuelta: "Tu coach lo revisará contigo en la próxima sesión.",
   seguimiento_estancado: "Se lo hemos trasladado a tu coach para retomarlo contigo.",
 };
 
@@ -191,7 +195,7 @@ export const askModuleClaude = createServerFn({ method: "POST" })
       '{"message": string, "should_save_deliverable": boolean, "deliverable_content": string | null, "flag": string | null}',
       "- message: tu respuesta al cliente, en español.",
       "- should_save_deliverable: true solo cuando la conversación del módulo esté completa; el cliente decide guardarlo con una acción explícita.",
-      "- flag: null normalmente. Usa exactamente \"malestar_emocional\" (desesperanza, indefensión total, deterioro grave de salud mental o relación en crisis), \"bloqueo_emocional\" (vergüenza intensa, bloqueo total del ejercicio o intento de cerrar la conversación sin completarla), \"riesgo_cero\" (marca como innegociable prácticamente todo, sin margen de riesgo) o \"empate_decision\" (dos narrativas empatadas o resistencia clara a decidir). Usa un texto breve para cualquier otra señal que el coach humano deba revisar.",
+      "- flag: null normalmente. Usa exactamente \"lenguaje_crisis\" (desesperanza sostenida, indefensión total, deterioro grave de salud mental), \"bloqueo_repetido\" (misma respuesta vacía o genérica en 2 o más preguntas pese a la repregunta), o \"contradiccion_no_resuelta\" (discrepancia fuerte entre lo declarado ahora y el perfil acumulado del usuario, no reconocida pese a señalarla una vez). Usa un texto breve para cualquier otra señal que el coach humano deba revisar.",
     ].join("\n");
 
     const messages = [
