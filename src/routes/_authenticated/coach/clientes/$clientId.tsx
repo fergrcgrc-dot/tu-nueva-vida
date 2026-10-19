@@ -1,17 +1,25 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  queryOptions,
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, CheckCircle2, Circle, CircleDot, Lock, Flag, Save } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Circle, CircleDot, Lock, LockOpen, Flag, Save } from "lucide-react";
 
 import { AppHeader } from "@/components/AppHeader";
+import { adminSetModuleLock } from "@/lib/admin.functions";
 import {
   getClientDetail,
   getMyRole,
   reviewFlag,
   updateSession,
 } from "@/lib/program.functions";
+
+const myRoleQuery = queryOptions({ queryKey: ["my-role"], queryFn: () => getMyRole() });
 
 const detailQuery = (clientId: string) =>
   queryOptions({
@@ -49,14 +57,31 @@ function ProgressIcon({ status }: { status: string }) {
 function ClientDetailPage() {
   const { clientId } = Route.useParams();
   const { data } = useSuspenseQuery(detailQuery(clientId));
+  const { data: myRole } = useQuery(myRoleQuery);
   const queryClient = useQueryClient();
   const callReview = useServerFn(reviewFlag);
   const callUpdateSession = useServerFn(updateSession);
+  const callSetModuleLock = useServerFn(adminSetModuleLock);
 
   const [notesDraft, setNotesDraft] = useState<Record<string, string>>({});
   const [dateDraft, setDateDraft] = useState<Record<string, string>>({});
   const [nextStepDraft, setNextStepDraft] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string | null>(null);
+
+  const isPlatformAdmin = myRole?.role === "platform_admin";
+
+  async function handleToggleModuleLock(moduleId: string, locked: boolean) {
+    setBusy(moduleId);
+    try {
+      await callSetModuleLock({ data: { clientId, moduleId, locked } });
+      toast.success(locked ? "Módulo bloqueado." : "Módulo desbloqueado.");
+      await queryClient.invalidateQueries({ queryKey: ["coach-client", clientId] });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo actualizar el módulo.");
+    } finally {
+      setBusy(null);
+    }
+  }
 
   const completed = data.progress.filter((p) => p.status === "completed").length;
 
@@ -172,6 +197,26 @@ function ClientDetailPage() {
                   <span className="flex-1 truncate text-sm text-foreground">
                     {p.module!.title}
                   </span>
+                  {isPlatformAdmin && (
+                    <button
+                      onClick={() =>
+                        handleToggleModuleLock(p.module!.id, p.status !== "locked")
+                      }
+                      disabled={busy === p.module!.id}
+                      title={
+                        p.status === "locked"
+                          ? "Desbloquear manualmente"
+                          : "Volver a bloquear"
+                      }
+                      className="shrink-0 rounded-lg border border-border p-1.5 text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground disabled:opacity-50"
+                    >
+                      {p.status === "locked" ? (
+                        <LockOpen className="h-3.5 w-3.5" aria-hidden />
+                      ) : (
+                        <Lock className="h-3.5 w-3.5" aria-hidden />
+                      )}
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>

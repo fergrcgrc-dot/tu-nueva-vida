@@ -9,6 +9,7 @@ import {
   CalendarClock,
   Flag,
   History,
+  Mail,
   ShieldCheck,
   UserPlus,
   Users,
@@ -17,8 +18,8 @@ import {
 import { AppHeader } from "@/components/AppHeader";
 import {
   adminAssignCoach,
-  adminCreateClient,
   adminCreateCoach,
+  adminInviteClient,
   adminSetAccountStatus,
   getAdminOverview,
   getAuditLogs,
@@ -235,7 +236,7 @@ function DashboardSection({ data }: { data: Overview }) {
 /* ------------------------------ Clientes ----------------------------- */
 
 function ClientsSection({ data, onChanged }: { data: Overview; onChanged: () => Promise<unknown> }) {
-  const callCreate = useServerFn(adminCreateClient);
+  const callInvite = useServerFn(adminInviteClient);
   const callAssign = useServerFn(adminAssignCoach);
   const callStatus = useServerFn(adminSetAccountStatus);
 
@@ -244,10 +245,7 @@ function ClientsSection({ data, onChanged }: { data: Overview; onChanged: () => 
   const [form, setForm] = useState({
     fullName: "",
     email: "",
-    password: "",
-    startDate: "",
     coachId: "",
-    adminNotes: "",
   });
 
   const [search, setSearch] = useState("");
@@ -278,31 +276,29 @@ function ClientsSection({ data, onChanged }: { data: Overview; onChanged: () => 
     [data.clients, search, coachFilter, statusFilter, flagsOnly, withoutCoachOnly],
   );
 
-  async function handleCreate(event: FormEvent) {
+  async function handleInvite(event: FormEvent) {
     event.preventDefault();
     if (creating) return;
     setCreating(true);
     try {
-      const result = await callCreate({
+      const result = await callInvite({
         data: {
           fullName: form.fullName.trim(),
           email: form.email.trim(),
-          password: form.password,
-          programStartDate: form.startDate,
+          redirectOrigin: window.location.origin,
           coachId: form.coachId || null,
-          adminNotes: form.adminNotes.trim() || undefined,
         },
       });
       if (result.withoutCoach) {
-        toast.warning(`«${form.fullName.trim()}» se ha creado sin coach asignado.`);
+        toast.warning(`Invitación enviada a «${form.fullName.trim()}», sin coach asignado.`);
       } else {
-        toast.success(`Cliente «${form.fullName.trim()}» creado y asignado.`);
+        toast.success(`Invitación enviada a «${form.fullName.trim()}».`);
       }
       setShowForm(false);
-      setForm({ fullName: "", email: "", password: "", startDate: "", coachId: "", adminNotes: "" });
+      setForm({ fullName: "", email: "", coachId: "" });
       await onChanged();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "No se pudo crear el cliente.");
+      toast.error(error instanceof Error ? error.message : "No se pudo enviar la invitación.");
     } finally {
       setCreating(false);
     }
@@ -340,16 +336,19 @@ function ClientsSection({ data, onChanged }: { data: Overview; onChanged: () => 
           onClick={() => setShowForm((v) => !v)}
           className="ember-glow inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
         >
-          <UserPlus className="h-4 w-4" aria-hidden />
-          Nuevo cliente
+          <Mail className="h-4 w-4" aria-hidden />
+          Invitar cliente
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleCreate} className="card-depth grid gap-4 rounded-2xl p-6 sm:grid-cols-2">
+        <form onSubmit={handleInvite} className="card-depth grid gap-4 rounded-2xl p-6 sm:grid-cols-2">
           <h2 className="font-display text-lg font-semibold text-foreground sm:col-span-2">
-            Nuevo cliente
+            Invitar cliente
           </h2>
+          <p className="text-sm text-muted-foreground sm:col-span-2">
+            Le llegará un correo de invitación para unirse y crear su propia contraseña.
+          </p>
           <input
             required
             placeholder="Nombre completo"
@@ -365,21 +364,6 @@ function ClientsSection({ data, onChanged }: { data: Overview; onChanged: () => 
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             className={inputClass}
           />
-          <input
-            required
-            minLength={8}
-            placeholder="Contraseña temporal"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            className={inputClass}
-          />
-          <input
-            required
-            type="date"
-            value={form.startDate}
-            onChange={(e) => setForm({ ...form, startDate: e.target.value })}
-            className={inputClass}
-          />
           <select
             value={form.coachId}
             onChange={(e) => setForm({ ...form, coachId: e.target.value })}
@@ -392,19 +376,13 @@ function ClientsSection({ data, onChanged }: { data: Overview; onChanged: () => 
               </option>
             ))}
           </select>
-          <input
-            placeholder="Notas administrativas (opcional)"
-            value={form.adminNotes}
-            onChange={(e) => setForm({ ...form, adminNotes: e.target.value })}
-            className={inputClass}
-          />
           <div className="flex gap-3 sm:col-span-2">
             <button
               type="submit"
               disabled={creating}
               className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
             >
-              {creating ? "Creando…" : "Crear cliente"}
+              {creating ? "Enviando…" : "Enviar invitación"}
             </button>
             <button
               type="button"

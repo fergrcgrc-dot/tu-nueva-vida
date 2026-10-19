@@ -203,44 +203,45 @@ export const getAuditLogs = createServerFn({ method: "GET" })
 /* Altas                                                               */
 /* ------------------------------------------------------------------ */
 
-const CreateClientInput = z.object({
+const InviteClientInput = z.object({
   email: z.string().email(),
-  password: z.string().min(8).max(128),
   fullName: z.string().min(1).max(120),
-  programStartDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  redirectOrigin: z.string().url(),
   coachId: z.string().uuid().nullable().optional(),
-  adminNotes: z.string().max(4000).optional(),
 });
 
-/** Alta de cliente. Solo administrador de plataforma. */
-export const adminCreateClient = createServerFn({ method: "POST" })
+/**
+ * Invita a un cliente por correo. No se fija contraseña aquí: Supabase envía
+ * un email de invitación y la persona la crea ella misma desde /set-password.
+ * Solo administrador de plataforma.
+ */
+export const adminInviteClient = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => CreateClientInput.parse(input))
+  .inputValidator((input: unknown) => InviteClientInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertPlatformAdmin(supabase, userId);
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: created, error: createError } = await supabaseAdmin.auth.admin.createUser({
-      email: data.email,
-      password: data.password,
-      email_confirm: true,
-    });
-    if (createError || !created.user) {
-      console.error("[adminCreateClient] createUser", {
-        status: createError?.status,
-        code: createError?.code,
+    const { data: created, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(
+      data.email,
+      {
+        data: { full_name: data.fullName },
+        redirectTo: `${data.redirectOrigin}/set-password`,
+      },
+    );
+    if (inviteError || !created.user) {
+      console.error("[adminInviteClient] inviteUserByEmail", {
+        status: inviteError?.status,
+        code: inviteError?.code,
       });
-      const code = createError?.code ?? "";
-      const msg = (createError?.message ?? "").toLowerCase();
+      const code = inviteError?.code ?? "";
+      const msg = (inviteError?.message ?? "").toLowerCase();
       if (code === "email_exists" || msg.includes("already")) {
-        throw safeError("Ese correo ya tiene una cuenta. Usa otro correo.");
+        throw safeError("Ese correo ya tiene una cuenta.");
       }
-      if (code === "weak_password") {
-        throw safeError("La contraseña no cumple los requisitos mínimos.");
-      }
-      throw safeError("No se pudo crear la cuenta. Revisa el correo e inténtalo de nuevo.");
+      throw safeError("No se pudo enviar la invitación. Revisa el correo e inténtalo de nuevo.");
     }
     const clientId = created.user.id;
 
@@ -248,8 +249,7 @@ export const adminCreateClient = createServerFn({ method: "POST" })
       id: clientId,
       role: "client",
       full_name: data.fullName,
-      program_start_date: data.programStartDate,
-      admin_notes: data.adminNotes ?? null,
+      program_start_date: new Date().toISOString().slice(0, 10),
       status: "active",
     });
     if (profileError) {
@@ -281,16 +281,16 @@ export const adminCreateClient = createServerFn({ method: "POST" })
         status: "active",
       });
       if (assignError) {
-        throw safeError("Cliente creado, pero no se pudo asignar el coach.");
+        throw safeError("Invitación enviada, pero no se pudo asignar el coach.");
       }
     }
 
     await writeAuditLog({
       actorUserId: userId,
-      action: "client_created",
+      action: "client_invited",
       targetType: "profile",
       targetId: clientId,
-      metadata: { conCoach: Boolean(data.coachId) },
+      metadata: { email: data.email, conCoach: Boolean(data.coachId) },
     });
 
     return { ok: true, clientId, withoutCoach: !data.coachId };
@@ -455,4 +455,50 @@ export const adminAssignCoach = createServerFn({ method: "POST" })
     });
 
     return { ok: true, unchanged: false };
+  });
+
+/* ------------------------------------------------------------------ */
+/* Desbloqueo manual de contenido                                      */
+/* ------------------------------------------------------------------ */
+
+const SetModuleLockInput = z.object({
+  clientId: z.string().uuid(),
+  moduleId: z.string().uuid(),
+  locked: z.boolean(),
+});
+
+/**
+ * Desbloquea o vuelve a bloquear un módulo concreto para un cliente concreto,
+ * sin pasar por la secuencia automática (complete_module). Solo administrador
+ * de plataforma; pensado para excepciones puntuales, no para el flujo normal.
+ */
+export const adminSetModuleLock = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => SetModuleLockInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertPlatformAdmin(supabase, userId);
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { error } = await supabaseAdmin
+      .from("module_progress")
+      .update(
+        data.locked
+          ? { status: "locked", started_at: null, completed_at: null }
+          : { status: "unlocked" },
+      )
+      .eq("user_id", data.clientId)
+      .eq("module_id", data.moduleId);
+    if (error) throw safeError("No se pudo cambiar el estado del módulo.");
+
+    await writeAuditLog({
+      actorUserId: userId,
+      action: data.locked ? "module_locked_manually" : "module_unlocked_manually",
+      targetType: "module_progress",
+      targetId: data.moduleId,
+      metadata: { clientId: data.clientId },
+    });
+
+    return { ok: true };
   });
