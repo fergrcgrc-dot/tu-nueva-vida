@@ -20,6 +20,12 @@ dist-ssr
 .wrangler/
 .dev.vars
 
+# Package manager artifacts (bun.lock is canonical)
+package-lock.json
+
+# Supabase CLI local cache
+supabase/.temp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
