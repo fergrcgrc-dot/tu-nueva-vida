@@ -294,7 +294,7 @@ function Landing() {
             compromiso y sin discurso de ventas.
           </p>
           <a
-            href="mailto:hola@encuentratucamino.es?subject=Reserva%20de%20llamada%20—%20Tu%20nueva%20vida"
+            href="mailto:hola@tunuevavida.com?subject=Reserva%20de%20llamada%20—%20Tu%20nueva%20vida"
             className="mt-8 inline-flex items-center gap-2 rounded-full bg-card px-7 py-3.5 text-sm font-semibold text-card-foreground transition-opacity hover:opacity-90"
           >
             Reserva tu llamada
@@ -305,7 +305,7 @@ function Landing() {
 
       <footer className="landing-footer-bg px-5 py-10">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground">
-          <p>Tu nueva vida — por Fernando García, fundador de Encuentra tu Camino.</p>
+          <p>Tu nueva vida — por Fernando García.</p>
           <Link to="/login" className="font-medium transition-colors hover:text-foreground">
             Acceder al programa
           </Link>

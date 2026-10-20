@@ -1,9 +1,19 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { getMyRole } from "@/lib/program.functions";
+
+const REMEMBERED_EMAIL_KEY = "tnv_remembered_email";
+
+function readRememberedEmail(): string {
+  try {
+    return localStorage.getItem(REMEMBERED_EMAIL_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -34,8 +44,15 @@ function LoginPage() {
   const fetchRole = useServerFn(getMyRole);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const remembered = readRememberedEmail();
+    if (remembered) setEmail(remembered);
+    else setRememberMe(false);
+  }, []);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -49,6 +66,12 @@ function LoginPage() {
       setLoading(false);
       setError("Correo o contraseña incorrectos.");
       return;
+    }
+    try {
+      if (rememberMe) localStorage.setItem(REMEMBERED_EMAIL_KEY, email);
+      else localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+    } catch {
+      /* localStorage no disponible: no es crítico */
     }
     try {
       const { role } = await fetchRole();
@@ -114,6 +137,16 @@ function LoginPage() {
               placeholder="••••••••"
             />
           </div>
+
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="h-4 w-4 rounded border-input"
+            />
+            Recordarme en este dispositivo
+          </label>
 
           {error && (
             <p role="alert" className="text-sm text-destructive">
