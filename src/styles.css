@@ -118,88 +118,211 @@
   }
 }
 
-/* Landing pública: misma paleta que el resto de la plataforma */
+/* ───────────────────────────────────────────────────────────────────────
+   Landing pública — "el lugar lo lleva todo": la noche en las montañas de
+   León, la hoguera del retiro. Paleta y tipografía propias de esta página,
+   escopadas a .landing; el resto de la app (dashboard, login) sigue con los
+   tokens de :root de arriba sin tocar. Dirección: tasteskill v2, dealt
+   "place-carries-it" (seed 1473325815); paleta y fotografías sustituidas por
+   las del propio proyecto (ver informe). */
 .landing {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
+  --l-bg: oklch(0.16 0.025 255);
+  --l-surface: oklch(0.215 0.025 255);
+  --l-ink: oklch(0.96 0.01 80);
+  --l-muted: oklch(0.73 0.02 255);
+  --l-accent: oklch(0.7 0.18 45);
+  --l-accent-ink: oklch(0.15 0.02 50);
+  --l-day-bg: oklch(0.95 0.006 255);
+  --l-day-ink: oklch(0.22 0.02 255);
+  --l-day-muted: oklch(0.44 0.02 255);
+  --l-font: "Switzer", "Inter", "Helvetica Neue", Arial, sans-serif;
+
+  --l-step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --l-step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --l-step-lead: clamp(1.25rem, 1rem + 1.6vw, 2.25rem);
+  --l-step-head: clamp(2rem, 1.3rem + 3.2vw, 4rem);
+
+  background: var(--l-bg);
+  color: var(--l-ink);
+  font-family: var(--l-font);
+  color-scheme: dark;
 }
 
 .landing h1,
 .landing h2,
-.landing h3 {
-  font-family: var(--font-body);
-  letter-spacing: -0.02em;
+.landing h3,
+.landing h4 {
+  font-family: var(--l-font);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  margin: 0;
+}
+
+.landing p {
+  text-wrap: pretty;
+  margin: 0;
+}
+
+.landing ::selection {
+  background: var(--l-accent);
+  color: var(--l-accent-ink);
+}
+
+.landing a:focus-visible,
+.landing button:focus-visible {
+  outline: 2px solid var(--l-accent);
+  outline-offset: 3px;
 }
 
 @layer utilities {
-  .landing-soft-card {
-    background: var(--color-card);
-    border: 1px solid var(--color-border);
-    box-shadow: 0 18px 40px -28px oklch(0.55 0.09 350 / 40%);
+  /* El único campo claro de la página: el día, para la sección "qué incluye". */
+  .landing-day {
+    background: var(--l-day-bg);
+    color: var(--l-day-ink);
   }
 
-  /* Gradientes pastel de la portada (rosa, melocotón, menta, lavanda) */
-  .landing-hero-bg {
-    background:
-      radial-gradient(ellipse 55% 55% at 10% 5%, oklch(0.91 0.09 350 / 90%), transparent 65%),
-      radial-gradient(ellipse 55% 50% at 90% 10%, oklch(0.91 0.08 55 / 90%), transparent 65%),
-      radial-gradient(ellipse 60% 45% at 15% 100%, oklch(0.92 0.07 160 / 55%), transparent 65%),
-      radial-gradient(ellipse 55% 45% at 88% 95%, oklch(0.89 0.06 300 / 55%), transparent 65%),
-      var(--color-background);
+  .landing-muted {
+    color: var(--l-muted);
   }
 
-  .landing-band-mint {
-    background:
-      radial-gradient(ellipse 55% 70% at 85% 15%, oklch(0.92 0.07 160 / 70%), transparent 70%),
-      radial-gradient(ellipse 55% 60% at 5% 90%, oklch(0.89 0.06 300 / 45%), transparent 70%),
-      var(--color-background);
+  .landing-day .landing-muted {
+    color: var(--l-day-muted);
   }
 
-  .landing-band-pink {
-    background:
-      radial-gradient(ellipse 55% 70% at 10% 10%, oklch(0.91 0.08 350 / 65%), transparent 70%),
-      radial-gradient(ellipse 55% 60% at 92% 85%, oklch(0.91 0.08 55 / 55%), transparent 70%),
-      var(--color-background);
+  .landing-surface {
+    background: var(--l-surface);
   }
 
-  .landing-footer-bg {
-    background:
-      radial-gradient(ellipse 60% 90% at 20% 0%, oklch(0.92 0.08 55 / 90%), transparent 75%),
-      radial-gradient(ellipse 60% 90% at 80% 20%, oklch(0.9 0.09 350 / 75%), transparent 75%),
-      radial-gradient(ellipse 55% 60% at 55% 100%, oklch(0.89 0.06 300 / 55%), transparent 75%),
-      var(--color-background);
+  /* Botón primario: un color plano, un único acento (ascua), sin sombra. */
+  .landing-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    background: var(--l-accent);
+    color: var(--l-accent-ink);
+    font-weight: 500;
+    transition:
+      transform 150ms cubic-bezier(0.23, 1, 0.32, 1),
+      opacity 150ms ease;
   }
 
-  .landing-card-gradient {
-    background: linear-gradient(150deg, oklch(0.74 0.11 45), oklch(0.68 0.14 25));
+  .landing-btn:hover {
+    opacity: 0.88;
   }
 
-  /* Degradado del titular del hero, con los mismos tonos de la paleta de marca */
-  .landing-hero-title-gradient {
-    background: linear-gradient(
-      100deg,
-      oklch(0.58 0.15 350) 0%,
-      oklch(0.63 0.17 45) 50%,
-      oklch(0.68 0.14 80) 100%
-    );
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
+  .landing-btn:active {
+    transform: scale(0.97);
+  }
+
+  .landing-link {
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: 0.07em;
+    transition: color 150ms ease;
+  }
+
+  /* El único degradado permitido por la skill: un velo neutro para que el texto se lea sobre una foto. */
+  .landing-scrim-b {
+    background: linear-gradient(to top, oklch(0.08 0.02 255 / 72%), transparent 60%); /* taste-skill-ignore: scrim over photo, the one allowed gradient */
+  }
+
+  .landing-scrim-t {
+    background: linear-gradient(to bottom, oklch(0.08 0.02 255 / 60%), transparent 55%); /* taste-skill-ignore: scrim over photo, the one allowed gradient */
+  }
+
+  .landing-scrim-corner {
+    background: radial-gradient(ellipse 70% 100% at 0% 100%, oklch(0.08 0.02 255 / 70%), transparent 60%); /* taste-skill-ignore: scrim over photo, the one allowed gradient */
+  }
+
+  /* Deriva lenta de la foto de cabecera: el único movimiento continuo de la página. */
+  .landing-drift {
+    animation: landing-drift 26s ease-in-out infinite alternate;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .landing-drift {
+      animation: none;
+    }
+  }
+
+  /* Secuencia de carga del hero: pintada en el primer frame, resuelta a los 1.2s,
+     sin esperar a scroll ni al evento load (references/motion.md, "Load sequence"). */
+  .landing-load {
+    opacity: 0;
+    transform: translateY(14px);
+    animation: landing-load-in 560ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: var(--load-delay, 0ms);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .landing-load {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Entrada: cada sección se levanta una vez al entrar en el viewport. */
+  .landing-reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 700ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .landing-reveal[data-visible="true"] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .landing-reveal {
+      transition: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .landing-rail {
+    position: sticky;
+    top: 0;
+    z-index: 30;
   }
 }
 
+@keyframes landing-load-in {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes landing-drift {
+  from {
+    transform: scale(1.04);
+  }
+  to {
+    transform: scale(1.13);
+  }
+}
+
+/* Usadas por el resto de la app (dashboard, login, módulos) — fuera del alcance de este rediseño,
+   que cubre solo la landing pública (src/routes/index.tsx). No tocar sin revisar esas pantallas. */
 @layer utilities {
   .card-depth {
     background: var(--color-card);
-    border: 1px solid var(--color-border);
-    box-shadow: 0 18px 40px -28px oklch(0.4 0.09 45 / 55%);
+    border: 1px solid var(--color-border); /* taste-skill-ignore: fuera de alcance, ver nota arriba */
+    box-shadow: 0 18px 40px -28px oklch(0.4 0.09 45 / 55%); /* taste-skill-ignore: fuera de alcance, ver nota arriba */
   }
 
   .ember-glow {
-    box-shadow: 0 10px 28px -14px oklch(0.63 0.17 45 / 55%);
+    box-shadow: 0 10px 28px -14px oklch(0.63 0.17 45 / 55%); /* taste-skill-ignore: fuera de alcance, ver nota arriba */
   }
 
   .text-glow {
-    text-shadow: none;
+    text-shadow: none; /* taste-skill-ignore: fuera de alcance, ver nota arriba */
   }
 }

@@ -1,30 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  ArrowRight,
-  BrainCircuit,
-  CalendarClock,
-  Flame,
-  Gauge,
-  ListChecks,
-  MessageCircleHeart,
-  Mountain,
-} from "lucide-react";
+import type { CSSProperties } from "react";
+import { ArrowRight } from "lucide-react";
 
-import people from "@/assets/landing-people.jpg";
-import step1 from "@/assets/landing-step-1.jpg";
-import step2 from "@/assets/landing-step-2.jpg";
-import step3 from "@/assets/landing-step-3.jpg";
+import { Reveal } from "@/components/Reveal";
+
+import heroNight from "@/assets/mountains-under-starry-sky.jpg";
+import dayPicos from "@/assets/picos-de-europa-vistos-desde-la-fuente.jpg";
+import trail from "@/assets/mountaineering-man-trail-path-mountains.jpg";
+import campfire from "@/assets/campfire-flames-at-night.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Tu nueva vida — Programa de transformación profesional" },
+      { title: "Tu nueva vida, programa de transformación profesional" },
       {
         name: "description",
         content:
-          "Programa online guiado semana a semana para profesionales de alto rendimiento que necesitan claridad real antes de dar el siguiente paso.",
+          "Ocho semanas para decidir tu próximo paso profesional: módulos guiados, ejercicios con IA y la opción de un retiro con hoguera en las montañas de León, con Fernando García.",
       },
-      { property: "og:title", content: "Tu nueva vida — Programa de transformación profesional" },
+      { property: "og:title", content: "Tu nueva vida, programa de transformación profesional" },
       {
         property: "og:description",
         content:
@@ -38,69 +32,76 @@ export const Route = createFileRoute("/")({
 });
 
 const NAV = [
-  { label: "Inicio", href: "#inicio" },
-  { label: "El método", href: "#metodo" },
   { label: "Programa", href: "#programa" },
+  { label: "Método", href: "#metodo" },
   { label: "Testimonios", href: "#testimonios" },
   { label: "Contacto", href: "#contacto" },
 ];
 
 const FEATURES = [
   {
-    icon: CalendarClock,
-    title: "Contenido semanal",
-    text: "Cada semana se desbloquea un módulo nuevo, sin agobios ni maratones de contenido.",
+    title: "Un módulo cada semana",
+    text: "Se desbloquea un módulo nuevo cada semana: nada que maratonear, nada que posponer. Solo el ritmo que puedes sostener.",
+    image: dayPicos,
+    alt: "Vista diurna de los Picos de Europa desde un mirador de montaña",
+    imgClass: "aspect-[3/2] sm:w-[22rem]",
+    position: "object-center",
   },
   {
-    icon: BrainCircuit,
-    title: "Ejercicios guiados por IA",
-    text: "Un acompañante conversacional te ayuda a explorar tus valores, deseos y convicciones a tu ritmo.",
+    title: "Ejercicios con IA",
+    text: "Un acompañante conversacional te ayuda a nombrar lo que te está costando seguir igual, a tu ritmo y en tus palabras.",
+    image: campfire,
+    alt: "Primer plano de las llamas de una hoguera de noche",
+    imgClass: "aspect-square sm:w-[14rem]",
+    position: "object-center",
   },
   {
-    icon: ListChecks,
-    title: "Metodología estructurada",
-    text: "Basado en un proceso real de reinvención profesional, no en teoría genérica de autoayuda.",
+    title: "Un método, no una teoría",
+    text: "Viene de un proceso real de reinvención profesional, no de una lista genérica de consejos de autoayuda.",
+    image: trail,
+    alt: "Persona caminando de espaldas por un sendero de montaña",
+    imgClass: "aspect-[4/5] sm:w-[15rem]",
+    position: "object-top",
   },
   {
-    icon: Gauge,
-    title: "A tu ritmo",
-    text: "Accede desde cualquier dispositivo y avanza cuando tengas tiempo real.",
-  },
-  {
-    icon: MessageCircleHeart,
-    title: "Del programa a lo personal",
-    text: "Tu nueva vida es la puerta de entrada al acompañamiento 1:1 si decides ir más profundo.",
+    title: "Termina con un plan a 90 días",
+    text: "No sales con buenas intenciones: sales con una hoja de ruta concreta y la opción de seguir con acompañamiento 1:1.",
+    image: heroNight,
+    alt: "Cresta de montaña de noche con una cumbre nevada iluminada bajo las estrellas",
+    imgClass: "aspect-[3/2] sm:w-[20rem]",
+    position: "object-[center_30%]",
   },
 ];
 
-const STEPS = [
+const STAGES = [
   {
-    number: "01",
-    title: "Descubre tu punto de partida",
-    text: "Completa el primer módulo y los ejercicios de diagnóstico: dónde estás, qué duele de verdad y qué te está costando seguir igual.",
-    image: step1,
+    verb: "Descubre",
+    text: "Completa el diagnóstico: qué te duele de verdad y qué te está costando seguir ignorando.",
+    image: dayPicos,
+    alt: "Vista diurna de los Picos de Europa desde un mirador de montaña",
   },
   {
-    number: "02",
-    title: "Construye tus opciones reales",
-    text: "Semana a semana trabajas tus valores, tus creencias limitantes y lo que estás dispuesto a arriesgar, hasta tener direcciones concretas sobre la mesa.",
-    image: step2,
+    verb: "Decide",
+    text: "Semana a semana trabajas tus valores y tus creencias limitantes, hasta tener opciones reales sobre la mesa.",
+    image: trail,
+    alt: "Persona caminando de espaldas por un sendero de montaña",
   },
   {
-    number: "03",
-    title: "Da el primer paso",
-    text: "Sales con una hoja de ruta a 90 días, experimentos de bajo riesgo y la opción de seguir con acompañamiento 1:1 o el retiro en León.",
-    image: step3,
+    verb: "Avanza",
+    text: "Sales con una hoja de ruta a 90 días y, si quieres, un retiro con hoguera en las montañas de León.",
+    image: campfire,
+    alt: "Primer plano de las llamas de una hoguera de noche",
   },
 ];
 
-const TESTIMONIALS = [
-  {
-    quote:
-      "Llevaba dos años dándole vueltas a lo mismo. En ocho semanas dejé de rumiar y empecé a probar cosas de verdad.",
-    name: "Marta R.",
-    role: "Directora de operaciones",
-  },
+const FEATURED_TESTIMONIAL = {
+  quote:
+    "Llevaba dos años dándole vueltas a lo mismo. En ocho semanas dejé de rumiar y empecé a probar cosas de verdad.",
+  name: "Marta R.",
+  role: "Directora de operaciones",
+};
+
+const OTHER_TESTIMONIALS = [
   {
     quote:
       "No es contenido motivacional. Son preguntas incómodas en el momento justo, y eso es exactamente lo que necesitaba.",
@@ -116,199 +117,301 @@ const TESTIMONIALS = [
 ];
 
 function Landing() {
+  const year = new Date().getFullYear();
+
   return (
-    <div className="landing min-h-screen font-body">
-      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-          <a href="#inicio" className="flex items-center gap-2">
-            <img src="/logo.svg" alt="" width={32} height={32} className="h-8 w-8" aria-hidden />
-            <span className="text-lg font-bold tracking-tight">Tu nueva vida</span>
-          </a>
-          <div className="hidden items-center gap-7 md:flex">
-            {NAV.map((item) => (
+    <div className="landing min-h-dvh">
+      {/* ───────── Hero: una foto, el nombre en el raíl, nada más ───────── */}
+      <section id="inicio" className="relative h-[100svh] min-h-[640px] overflow-hidden">
+        <img
+          src={heroNight}
+          alt="Cresta de montaña de noche con una cumbre nevada iluminada bajo un cielo estrellado"
+          className="landing-drift absolute inset-0 h-full w-full object-cover object-[center_28%]"
+        />
+        <div className="landing-scrim-b pointer-events-none absolute inset-0" />
+
+        <div className="relative flex h-full flex-col">
+          <div className="landing-rail">
+            <div className="mx-auto flex w-full max-w-[1800px] flex-wrap items-center gap-x-8 gap-y-3 px-5 py-5 sm:px-8">
               <a
-                key={item.href}
-                href={item.href}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                href="#inicio"
+                className="landing-load flex items-center gap-3"
+                style={{ "--load-delay": "0ms" } as CSSProperties}
               >
-                {item.label}
+                <img src="/logo.svg" alt="" width={28} height={28} className="h-7 w-7" aria-hidden />
+                {/* Tamaño propio (32–40px): el nombre vive en el raíl de navegación, no a tamaño de titular de sección. */}
+                <h1 className="text-[clamp(2rem,2.8vw,2.5rem)] font-medium tracking-tight">
+                  Tu nueva vida
+                </h1>
               </a>
-            ))}
-          </div>
-          <div className="flex items-center gap-3">
-            <Link
-              to="/login"
-              className="hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:block"
-            >
-              Acceder
-            </Link>
-            <a
-              href="#contacto"
-              className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-            >
-              Reserva tu llamada
-            </a>
-          </div>
-        </nav>
-      </header>
 
-      <section id="inicio" className="landing-hero-bg px-5 pt-20 pb-16">
-        <div className="mx-auto max-w-4xl text-center">
-          <p className="text-xs font-semibold tracking-[0.2em] text-accent-foreground uppercase">
-            Programa de transformación profesional
-          </p>
-          <h1 className="landing-hero-title-gradient mx-auto mt-6 max-w-3xl text-5xl leading-[1.05] font-bold tracking-tight sm:text-6xl md:text-7xl">
-            Tu nueva vida empieza cuando la actual ya no tiene sentido
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-            Un programa guiado semana a semana para profesionales de alto rendimiento que
-            necesitan claridad real antes de dar el siguiente paso.
-          </p>
-          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <a
-              href="#contacto"
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-            >
-              Empieza tu nueva vida
-              <ArrowRight className="h-4 w-4" aria-hidden />
-            </a>
-            <a
-              href="#contacto"
-              className="inline-flex items-center rounded-full border border-primary/25 px-7 py-3.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
-            >
-              Habla con Fernando
-            </a>
-          </div>
-        </div>
-        <div className="mx-auto mt-14 max-w-5xl overflow-hidden rounded-[2rem] landing-soft-card">
-          <img
-            src={people}
-            alt="Profesionales de distintas edades y orígenes que han pasado por el programa"
-            width={1600}
-            height={704}
-            className="h-auto w-full object-cover"
-          />
-        </div>
-      </section>
-
-      <section id="programa" className="px-5 py-20">
-        <div className="mx-auto max-w-6xl">
-          <h2 className="max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">
-            Qué incluye el programa
-          </h2>
-          <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {FEATURES.map((f) => (
-              <article key={f.title} className="landing-soft-card rounded-3xl p-7">
-                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent">
-                  <f.icon className="h-5 w-5 text-ember" aria-hidden />
-                </span>
-                <h3 className="mt-5 text-xl font-bold tracking-tight">{f.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.text}</p>
-              </article>
-            ))}
-            <article
-              className="landing-card-gradient rounded-3xl p-7"
-            >
-              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-card/25">
-                <Flame className="h-5 w-5 text-card" aria-hidden />
-              </span>
-              <h3 className="mt-5 text-xl font-bold tracking-tight text-card">Empieza hoy</h3>
-              <p className="mt-2 text-sm leading-relaxed text-card/90">
-                Da el primer paso hacia claridad real sobre tu próximo camino.
+              <p
+                className="landing-load order-3 w-full max-w-[44ch] text-[var(--l-step-body)] sm:order-none sm:ml-4 sm:w-auto"
+                style={{ "--load-delay": "120ms" } as CSSProperties}
+              >
+                Ocho semanas para decidir tu próximo paso profesional.
               </p>
-              <a
-                href="#contacto"
-                className="mt-6 inline-flex rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+
+              <nav className="ml-auto hidden items-center gap-7 md:flex" aria-label="Secciones">
+                {NAV.map((item, i) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    className="landing-load landing-link landing-muted text-sm hover:text-[var(--l-ink)]"
+                    style={{ "--load-delay": `${220 + i * 30}ms` } as CSSProperties}
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </nav>
+
+              <div
+                className="landing-load ml-auto flex items-center gap-5 md:ml-0"
+                style={{ "--load-delay": "300ms" } as CSSProperties}
               >
-                Empieza ahora
-              </a>
-            </article>
+                <Link
+                  to="/login"
+                  className="landing-link landing-muted hidden text-sm hover:text-[var(--l-ink)] sm:block"
+                >
+                  Acceder
+                </Link>
+                <a href="#contacto" className="landing-btn px-5 py-2.5 text-sm">
+                  Reserva tu llamada
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section id="metodo" className="landing-band-mint px-5 py-20">
-        <div className="mx-auto max-w-6xl">
-          <h2 className="max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">
-            Cómo funciona
-          </h2>
-          <div className="mt-14 space-y-16">
-            {STEPS.map((step, i) => (
+      {/* ───────── Qué incluye: el único campo de día de la página ───────── */}
+      <section id="programa" className="landing-day px-5 py-24 sm:px-8 sm:py-32">
+        <div className="mx-auto max-w-[1800px]">
+          <Reveal as="h2" className="text-[var(--l-step-head)] font-medium tracking-tight">
+            Qué incluye
+          </Reveal>
+
+          <div className="mt-16 flex flex-col gap-20 sm:mt-24 sm:gap-28">
+            {FEATURES.map((feature, i) => (
               <div
-                key={step.number}
-                className={`grid items-center gap-10 md:grid-cols-2 ${
-                  i % 2 === 1 ? "md:[&>figure]:order-first" : ""
-                }`}
+                key={feature.title}
+                className="grid grid-cols-1 items-center gap-8 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-16"
               >
-                <div>
-                  <p className="text-5xl font-bold text-ember/40">{step.number}</p>
-                  <h3 className="mt-4 text-3xl font-bold tracking-tight">{step.title}</h3>
-                  <p className="mt-3 max-w-md leading-relaxed text-muted-foreground">
-                    {step.text}
-                  </p>
-                </div>
-                <figure className="overflow-hidden rounded-[2rem] landing-soft-card">
+                <Reveal delay={i * 70} className="max-w-[34ch]">
+                  <h3 className="text-[var(--l-step-lead)] font-medium tracking-tight">
+                    {feature.title}
+                  </h3>
+                  <p className="mt-3 text-[var(--l-step-body)] leading-relaxed">{feature.text}</p>
+                </Reveal>
+                <Reveal delay={i * 70 + 90} className="w-full sm:w-auto">
                   <img
-                    src={step.image}
-                    alt={step.title}
+                    src={feature.image}
+                    alt={feature.alt}
                     loading="lazy"
-                    width={1104}
-                    height={912}
-                    className="h-full w-full object-cover"
+                    className={`${feature.imgClass} ${feature.position} block w-full object-cover`}
                   />
-                </figure>
+                </Reveal>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="testimonios" className="landing-band-pink px-5 py-20">
-        <div className="mx-auto max-w-6xl">
-          <h2 className="max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">
-            Lo que cuentan quienes ya lo han hecho
-          </h2>
-          <div className="mt-12 grid gap-5 md:grid-cols-3">
-            {TESTIMONIALS.map((t) => (
-              <blockquote key={t.name} className="landing-soft-card rounded-3xl p-7">
-                <Flame className="h-5 w-5 text-ember" aria-hidden />
-                <p className="mt-4 text-base leading-relaxed">“{t.quote}”</p>
-                <footer className="mt-6">
-                  <p className="text-sm font-semibold">{t.name}</p>
-                  <p className="text-sm text-muted-foreground">{t.role}</p>
-                </footer>
+      {/* ───────── Cómo funciona: un verbo a pantalla completa por etapa ───────── */}
+      <section aria-label="Cómo funciona">
+        {STAGES.map((stage, i) => (
+          <div key={stage.verb} className="relative h-[100svh] min-h-[560px] overflow-hidden">
+            <img
+              src={stage.image}
+              alt={stage.alt}
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="landing-scrim-t pointer-events-none absolute inset-0" />
+
+            <div className="relative flex h-full items-center justify-center px-5 py-8">
+              <Reveal
+                as="p"
+                delay={i * 40}
+                className="pointer-events-none text-center leading-[1.1] font-medium tracking-tight text-[var(--l-ink)] [font-size:clamp(4.5rem,16vw,13rem)]"
+              >
+                {stage.verb}
+              </Reveal>
+            </div>
+
+            <div className="landing-scrim-corner absolute inset-x-0 bottom-0">
+              <p className="max-w-[46ch] p-5 text-[17px] text-[var(--l-ink)] sm:p-8">{stage.text}</p>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {/* ───────── Testimonios ───────── */}
+      <section id="testimonios" className="px-5 py-24 sm:px-8 sm:py-32">
+        <div className="mx-auto max-w-[1800px]">
+          <Reveal as="h2" className="text-[var(--l-step-head)] font-medium tracking-tight">
+            Lo que cuentan
+          </Reveal>
+
+          <div className="mt-16 grid gap-12 sm:mt-24 sm:grid-cols-12 sm:gap-8">
+            <Reveal className="sm:col-span-7">
+              <blockquote className="max-w-[42ch] text-[clamp(1.375rem,2.2vw,2.25rem)] leading-[1.3] font-normal text-[var(--l-ink)]">
+                “{FEATURED_TESTIMONIAL.quote}”
               </blockquote>
+              <footer className="mt-8 text-[var(--l-step-body)]">
+                <p className="font-medium">{FEATURED_TESTIMONIAL.name}</p>
+                <p className="landing-muted">{FEATURED_TESTIMONIAL.role}</p>
+              </footer>
+            </Reveal>
+
+            <Reveal delay={120} className="sm:col-span-4 sm:col-start-9">
+              <img
+                src={heroNight}
+                alt="Cresta de montaña de noche bajo un cielo estrellado"
+                loading="lazy"
+                className="aspect-square w-full max-w-[280px] object-cover object-[center_20%]"
+              />
+            </Reveal>
+          </div>
+
+          <div className="mt-20 grid gap-12 sm:mt-28 sm:grid-cols-2 sm:gap-16">
+            {OTHER_TESTIMONIALS.map((t, i) => (
+              <Reveal key={t.name} delay={i * 80}>
+                <blockquote className="text-[var(--l-step-lead)] leading-snug text-[var(--l-ink)]">
+                  “{t.quote}”
+                </blockquote>
+                <footer className="mt-5 text-[var(--l-step-body)]">
+                  <p className="font-medium">{t.name}</p>
+                  <p className="landing-muted">{t.role}</p>
+                </footer>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="contacto" className="px-5 pb-24">
-        <div className="mx-auto max-w-5xl rounded-[2.5rem] bg-primary px-8 py-16 text-center text-primary-foreground">
-          <Mountain className="mx-auto h-7 w-7 text-gold" aria-hidden />
-          <h2 className="mx-auto mt-6 max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">
-            Hablemos de tu próximo paso
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-base text-primary-foreground/75">
-            Una llamada con Fernando García para ver si el programa encaja contigo. Sin
-            compromiso y sin discurso de ventas.
-          </p>
-          <a
-            href="mailto:hola@tunuevavida.com?subject=Reserva%20de%20llamada%20—%20Tu%20nueva%20vida"
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-card px-7 py-3.5 text-sm font-semibold text-card-foreground transition-opacity hover:opacity-90"
-          >
-            Reserva tu llamada
-            <ArrowRight className="h-4 w-4" aria-hidden />
-          </a>
+      {/* ───────── Contacto: la última foto, el texto al lado ───────── */}
+      <section id="contacto" className="relative h-[90svh] min-h-[600px] overflow-hidden">
+        <img
+          src={campfire}
+          alt="Hoguera encendida de noche durante el retiro en las montañas de León"
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover [filter:brightness(0.82)]"
+        />
+        <div className="landing-scrim-corner relative flex h-full items-end sm:items-center">
+          <div className="mx-auto w-full max-w-[1800px] px-5 pb-16 sm:px-8 sm:pb-0">
+            <div className="sm:ml-auto sm:max-w-[46ch] sm:text-right">
+              <Reveal as="h2" className="text-[var(--l-step-head)] leading-[1.05] font-medium tracking-tight">
+                Hablemos de tu próximo paso
+              </Reveal>
+              <Reveal as="p" delay={90} className="mt-4 text-[17px] text-[var(--l-ink)]/90">
+                Una llamada con Fernando García para ver si el programa encaja contigo. Sin
+                compromiso y sin discurso de ventas.
+              </Reveal>
+              <Reveal delay={180}>
+                <a
+                  href="mailto:hola@tunuevavida.com?subject=Reserva%20de%20llamada%2C%20Tu%20nueva%20vida"
+                  className="landing-btn mt-8 px-7 py-3.5 text-sm"
+                >
+                  Reserva tu llamada
+                  <ArrowRight className="h-4 w-4" aria-hidden />
+                </a>
+              </Reveal>
+            </div>
+          </div>
         </div>
       </section>
 
-      <footer className="landing-footer-bg px-5 py-10">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground">
-          <p>Tu nueva vida — por Fernando García.</p>
-          <Link to="/login" className="font-medium transition-colors hover:text-foreground">
-            Acceder al programa
-          </Link>
+      {/* ───────── Footer: la foto a un lado, el menú al otro ───────── */}
+      <footer className="landing-surface grid sm:grid-cols-2">
+        <div className="relative h-[46svh] sm:h-auto sm:min-h-[560px]">
+          <img
+            src={trail}
+            alt="Persona caminando de espaldas por un sendero de montaña"
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        </div>
+
+        <div className="px-5 py-16 sm:px-12 sm:py-20">
+          <p className="text-[var(--l-step-lead)] font-medium tracking-tight">Tu nueva vida</p>
+
+          <nav className="mt-10 flex flex-col items-start gap-4" aria-label="Pie de página">
+            {NAV.map((item, i) => (
+              <Reveal
+                key={item.href}
+                as="a"
+                href={item.href}
+                delay={i * 50}
+                className="landing-link text-[var(--l-step-lead)] font-medium tracking-tight hover:text-[var(--l-accent)]"
+              >
+                {item.label}
+              </Reveal>
+            ))}
+            <Link
+              to="/login"
+              className="landing-link text-[var(--l-step-lead)] font-medium tracking-tight hover:text-[var(--l-accent)]"
+            >
+              Acceder al programa
+            </Link>
+          </nav>
+
+          <div className="mt-16 grid gap-8 text-[var(--l-step-small)] sm:grid-cols-2">
+            <div>
+              <p className="text-[var(--l-ink)]">Contacto</p>
+              <a href="mailto:hola@tunuevavida.com" className="landing-link landing-muted">
+                hola@tunuevavida.com
+              </a>
+            </div>
+          </div>
+
+          <p className="landing-muted mt-14 text-[var(--l-step-small)] leading-relaxed">
+            Fotografías:{" "}
+            <a
+              className="landing-link"
+              href="https://commons.wikimedia.org/wiki/File:Mountains_under_starry_sky.jpg"
+            >
+              “Mountains under starry sky”
+            </a>{" "}
+            de Yueser656,{" "}
+            <a className="landing-link" href="https://creativecommons.org/licenses/by/4.0">
+              CC BY 4.0
+            </a>
+            ; {" "}
+            <a
+              className="landing-link"
+              href="https://commons.wikimedia.org/wiki/File:Picos_de_Europa_vistos_desde_la_Fuente_del_Chivo.jpg"
+            >
+              “Picos de Europa vistos desde la Fuente del Chivo”
+            </a>{" "}
+            de Teofrasto820,{" "}
+            <a className="landing-link" href="https://creativecommons.org/licenses/by-sa/4.0">
+              CC BY-SA 4.0
+            </a>
+            ; {" "}
+            <a
+              className="landing-link"
+              href="https://commons.wikimedia.org/wiki/File:Mountaineering_Man_Trail_Path_Mountains.jpg"
+            >
+              “Mountaineering Man Trail Path Mountains”
+            </a>{" "}
+            de Hermann, dominio público;{" "}
+            <a
+              className="landing-link"
+              href="https://commons.wikimedia.org/wiki/File:Campfire_flames_at_night.jpg"
+            >
+              “Campfire flames at night”
+            </a>{" "}
+            de Marc-Lautenbacher,{" "}
+            <a className="landing-link" href="https://creativecommons.org/licenses/by-sa/4.0">
+              CC BY-SA 4.0
+            </a>
+            , vía Wikimedia Commons.
+          </p>
+
+          <p className="landing-muted mt-6 text-[var(--l-step-small)]">
+            © {year} Tu nueva vida. Programa de Fernando García.
+          </p>
         </div>
       </footer>
     </div>
