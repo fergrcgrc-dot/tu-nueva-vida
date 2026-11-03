@@ -15,6 +15,7 @@ dist-ssr
 .tanstack/**
 .nitro
 *.local
+*.local.sh
 
 # Wrangler / Cloudflare
 .wrangler/
@@ -25,6 +26,9 @@ package-lock.json
 
 # Supabase CLI local cache
 supabase/.temp/
+
+# Claude Code local-only settings (shared config stays in .claude/launch.json)
+.claude/settings.local.json
 
 # Editor directories and files
 .vscode/*
