@@ -116,7 +116,7 @@ async function callClaude(
 ): Promise<string> {
   const apiKey = process.env["ANTHROPIC_API_KEY"];
   if (!apiKey) {
-    throw safeError("Falta configurar el secreto ANTHROPIC_API_KEY en Lovable Cloud.");
+    throw safeError("Falta configurar el secreto ANTHROPIC_API_KEY en el hosting.");
   }
 
   let res: Response;
