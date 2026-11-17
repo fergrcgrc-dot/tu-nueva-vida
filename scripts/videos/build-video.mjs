@@ -174,8 +174,9 @@ function slideHtml(week, slide, index, total) {
     ? `<p class="eyebrow">${esc(meta.phase)} · Módulo ${week} de 8</p>
        <h1 class="cover">${esc(meta.title)}</h1>
        ${slide.lines
-         .filter((l) => l.startsWith('"') || l.startsWith("“"))
-         .map((l) => `<p class="question">${esc(l.replace(/^["“]|["”]$/g, ""))}</p>`)
+         .map((l) => l.match(/^["“](.+?)["”]/)?.[1])
+         .filter(Boolean)
+         .map((q) => `<p class="question">${esc(q)}</p>`)
          .join("")}`
     : `<p class="eyebrow">Módulo ${week} · ${esc(meta.title)}</p>
        <h2>${esc(slide.heading)}</h2>
