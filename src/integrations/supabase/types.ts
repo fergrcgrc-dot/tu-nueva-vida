@@ -507,6 +507,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consume_rate_limit: {
+        Args: { _bucket: string; _max: number; _window_seconds: number }
+        Returns: boolean
+      }
       complete_module: {
         Args: { _module_id: string; _user_id: string }
         Returns: undefined

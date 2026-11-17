@@ -47,6 +47,7 @@ function LoginPage() {
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   useEffect(() => {
     const remembered = readRememberedEmail();
@@ -86,6 +87,24 @@ function LoginPage() {
     }
   }
 
+  /**
+   * Recuperación de contraseña. La respuesta es siempre la misma, exista o no
+   * la cuenta, para no revelar qué emails están registrados.
+   */
+  async function handleReset() {
+    setError(null);
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      setError("Escribe tu email arriba y vuelve a pulsar.");
+      return;
+    }
+    setLoading(true);
+    await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/set-password`,
+    });
+    setLoading(false);
+    setResetSent(true);
+  }
+
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4">
       {/* Fogata: un punto de luz cálida sobre el cielo nocturno */}
@@ -101,9 +120,7 @@ function LoginPage() {
         <div className="mb-8 text-center">
           <div className="ember-glow mx-auto mb-5 h-2.5 w-2.5 rounded-full bg-ember" />
           <h1 className="text-3xl font-semibold text-foreground">Tu Nueva Vida</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Un espacio privado. Accede con tu invitación.
-          </p>
+          <p className="mt-2 text-sm text-muted-foreground">Accede con el email de tu compra.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -162,6 +179,24 @@ function LoginPage() {
             {loading ? "Entrando…" : "Entrar"}
           </button>
         </form>
+
+        <div className="mt-4 text-center text-xs">
+          {resetSent ? (
+            <p className="text-muted-foreground">
+              Si ese email tiene acceso, te hemos enviado un enlace para crear una contraseña nueva.
+              Caduca en 1 hora.
+            </p>
+          ) : (
+            <button
+              type="button"
+              onClick={handleReset}
+              disabled={loading}
+              className="font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+            >
+              ¿Has olvidado tu contraseña o no te llegó el email de acceso?
+            </button>
+          )}
+        </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
           ¿Aún no tienes acceso?{" "}

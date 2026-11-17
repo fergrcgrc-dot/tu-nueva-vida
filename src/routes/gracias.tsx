@@ -19,7 +19,9 @@ function Gracias() {
         <h1 className="mt-6 text-3xl font-bold tracking-tight">Ya estás dentro</h1>
         <p className="mt-4 text-muted-foreground">
           Te hemos enviado un email para crear tu contraseña. Ábrelo desde este dispositivo y
-          empieza por el Módulo 1. Si no lo ves en unos minutos, revisa la carpeta de spam.
+          empieza por el Módulo 1. Si no lo ves en unos minutos, revisa la carpeta de spam. El
+          enlace caduca en 1 hora: si se te pasa, pide uno nuevo desde «¿Has olvidado tu
+          contraseña?» en la página de acceso.
         </p>
         <p className="mt-4 text-sm text-muted-foreground">
           ¿Ya tenías cuenta? Entra directamente con tu email y tu contraseña.

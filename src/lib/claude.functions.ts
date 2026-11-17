@@ -18,10 +18,23 @@ const HistoryMessage = z.object({
   content: z.string().min(1).max(8000),
 });
 
+/** Tope de tamaño total de la conversación que se envía al modelo. */
+const MAX_HISTORY_CHARS = 40_000;
+function capHistory<T extends { content: string }>(history: T[] | undefined): T[] {
+  const out: T[] = [];
+  let total = 0;
+  for (const m of [...(history ?? [])].reverse()) {
+    total += m.content.length;
+    if (total > MAX_HISTORY_CHARS) break;
+    out.unshift(m);
+  }
+  return out;
+}
+
 const ModuleClaudeInput = z.object({
   moduleId: z.string().uuid(),
   message: z.string().min(1).max(8000),
-  history: z.array(HistoryMessage).max(60).optional(),
+  history: z.array(HistoryMessage).max(30).optional(),
   /** Borrador actual del ejercicio, en texto, para que el coach lo tenga delante. */
   draft: z.string().max(30000).optional(),
 });
@@ -61,17 +74,13 @@ function safeError(message: string): Error {
 }
 
 /** Módulo existente y accesible por el cliente con sesión. */
-async function loadAccessibleModule(
-  supabase: AuthedClient,
-  userId: string,
-  moduleId: string,
-) {
+async function loadAccessibleModule(supabase: AuthedClient, userId: string, moduleId: string) {
   const { data: owner } = await supabase
     .from("profiles")
     .select("status")
     .eq("id", userId)
     .maybeSingle();
-  if (owner && owner.status !== "active") {
+  if (!owner || owner.status !== "active") {
     throw safeError("Tu acceso al programa no está activo.");
   }
   const { data: moduleRow, error: moduleError } = await supabase
@@ -96,11 +105,7 @@ async function loadAccessibleModule(
 }
 
 /** Entregables anteriores del propio cliente (RLS refuerza la propiedad). */
-async function loadPreviousDeliverables(
-  supabase: AuthedClient,
-  userId: string,
-  week: number,
-) {
+async function loadPreviousDeliverables(supabase: AuthedClient, userId: string, week: number) {
   const { data, error } = await supabase
     .from("deliverables")
     .select("content, created_at, modules!inner(week_number)")
@@ -187,11 +192,9 @@ export const askModuleClaude = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<ModuleClaudeReply> => {
     const { supabase, userId } = context;
     const moduleRow = await loadAccessibleModule(supabase, userId, data.moduleId);
-    const previous = await loadPreviousDeliverables(
-      supabase,
-      userId,
-      moduleRow.week_number,
-    );
+    const { enforceRateLimit } = await import("@/lib/security.server");
+    await enforceRateLimit(supabase, userId, ["ai_chat", "ai_chat_day"]);
+    const previous = await loadPreviousDeliverables(supabase, userId, moduleRow.week_number);
     const content = getModuleContent(moduleRow.week_number);
 
     const systemPrompt = [
@@ -202,7 +205,9 @@ export const askModuleClaude = createServerFn({ method: "POST" })
       "",
       `## Guía del módulo\n${content.systemPrompt}`,
       "",
-      data.draft ? `## Borrador actual del ejercicio del usuario\n${data.draft}` : "El usuario todavía no ha escrito nada en el ejercicio.",
+      data.draft
+        ? `## Borrador actual del ejercicio del usuario\n${data.draft}`
+        : "El usuario todavía no ha escrito nada en el ejercicio.",
       "",
       `Contexto del programa: «Tu Nueva Vida». Fase ${moduleRow.phase_number} — «${moduleRow.phase_name}». Semana ${moduleRow.week_number} de 8. Módulo: «${moduleRow.title}». Objetivo: ${moduleRow.objective}`,
       previous.length > 0
@@ -213,11 +218,11 @@ export const askModuleClaude = createServerFn({ method: "POST" })
       '{"message": string, "should_save_deliverable": boolean, "deliverable_content": string | null, "flag": string | null}',
       "- message: tu respuesta al cliente, en español.",
       "- should_save_deliverable: true solo cuando la conversación del módulo esté completa; el cliente decide guardarlo con una acción explícita.",
-      "- flag: null normalmente. Usa exactamente \"lenguaje_crisis\" (desesperanza sostenida, indefensión total, deterioro grave de salud mental), \"bloqueo_repetido\" (misma respuesta vacía o genérica en 2 o más preguntas pese a la repregunta), o \"contradiccion_no_resuelta\" (discrepancia fuerte entre lo declarado ahora y el perfil acumulado del usuario, no reconocida pese a señalarla una vez). No uses otros valores.",
+      '- flag: null normalmente. Usa exactamente "lenguaje_crisis" (desesperanza sostenida, indefensión total, deterioro grave de salud mental), "bloqueo_repetido" (misma respuesta vacía o genérica en 2 o más preguntas pese a la repregunta), o "contradiccion_no_resuelta" (discrepancia fuerte entre lo declarado ahora y el perfil acumulado del usuario, no reconocida pese a señalarla una vez). No uses otros valores.',
     ].join("\n");
 
     const messages = [
-      ...(data.history ?? []).map((m) => ({ role: m.role, content: m.content })),
+      ...capHistory(data.history).map((m) => ({ role: m.role, content: m.content })),
       { role: "user" as const, content: data.message },
     ];
 
@@ -241,7 +246,8 @@ export const askModuleClaude = createServerFn({ method: "POST" })
     if (reply.flag) {
       const raw = reply.flag.trim();
       const triggerType = raw in KNOWN_TRIGGERS ? raw : "senal_guia";
-      const { error: flagError } = await supabase.from("flags").insert({
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { error: flagError } = await supabaseAdmin.from("flags").insert({
         user_id: userId,
         module_id: moduleRow.id,
         trigger_type: triggerType,
@@ -271,6 +277,14 @@ const FollowUpChatInput = z.object({
 
 /** Comprueba que el seguimiento es del propio cliente y está disponible. */
 async function loadFollowUp(supabase: AuthedClient, userId: string, id: string) {
+  const { data: owner } = await supabase
+    .from("profiles")
+    .select("status")
+    .eq("id", userId)
+    .maybeSingle();
+  if (!owner || owner.status !== "active") {
+    throw safeError("Tu acceso al programa no está activo.");
+  }
   const { data, error } = await supabase
     .from("follow_ups")
     .select("id, day_offset, due_at, status")
@@ -289,6 +303,8 @@ export const askFollowUpClaude = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<ModuleClaudeReply> => {
     const { supabase, userId } = context;
     const followUp = await loadFollowUp(supabase, userId, data.followUpId);
+    const { enforceRateLimit } = await import("@/lib/security.server");
+    await enforceRateLimit(supabase, userId, ["ai_chat", "ai_chat_day"]);
 
     const previous = await loadPreviousDeliverables(supabase, userId, 9);
 
@@ -309,7 +325,7 @@ export const askFollowUpClaude = createServerFn({ method: "POST" })
     ].join("\n");
 
     const text = await callClaude(systemPrompt, [
-      ...(data.history ?? []).map((m) => ({ role: m.role, content: m.content })),
+      ...capHistory(data.history).map((m) => ({ role: m.role, content: m.content })),
       { role: "user" as const, content: data.message },
     ]);
 
@@ -330,7 +346,8 @@ export const askFollowUpClaude = createServerFn({ method: "POST" })
     if (reply.flag) {
       const raw = reply.flag.trim();
       const triggerType = raw in KNOWN_TRIGGERS ? raw : "seguimiento_estancado";
-      const { error: flagError } = await supabase.from("flags").insert({
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { error: flagError } = await supabaseAdmin.from("flags").insert({
         user_id: userId,
         module_id: null,
         trigger_type: triggerType,
@@ -360,6 +377,8 @@ export const closeFollowUp = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ summary: string }> => {
     const { supabase, userId } = context;
     const followUp = await loadFollowUp(supabase, userId, data.followUpId);
+    const { enforceRateLimit } = await import("@/lib/security.server");
+    await enforceRateLimit(supabase, userId, ["ai_chat", "ai_chat_day"]);
 
     const transcript = data.history
       .map((m) => `${m.role === "user" ? "Cliente" : "Guía"}: ${m.content}`)

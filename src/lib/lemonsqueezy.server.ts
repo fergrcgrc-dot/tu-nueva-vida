@@ -6,6 +6,7 @@
  *   LEMONSQUEEZY_VARIANT_ID      id de la variante del producto (399 €)
  *   LEMONSQUEEZY_WEBHOOK_SECRET  firma de los webhooks
  *   LEMONSQUEEZY_CHECKOUT_URL    (opcional) enlace de pago fijo de respaldo
+ *   LEMONSQUEEZY_ALLOW_TEST_MODE (opcional) "true" solo mientras se prueba con pedidos de test
  *   SITE_URL                     p. ej. https://tunuevavida.eu
  */
 
@@ -99,6 +100,7 @@ export type OrderEvent = {
   totalCents: number | null;
   currency: string | null;
   variantId: string | null;
+  storeId: string | null;
   testMode: boolean;
 };
 
@@ -111,6 +113,7 @@ export function parseOrderEvent(payload: unknown): OrderEvent | null {
       attributes?: {
         user_email?: string;
         user_name?: string;
+        store_id?: number;
         status?: string;
         total?: number;
         currency?: string;
@@ -130,6 +133,7 @@ export function parseOrderEvent(payload: unknown): OrderEvent | null {
     currency: a.currency ?? null,
     variantId:
       a.first_order_item?.variant_id != null ? String(a.first_order_item.variant_id) : null,
+    storeId: a.store_id != null ? String(a.store_id) : null,
     testMode: Boolean(p.meta?.test_mode),
   };
 }

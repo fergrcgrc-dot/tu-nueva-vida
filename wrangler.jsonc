@@ -4,6 +4,8 @@
   "compatibility_date": "2026-11-04",
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/server.ts",
+  // Logs del Worker en Cloudflare (Workers → tu-nueva-vida → Logs) para vigilar errores y abusos.
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
   "routes": [
     { "pattern": "tunuevavida.eu", "custom_domain": true },
     { "pattern": "www.tunuevavida.eu", "custom_domain": true }

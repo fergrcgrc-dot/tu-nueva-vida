@@ -663,3 +663,65 @@ export function formatAnswers(schema: ExerciseSchema, answers: ExerciseAnswers):
   }
   return out.join("\n\n");
 }
+
+/* ------------------------------------------------------------------ */
+/* Saneado en servidor                                                 */
+/* ------------------------------------------------------------------ */
+
+const MAX_TEXT = 6000;
+const MAX_CELL = 1000;
+
+/**
+ * Reconstruye las respuestas solo con los campos y tipos que define el
+ * esquema del módulo: descarta claves desconocidas, recorta textos y filas
+ * y fuerza números dentro de rango. Se aplica en el servidor antes de
+ * guardar o enviar a la IA, nunca se confía en lo que manda el navegador.
+ */
+export function sanitizeAnswers(schema: ExerciseSchema, raw: unknown): ExerciseAnswers {
+  const input = (raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {}) as Record<
+    string,
+    unknown
+  >;
+  const out: ExerciseAnswers = {};
+  const str = (v: unknown, max: number) => (typeof v === "string" ? v.slice(0, max) : "");
+
+  for (const section of schema.sections) {
+    for (const field of section.fields) {
+      const v = input[field.id];
+      if (field.type === "text") {
+        out[field.id] = str(v, MAX_TEXT);
+      } else if (field.type === "select") {
+        const s = str(v, 100);
+        out[field.id] = field.options.some((o) => o.value === s) ? s : "";
+      } else if (field.type === "scale") {
+        const obj = (v && typeof v === "object" ? v : {}) as Record<string, unknown>;
+        const n =
+          typeof obj["value"] === "number" && Number.isInteger(obj["value"]) ? obj["value"] : null;
+        const scale: ScaleValue = { value: n !== null && n >= 1 && n <= 10 ? n : null };
+        if (field.withReason) scale.reason = str(obj["reason"], MAX_CELL);
+        out[field.id] = scale;
+      } else if (field.type === "list") {
+        const rows = Array.isArray(v) ? v.slice(0, field.max) : [];
+        out[field.id] = rows.map((r) => {
+          const row = (r && typeof r === "object" ? r : {}) as Record<string, unknown>;
+          const clean: ListRow = {};
+          for (const c of field.columns) {
+            const cell = row[c.id];
+            if (c.kind === "bool") clean[c.id] = typeof cell === "boolean" ? cell : null;
+            else if (c.kind === "number")
+              clean[c.id] =
+                typeof cell === "number" && Number.isFinite(cell) && cell >= c.min && cell <= c.max
+                  ? Math.round(cell)
+                  : null;
+            else if (c.kind === "date")
+              clean[c.id] =
+                typeof cell === "string" && /^\d{4}-\d{2}-\d{2}$/.test(cell) ? cell : "";
+            else clean[c.id] = str(cell, MAX_CELL);
+          }
+          return clean;
+        });
+      }
+    }
+  }
+  return out;
+}

@@ -43,8 +43,13 @@ function SetPasswordPage() {
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setError(null);
-    if (password.length < 8) {
-      setError("La contraseña debe tener al menos 8 caracteres.");
+    if (
+      password.length < 10 ||
+      !/[a-z]/.test(password) ||
+      !/[A-Z]/.test(password) ||
+      !/\d/.test(password)
+    ) {
+      setError("Usa al menos 10 caracteres, con mayúsculas, minúsculas y algún número.");
       return;
     }
     if (password !== confirmPassword) {
@@ -59,7 +64,14 @@ function SetPasswordPage() {
     const { error: updateError } = await supabase.auth.updateUser({ password });
     if (updateError) {
       setSaving(false);
-      setError("No se pudo guardar la contraseña. Inténtalo de nuevo.");
+      const code = (updateError as { code?: string }).code ?? "";
+      setError(
+        code === "weak_password"
+          ? "Esa contraseña es demasiado débil o aparece en filtraciones conocidas. Elige otra."
+          : code === "same_password"
+            ? "La contraseña nueva tiene que ser distinta de la anterior."
+            : "No se pudo guardar la contraseña. Inténtalo de nuevo.",
+      );
       return;
     }
     // Registro del consentimiento explícito (RGPD art. 9.2.a).
@@ -126,12 +138,12 @@ function SetPasswordPage() {
                 id="password"
                 type="password"
                 required
-                minLength={8}
+                minLength={10}
                 autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full rounded-lg border border-input bg-secondary px-3.5 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-ring"
-                placeholder="Mínimo 8 caracteres"
+                placeholder="Mínimo 10, con mayúsculas y números"
               />
             </div>
             <div className="space-y-2">

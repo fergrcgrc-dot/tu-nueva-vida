@@ -13,7 +13,12 @@ export const Route = createFileRoute("/api/lemonsqueezy/webhook")({
       POST: async ({ request }) => {
         const ls = await import("@/lib/lemonsqueezy.server");
         const raw = await request.text();
+        if (raw.length > 200_000) return new Response("too large", { status: 413 });
         if (!(await ls.verifySignature(raw, request.headers.get("x-signature")))) {
+          const { logSecurityEvent } = await import("@/lib/security.server");
+          await logSecurityEvent("webhook_invalid_signature", null, {
+            ip: request.headers.get("cf-connecting-ip"),
+          });
           return new Response("invalid signature", { status: 401 });
         }
 
@@ -26,10 +31,22 @@ export const Route = createFileRoute("/api/lemonsqueezy/webhook")({
         const order = ls.parseOrderEvent(payload);
         if (!order) return new Response("ignored", { status: 200 });
 
+        // El acceso solo se concede por el producto y la tienda configurados en
+        // el servidor; el precio lo fija Lemon Squeezy, nunca el navegador.
         const expectedVariant = process.env["LEMONSQUEEZY_VARIANT_ID"];
-        if (expectedVariant && order.variantId && order.variantId !== expectedVariant) {
-          return new Response("other product", { status: 200 });
+        const expectedStore = process.env["LEMONSQUEEZY_STORE_ID"];
+        const reject = async (reason: string) => {
+          const { logSecurityEvent } = await import("@/lib/security.server");
+          await logSecurityEvent("webhook_rejected", null, { reason, order: order.orderId });
+          return new Response("ignored", { status: 200 });
+        };
+        if (!expectedVariant || order.variantId !== expectedVariant) return reject("variant");
+        if (expectedStore && order.storeId && order.storeId !== expectedStore)
+          return reject("store");
+        if (order.testMode && process.env["LEMONSQUEEZY_ALLOW_TEST_MODE"] !== "true") {
+          return reject("test_mode");
         }
+        if (order.currency && order.currency !== "EUR") return reject("currency");
 
         const { provisionPurchase, revokePurchase } = await import("@/lib/purchases.server");
         try {

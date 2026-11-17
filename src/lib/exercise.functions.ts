@@ -7,6 +7,7 @@ import type { Database, Json } from "@/integrations/supabase/types";
 import {
   formatAnswers,
   getExerciseSchema,
+  sanitizeAnswers,
   validateAnswers,
   type ExerciseAnswers,
   type ListRow,
@@ -50,7 +51,7 @@ async function loadAccessibleModule(supabase: AuthedClient, userId: string, modu
     .select("status")
     .eq("id", userId)
     .maybeSingle();
-  if (owner && owner.status !== "active") {
+  if (!owner || owner.status !== "active") {
     throw safeError("Tu acceso al programa no está activo.");
   }
   const { data: moduleRow, error } = await supabase
@@ -172,6 +173,11 @@ export const saveExerciseDraft = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const moduleRow = await loadAccessibleModule(supabase, userId, data.moduleId);
+    const { enforceRateLimit } = await import("@/lib/security.server");
+    await enforceRateLimit(supabase, userId, ["draft_save"]);
+    const schema = getExerciseSchema(moduleRow.week_number);
+    if (!schema) throw safeError("Este módulo no tiene ejercicio.");
+    const clean = sanitizeAnswers(schema, data.answers);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: existing } = await supabaseAdmin
@@ -188,14 +194,14 @@ export const saveExerciseDraft = createServerFn({ method: "POST" })
     if (existing) {
       const { error } = await supabaseAdmin
         .from("exercise_submissions")
-        .update({ answers: data.answers as Json })
+        .update({ answers: clean as unknown as Json })
         .eq("id", existing.id);
       if (error) throw safeError("No se pudo guardar el borrador.");
     } else {
       const { error } = await supabaseAdmin.from("exercise_submissions").insert({
         user_id: userId,
         module_id: data.moduleId,
-        answers: data.answers as Json,
+        answers: clean as unknown as Json,
         status: "draft",
       });
       if (error) throw safeError("No se pudo guardar el borrador.");
@@ -237,7 +243,9 @@ export const submitExercise = createServerFn({ method: "POST" })
       const schema = getExerciseSchema(week);
       if (!schema) throw safeError("Este módulo no tiene ejercicio.");
 
-      const answers = data.answers as ExerciseAnswers;
+      const { enforceRateLimit, logSecurityEvent } = await import("@/lib/security.server");
+      await enforceRateLimit(supabase, userId, ["ai_review", "ai_review_day"]);
+      const answers = sanitizeAnswers(schema, data.answers);
       const problems = validateAnswers(schema, answers);
       if (problems.length > 0) {
         throw safeError(`Antes de enviar: ${problems.slice(0, 3).join(" ")}`);
@@ -324,6 +332,7 @@ export const submitExercise = createServerFn({ method: "POST" })
 
       // Aviso interno (solo admin): nunca hay una persona que responda al
       // cliente, pero el administrador debe saber que hubo una señal seria.
+      if (crisis) await logSecurityEvent("crisis_signal", userId, { week });
       if (review.flag) {
         await supabaseAdmin.from("flags").insert({
           user_id: userId,

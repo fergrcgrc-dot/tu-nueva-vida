@@ -23,14 +23,18 @@ export async function assertPlatformAdmin(supabase: AuthedClient, userId: string
   const { data: isAdmin } = await supabase.rpc("is_platform_admin", {
     _user_id: userId,
   });
-  if (!isAdmin) throw safeError("No tienes permiso para acceder a esta sección.");
+  if (!isAdmin) {
+    const { logSecurityEvent } = await import("@/lib/security.server");
+    await logSecurityEvent("admin_access_denied", userId);
+    throw safeError("No tienes permiso para acceder a esta sección.");
+  }
 
   const { data: profile } = await supabase
     .from("profiles")
     .select("status")
     .eq("id", userId)
     .maybeSingle();
-  if (profile && profile.status !== "active") {
+  if (!profile || profile.status !== "active") {
     throw safeError("Tu cuenta no está activa.");
   }
 }
@@ -84,8 +88,12 @@ export const getAdminOverview = createServerFn({ method: "GET" })
       ]);
 
     if (
-      profilesRes.error || rolesRes.error || assignRes.error ||
-      flagsRes.error || sessionsRes.error || progressRes.error
+      profilesRes.error ||
+      rolesRes.error ||
+      assignRes.error ||
+      flagsRes.error ||
+      sessionsRes.error ||
+      progressRes.error
     ) {
       throw safeError("No se pudo cargar el panel de administración.");
     }
@@ -149,7 +157,7 @@ export const getAdminOverview = createServerFn({ method: "GET" })
         createdAt: c.created_at,
         coachId: coachByClient.get(c.id) ?? null,
         coachName: coachByClient.has(c.id)
-          ? nameById.get(coachByClient.get(c.id)!) ?? null
+          ? (nameById.get(coachByClient.get(c.id)!) ?? null)
           : null,
         openFlags: openFlagsByClient.get(c.id) ?? 0,
         completedModules: completedByClient.get(c.id) ?? 0,
@@ -382,7 +390,8 @@ export const adminSetAccountStatus = createServerFn({ method: "POST" })
       throw safeError("No puedes cambiar el estado de tu propia cuenta.");
     }
 
-    const { error } = await supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
       .from("profiles")
       .update({ status: data.status })
       .eq("id", data.targetUserId);
