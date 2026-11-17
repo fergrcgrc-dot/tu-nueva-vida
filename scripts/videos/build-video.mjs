@@ -1,8 +1,8 @@
 // Pipeline de vídeo faceless por módulo (opción B):
 //   guion de slides (contenido-programa) + teoría
 //   → narración por diapositiva (Claude vía OpenRouter) [editable, se guarda en git]
-//   → voz femenina (ElevenLabs multilingual v2 vía fal.ai)
-//   → diapositivas 1920x1080 con la identidad de la marca (Playwright)
+//   → voz femenina dulce en español de España (Gemini TTS vía fal.ai)
+//   → diapositivas 1920x1080 con la identidad de la landing (Playwright)
 //   → MP4 H.264 + AAC (ffmpeg)
 //
 // Uso:
@@ -24,7 +24,13 @@ const CONTENT = join(ROOT, "contenido-programa");
 const NARRATION_DIR = join(CONTENT, "videos");
 const OUT = join(ROOT, "videos-out");
 
-const VOICE = process.env.VIDEO_VOICE ?? "Laura"; // voz femenina de ElevenLabs
+// Voz femenina dulce en español de España (Gemini TTS vía fal.ai).
+// Alternativas probadas: Achernar (suave), Sulafat (cálida).
+const VOICE = process.env.VIDEO_VOICE ?? "Vindemiatrix";
+// En inglés a propósito: con instrucciones en español el filtro de contenido
+// de fal da falsos positivos. El idioma lo fija language_code.
+const VOICE_STYLE =
+  "Read in a warm, gentle and soothing tone, at a calm pace, with a natural accent from Spain.";
 const NARRATION_MODEL = process.env.NARRATION_MODEL ?? "anthropic/claude-sonnet-4.5";
 const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY ?? "proxy";
 const FAL_KEY = process.env.FAL_KEY ?? "proxy";
@@ -41,6 +47,7 @@ const MODULES = {
 };
 
 const pad = (n) => String(n).padStart(2, "0");
+const LOGO_B64 = readFileSync(join(ROOT, "public", "logo.svg")).toString("base64");
 
 /* ---------------------------- 1. Guion -------------------------------- */
 
@@ -73,7 +80,7 @@ async function narrate(week, slides) {
     `Escribe la locución de un vídeo explicativo del módulo ${week} del programa online «Tu nueva vida» (${MODULES[week].title}).`,
     "El vídeo es faceless: solo diapositivas y una voz femenina en off. No hay coach humano ni llamadas en el programa: no los menciones. El acompañamiento es un coach IA dentro de la plataforma.",
     "Reglas: español de España, tuteo, frases cortas y naturales para ser dichas en voz alta, tono cálido, sereno y directo, sin jerga de autoayuda ni frases grandilocuentes. No leas la diapositiva literalmente: explícala y amplíala con la teoría. Entre 25 y 60 palabras por diapositiva (la portada, 15-25). Nada de emojis, listas, comillas tipográficas raras ni acotaciones.",
-    "La voz es femenina, pero el oyente puede ser hombre o mujer: no marques nunca su género (evita «bienvenida/o», «lista/o», «cansada/o», «a ti misma/o»; usa construcciones neutras como «te damos la bienvenida», «cuando quieras», «a ti»). Llama al acompañante «tu coach IA» y escríbelo así: «tu coach i a».",
+    "La voz es femenina, pero el oyente puede ser hombre o mujer: no marques nunca su género (evita «bienvenida/o», «lista/o», «cansada/o», «a ti misma/o»; usa construcciones neutras como «te damos la bienvenida», «cuando quieras», «a ti»). Llama al acompañante «tu coach IA».",
     "La última diapositiva invita a hacer el ejercicio práctico que está justo debajo del vídeo y a enviarlo a revisión al coach IA.",
     `Devuelve SOLO un JSON: un array de ${slides.length} strings, una locución por diapositiva, en el mismo orden.`,
     "",
@@ -115,17 +122,26 @@ async function narrate(week, slides) {
 
 async function tts(text, outFile) {
   if (existsSync(outFile)) return;
-  const submit = await fetch("https://queue.fal.run/fal-ai/elevenlabs/tts/multilingual-v2", {
+  // El filtro de contenido a veces da falsos positivos: reintenta.
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await ttsOnce(text, outFile);
+    } catch (error) {
+      if (attempt >= 3) throw error;
+      console.log(`  reintentando voz (${attempt})…`);
+    }
+  }
+}
+
+async function ttsOnce(text, outFile) {
+  const submit = await fetch("https://queue.fal.run/fal-ai/gemini-3.1-flash-tts", {
     method: "POST",
     headers: { Authorization: `Key ${FAL_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      text,
+      prompt: text,
       voice: VOICE,
-      stability: 0.55,
-      similarity_boost: 0.75,
-      style: 0.15,
-      speed: 0.95,
-      language_code: "es",
+      language_code: "Spanish (Spain)",
+      style_instructions: VOICE_STYLE,
     }),
   });
   if (!submit.ok) throw new Error(`fal ${submit.status}: ${await submit.text()}`);
@@ -137,6 +153,7 @@ async function tts(text, outFile) {
     if (st.status === "FAILED" || st.status === "ERROR") throw new Error("TTS falló");
   }
   const result = await (await fetch(response_url, { headers: { Authorization: `Key ${FAL_KEY}` } })).json();
+  if (!result.audio?.url) throw new Error(`TTS sin audio: ${JSON.stringify(result).slice(0, 300)}`);
   const audio = await fetch(result.audio.url);
   writeFileSync(outFile, Buffer.from(await audio.arrayBuffer()));
 }
@@ -146,6 +163,9 @@ async function tts(text, outFile) {
 const esc = (s) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
+// Misma identidad que la landing (src/styles.css): Karla en negrita para
+// titulares (tracking -0.02em), paleta oklch, fondo .landing-hero-bg y
+// degradado del titular del hero (.landing-hero-title-gradient).
 function slideHtml(week, slide, index, total) {
   const meta = MODULES[week];
   const isCover = index === 0;
@@ -158,30 +178,55 @@ function slideHtml(week, slide, index, total) {
          .join("")}`
     : `<p class="eyebrow">Módulo ${week} · ${esc(meta.title)}</p>
        <h2>${esc(slide.heading)}</h2>
-       <div class="lines">${slide.lines.map((l) => `<p>${esc(l)}</p>`).join("")}</div>`;
+       <div class="card">${slide.lines.map((l) => `<p>${esc(l)}</p>`).join("")}</div>`;
   return `<!doctype html><html lang="es"><head><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,400&family=Karla:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --background: oklch(0.985 0.012 85);
+    --foreground: oklch(0.18 0.01 60);
+    --muted-foreground: oklch(0.48 0.02 60);
+    --accent-foreground: oklch(0.28 0.06 45);
+    --ember: oklch(0.63 0.17 45);
+    --border: oklch(0.9 0.02 80);
+  }
   * { margin: 0; box-sizing: border-box; }
-  body { width: 1920px; height: 1080px; overflow: hidden; font-family: Karla, system-ui, sans-serif;
-         background: radial-gradient(1200px 700px at 85% 110%, #FBE3CC 0%, transparent 60%),
-                     radial-gradient(900px 600px at 0% -10%, #FCE9EE 0%, transparent 55%), #FBF7F1;
-         color: #1E1A16; display: flex; flex-direction: column; justify-content: center; padding: 0 180px; }
-  .eyebrow { font-size: 26px; letter-spacing: .22em; text-transform: uppercase; color: #C2562B; font-weight: 600; }
-  h1.cover { font-family: Lora, Georgia, serif; font-size: 128px; line-height: 1.04; font-weight: 600; margin-top: 36px; max-width: 1400px; }
-  .question { font-family: Lora, Georgia, serif; font-style: italic; font-size: 52px; color: #6B5E52; margin-top: 44px; }
-  h2 { font-family: Lora, Georgia, serif; font-size: 92px; line-height: 1.08; font-weight: 600; margin-top: 30px; max-width: 1500px; }
-  .lines { margin-top: 56px; border-left: 6px solid #E07A45; padding-left: 44px; max-width: 1450px; }
-  .lines p { font-size: 46px; line-height: 1.38; color: #3A322B; }
-  .lines p + p { margin-top: 18px; }
-  .foot { position: absolute; left: 180px; right: 180px; bottom: 70px; display: flex; justify-content: space-between;
-          font-size: 24px; color: #8A7C6F; }
-  .flame { display: inline-block; width: 18px; height: 18px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
-           background: linear-gradient(135deg, #F2A65A, #C2562B); margin-right: 14px; vertical-align: -2px; }
-  .bar { position: absolute; left: 0; bottom: 0; height: 8px; background: #E07A45; width: ${Math.round(((index + 1) / total) * 100)}%; }
+  body {
+    width: 1920px; height: 1080px; overflow: hidden; position: relative;
+    font-family: Karla, system-ui, sans-serif; color: var(--foreground);
+    background:
+      radial-gradient(ellipse 55% 55% at 10% 5%, oklch(0.91 0.09 350 / 90%), transparent 65%),
+      radial-gradient(ellipse 55% 50% at 90% 10%, oklch(0.91 0.08 55 / 90%), transparent 65%),
+      radial-gradient(ellipse 60% 45% at 15% 100%, oklch(0.92 0.07 160 / 55%), transparent 65%),
+      radial-gradient(ellipse 55% 45% at 88% 95%, oklch(0.89 0.06 300 / 55%), transparent 65%),
+      var(--background);
+    display: flex; flex-direction: column; justify-content: center; padding: 0 180px;
+  }
+  .eyebrow { font-size: 26px; letter-spacing: .2em; text-transform: uppercase; font-weight: 600; color: var(--accent-foreground); }
+  h1, h2 { font-weight: 700; letter-spacing: -0.02em; }
+  h1.cover {
+    font-size: 150px; line-height: 1.05; margin-top: 40px; max-width: 1500px;
+    background: linear-gradient(100deg, oklch(0.58 0.15 350) 0%, oklch(0.63 0.17 45) 50%, oklch(0.68 0.14 80) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: 12px;
+  }
+  .question { font-size: 52px; font-weight: 400; color: var(--muted-foreground); margin-top: 40px; }
+  h2 { font-size: 96px; line-height: 1.05; margin-top: 28px; max-width: 1500px; }
+  .card {
+    margin-top: 56px; max-width: 1450px; padding: 48px 56px; border-radius: 48px;
+    background: oklch(1 0 0 / 82%); border: 1px solid var(--border);
+    box-shadow: 0 18px 40px -28px oklch(0.55 0.09 350 / 40%);
+  }
+  .card p { font-size: 44px; line-height: 1.4; color: var(--foreground); }
+  .card p + p { margin-top: 16px; }
+  .foot { position: absolute; left: 180px; right: 180px; bottom: 64px; display: flex; justify-content: space-between; align-items: center;
+          font-size: 26px; font-weight: 700; letter-spacing: -0.02em; color: var(--foreground); }
+  .foot .count { font-weight: 500; color: var(--muted-foreground); letter-spacing: 0; }
+  .foot img { width: 40px; height: 40px; margin-right: 14px; vertical-align: middle; }
+  .bar { position: absolute; left: 0; bottom: 0; height: 8px; width: ${Math.round(((index + 1) / total) * 100)}%;
+         background: linear-gradient(90deg, oklch(0.58 0.15 350), oklch(0.63 0.17 45), oklch(0.68 0.14 80)); }
 </style></head><body>
 ${body}
-<div class="foot"><span><span class="flame"></span>Tu nueva vida</span><span>${index + 1} / ${total}</span></div>
+<div class="foot"><span><img src="data:image/svg+xml;base64,${LOGO_B64}" alt="">Tu nueva vida</span><span class="count">${index + 1} / ${total}</span></div>
 <div class="bar"></div>
 </body></html>`;
 }
@@ -255,7 +300,7 @@ async function build(week) {
   // El nombre del audio lleva un hash del texto + voz: si editas la narración,
   // solo se regeneran las diapositivas cambiadas.
   const audios = narration.map((t, i) => {
-    const h = createHash("sha1").update(`${VOICE}|${t}`).digest("hex").slice(0, 8);
+    const h = createHash("sha1").update(`${VOICE}|${VOICE_STYLE}|${t}`).digest("hex").slice(0, 8);
     return join(dir, `voz-${pad(i + 1)}-${h}.mp3`);
   });
   for (let i = 0; i < audios.length; i += 4) {

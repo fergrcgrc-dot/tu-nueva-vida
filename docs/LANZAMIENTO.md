@@ -52,7 +52,7 @@ Y en Authentication → URL Configuration añade `https://tunuevavida.eu/set-pas
 
 ## 5. Vídeos de los módulos
 
-Pipeline: guion de slides + teoría → narración (Claude vía OpenRouter) → voz femenina (ElevenLabs vía fal.ai) → diapositivas con la marca → MP4.
+Pipeline: guion de slides + teoría → narración (Claude vía OpenRouter) → voz femenina dulce en español de España (Gemini TTS vía fal.ai, voz Vindemiatrix) → diapositivas con la paleta, el fondo y la fuente de la landing → MP4.
 
 ```bash
 node scripts/videos/build-video.mjs 1        # un módulo
