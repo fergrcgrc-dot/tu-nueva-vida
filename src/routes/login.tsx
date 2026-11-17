@@ -21,12 +21,12 @@ export const Route = createFileRoute("/login")({
       { title: "Iniciar sesión — Tu Nueva Vida" },
       {
         name: "description",
-        content: "Acceso privado para clientes y coach del programa Tu Nueva Vida.",
+        content: "Acceso privado al programa Tu Nueva Vida.",
       },
       { property: "og:title", content: "Iniciar sesión — Tu Nueva Vida" },
       {
         property: "og:description",
-        content: "Acceso privado para clientes y coach del programa Tu Nueva Vida.",
+        content: "Acceso privado al programa Tu Nueva Vida.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/login")({
 
 /**
  * Solo inicio de sesión: no existe registro público. Los clientes son
- * invitados manualmente por el coach.
+ * dados de alta automáticamente al comprar el programa.
  */
 function LoginPage() {
   const navigate = useNavigate();
@@ -164,7 +164,10 @@ function LoginPage() {
         </form>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          El acceso es solo por invitación de tu coach.
+          ¿Aún no tienes acceso?{" "}
+          <a href="/#precio" className="font-medium text-primary hover:underline">
+            Empieza el programa
+          </a>
         </p>
       </div>
     </div>

@@ -16,10 +16,10 @@ Al final, vas a poner una cifra a tres cosas distintas: cuánto te afecta emocio
 
 ## Lo que no vamos a hacer
 
-No vamos a añadir dramatismo que tú no hayas puesto, pero tampoco lo vamos a quitar si aparece. Si al escribir esto sientes algo que va más allá del malestar — una sensación de que no hay salida, no solo de que las cosas están mal — dilo con esas palabras. No esperamos a que termine la semana para avisar a tu coach: en ese caso, hablamos con él de inmediato.
+No vamos a añadir dramatismo que tú no hayas puesto, pero tampoco lo vamos a quitar si aparece. Si al escribir esto sientes algo que va más allá del malestar — una sensación de que no hay salida, no solo de que las cosas están mal — dilo con esas palabras. En ese caso no seguimos con el ejercicio como si nada: pausamos el ejercicio y te mostramos de inmediato los recursos de ayuda profesional (024, atención a la conducta suicida, gratuita y 24 h; 112 en emergencia).
 
 ## Cómo cierra esta semana
 
-Esta sesión cierra la primera fase del programa. Tienes una llamada con tu coach esta semana, y no es para analizar nada más: es para sostener lo que estas dos semanas han removido. Lo que escribas hoy es, literalmente, lo que tu coach va a tener delante antes de hablar contigo.
+Esta sesión cierra la primera fase del programa. Al enviar el ejercicio, tu coach IA hace la revisión de fase: junta lo que has escrito estas dos semanas y te lo devuelve en limpio, sin añadir análisis. No es para darle más vueltas: es para que veas, ordenado, lo que estas dos semanas han removido. Si después necesitas parar un par de días antes de seguir, para eso está el acceso de por vida.
 
 A partir de la semana que viene dejamos de mirar hacia atrás y empezamos a preguntarnos qué es importante de verdad. Pero esa pregunta solo tiene sentido si antes le has puesto un precio real a seguir igual — que es, exactamente, lo que vas a hacer hoy.

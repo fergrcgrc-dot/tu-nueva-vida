@@ -50,7 +50,7 @@ export const getDashboard = createServerFn({ method: "GET" })
     const [profileRes, modulesRes, progressRes, sessionsRes, followUpsRes] = await Promise.all([
       supabase
         .from("profiles")
-        .select("full_name, program_start_date")
+        .select("full_name, program_start_date, status")
         .eq("id", userId)
         .maybeSingle(),
       supabase
@@ -82,6 +82,10 @@ export const getDashboard = createServerFn({ method: "GET" })
       sessionsRes.error || followUpsRes.error
     ) {
       throw safeError("No se pudo cargar tu programa.");
+    }
+
+    if (profileRes.data && "status" in profileRes.data && profileRes.data.status !== "active") {
+      throw safeError("Tu acceso al programa no está activo. Si crees que es un error, escribe a hola@tunuevavida.eu.");
     }
 
     const progressByModule = new Map(
@@ -122,28 +126,6 @@ export const startModule = createServerFn({ method: "POST" })
       _module_id: data.moduleId,
     });
     if (error) throw safeError("No se pudo iniciar el módulo.");
-    return { ok: true };
-  });
-
-/**
- * Completa un módulo. La lógica (estado válido, desbloqueo de la semana
- * siguiente) vive íntegramente en la función de base de datos; desde el
- * navegador no se puede saltar ninguna semana.
- */
-export const completeModule = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => ModuleIdInput.parse(input))
-  .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.rpc("complete_module", {
-      _user_id: context.userId,
-      _module_id: data.moduleId,
-    });
-    if (error) {
-      if (error.message.includes("module_locked")) {
-        throw safeError("Este módulo todavía está bloqueado.");
-      }
-      throw safeError("No se pudo completar el módulo.");
-    }
     return { ok: true };
   });
 
@@ -206,24 +188,6 @@ export const getMyDeliverables = createServerFn({ method: "GET" })
       .order("created_at", { ascending: true });
     if (error) throw safeError("No se pudieron cargar tus entregables.");
     return data ?? [];
-  });
-
-/** "Hablar con alguien": crea un aviso abierto para el coach humano. */
-export const requestHumanContact = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ moduleId: z.string().uuid().nullable().optional() }).parse(input),
-  )
-  .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("flags").insert({
-      user_id: context.userId,
-      module_id: data.moduleId ?? null,
-      trigger_type: "solicitud_explicita",
-      status: "open",
-      note: "El cliente ha pedido hablar con una persona.",
-    });
-    if (error) throw safeError("No se pudo enviar tu solicitud. Inténtalo de nuevo.");
-    return { ok: true };
   });
 
 /* ------------------------------------------------------------------ */

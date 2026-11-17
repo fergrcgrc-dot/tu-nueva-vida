@@ -31,4 +31,4 @@ No vale responder solo a la primera mitad. Si te cuesta encontrar dónde no est�
 
 ## Qué recibes al terminar
 
-Un resumen del contraste entre tu autoimagen y tu valor de mayor distancia, que se incorpora directamente al informe que tu coach revisa antes de la llamada de esta semana — la que cierra esta fase del programa.
+El feedback de tu coach IA y la revisión de cierre de la Fase 2: el contraste entre tu autoimagen y tu valor de mayor distancia, con tus propias palabras.

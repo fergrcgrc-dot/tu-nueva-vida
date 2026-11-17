@@ -26,4 +26,4 @@ Valora cada cosa del 1 al 10, con una frase breve que explique el número:
 
 ## Qué recibes al terminar
 
-Un resumen breve de lo que has escrito, sin interpretación añadida. La versión más completa —con cualquier contraste entre lo que dijiste la semana pasada y lo que acabas de describir— se incorpora al informe que tu coach revisa antes de la llamada de esta semana.
+El feedback de tu coach IA y la revisión de cierre de la Fase 1: un resumen de lo que has escrito, sin interpretación añadida, y cualquier contraste entre lo que dijiste la semana pasada y lo que acabas de describir.

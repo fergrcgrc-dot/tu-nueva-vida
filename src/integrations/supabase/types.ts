@@ -130,6 +130,48 @@ export type Database = {
           },
         ]
       }
+      exercise_submissions: {
+        Row: {
+          answers: Json
+          attempts: number
+          created_at: string
+          feedback: Json | null
+          id: string
+          module_id: string
+          reviewed_at: string | null
+          status: Database["public"]["Enums"]["submission_status"]
+          submitted_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          attempts?: number
+          created_at?: string
+          feedback?: Json | null
+          id?: string
+          module_id: string
+          reviewed_at?: string | null
+          status?: Database["public"]["Enums"]["submission_status"]
+          submitted_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          attempts?: number
+          created_at?: string
+          feedback?: Json | null
+          id?: string
+          module_id?: string
+          reviewed_at?: string | null
+          status?: Database["public"]["Enums"]["submission_status"]
+          submitted_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       flags: {
         Row: {
           created_at: string
@@ -279,6 +321,7 @@ export type Database = {
           phase_number: number
           title: string
           updated_at: string
+          video_path: string | null
           week_number: number
         }
         Insert: {
@@ -339,6 +382,51 @@ export type Database = {
           status?: Database["public"]["Enums"]["account_status"]
           timezone?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      purchases: {
+        Row: {
+          created_at: string
+          currency: string | null
+          customer_name: string | null
+          email: string
+          id: string
+          order_id: string
+          provider: string
+          raw: Json
+          status: string
+          total_cents: number | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          customer_name?: string | null
+          email: string
+          id?: string
+          order_id: string
+          provider?: string
+          raw?: Json
+          status: string
+          total_cents?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          customer_name?: string | null
+          email?: string
+          id?: string
+          order_id?: string
+          provider?: string
+          raw?: Json
+          status?: string
+          total_cents?: number | null
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -451,6 +539,7 @@ export type Database = {
       module_status: "locked" | "unlocked" | "in_progress" | "completed"
       next_step: "acompanamiento_1_1" | "retiro_leon"
       session_status: "pending" | "scheduled" | "completed"
+      submission_status: "draft" | "submitted" | "needs_revision" | "approved"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -586,6 +675,7 @@ export const Constants = {
       module_status: ["locked", "unlocked", "in_progress", "completed"],
       next_step: ["acompanamiento_1_1", "retiro_leon"],
       session_status: ["pending", "scheduled", "completed"],
+      submission_status: ["draft", "submitted", "needs_revision", "approved"],
     },
   },
 } as const

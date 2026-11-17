@@ -40,3 +40,6 @@ supabase/.temp/
 *.njsproj
 *.sln
 *.sw?
+
+# Vídeos generados (se suben a Supabase Storage, no a git)
+videos-out/

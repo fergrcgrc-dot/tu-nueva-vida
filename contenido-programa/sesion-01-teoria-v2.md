@@ -18,7 +18,7 @@ Es tentador empezar por lo bonito: a dónde quieres llegar, qué versión de ti 
 
 Vamos a recorrer cuatro áreas: tu carrera, tu energía, tus relaciones y, en general, lo que no te acaba de encajar. No es casualidad que sean estas cuatro: son los sitios donde más fácil resulta explicarse a uno mismo por qué todo sigue igual — *"es una mala racha"*, *"todos los trabajos tienen días así"*, *"ahora mismo no tengo tiempo para los amigos"*. Hoy vamos a mirar cada una sin esa excusa delante.
 
-Te vamos a hacer preguntas, y a partir de lo que respondas, te vamos a devolver el patrón que veamos — sin decirte qué hacer con él, sin decirte si está bien o mal. Solo para que lo veas con claridad. Si en algún punto aparece algo serio — no cansancio, sino una desesperanza que se sostiene en el tiempo — vamos a avisar a tu coach de inmediato, sin esperar a que termines la semana. Eso no es un fallo del proceso: es parte de él.
+Te vamos a hacer preguntas, y a partir de lo que respondas, te vamos a devolver el patrón que veamos — sin decirte qué hacer con él, sin decirte si está bien o mal. Solo para que lo veas con claridad. Si en algún punto aparece algo serio — no cansancio, sino una desesperanza que se sostiene en el tiempo — pausamos el ejercicio y te mostramos de inmediato los recursos de ayuda profesional (024, atención a la conducta suicida, gratuita y 24 h; 112 en emergencia). Este programa no sustituye a un profesional de la salud mental, y cuando hace falta uno, te lo decimos sin rodeos.
 
 ## Lo que significa "de verdad"
 
@@ -26,6 +26,6 @@ La pregunta de esta primera fase es "¿de dónde vienes, de verdad?" — y esa �
 
 ## Qué pasa con lo que cuentes
 
-Nada de lo que escribas o digas hoy desaparece en el vacío. Si hay algo que tu coach debería saber antes de hablar contigo, lo va a saber. Y lo que cuentes hoy es también la base que usaremos la semana que viene, para que las preguntas dejen de ser genéricas y empiecen a ser, específicamente, las que a ti te cuesta responder.
+Nada de lo que escribas o digas hoy desaparece en el vacío. Queda guardado en tu perfil, solo para ti, y es la base que usaremos la semana que viene, para que las preguntas dejen de ser genéricas y empiecen a ser, específicamente, las que a ti te cuesta responder.
 
 No hace falta que te prepares nada. Solo que, durante los próximos 45 minutos, respondas lo que es verdad y no lo que suena mejor.

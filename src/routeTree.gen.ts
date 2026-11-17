@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as ComprarRouteImport } from './routes/comprar'
+import { Route as GraciasRouteImport } from './routes/gracias'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -21,6 +23,7 @@ import { Route as AuthenticatedCoachIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedCoachSeguimientosRouteImport } from './routes/_authenticated/coach/seguimientos'
 import { Route as AuthenticatedModulosModuleIdRouteImport } from './routes/_authenticated/modulos/$moduleId'
 import { Route as AuthenticatedSeguimientosFollowUpIdRouteImport } from './routes/_authenticated/seguimientos/$followUpId'
+import { Route as ApiLemonsqueezyWebhookRouteImport } from './routes/api/lemonsqueezy/webhook'
 import { Route as AuthenticatedCoachClientesClientIdRouteImport } from './routes/_authenticated/coach/clientes/$clientId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -30,6 +33,16 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComprarRoute = ComprarRouteImport.update({
+  id: '/comprar',
+  path: '/comprar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GraciasRoute = GraciasRouteImport.update({
+  id: '/gracias',
+  path: '/gracias',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -85,6 +98,11 @@ const AuthenticatedSeguimientosFollowUpIdRoute =
     path: '/seguimientos/$followUpId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiLemonsqueezyWebhookRoute = ApiLemonsqueezyWebhookRouteImport.update({
+  id: '/api/lemonsqueezy/webhook',
+  path: '/api/lemonsqueezy/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedCoachClientesClientIdRoute =
   AuthenticatedCoachClientesClientIdRouteImport.update({
     id: '/clientes/$clientId',
@@ -94,6 +112,8 @@ const AuthenticatedCoachClientesClientIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/comprar': typeof ComprarRoute
+  '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
   '/set-password': typeof SetPasswordRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
@@ -102,18 +122,22 @@ export interface FileRoutesByFullPath {
   '/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
+  '/api/lemonsqueezy/webhook': typeof ApiLemonsqueezyWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/coach/': typeof AuthenticatedCoachIndexRoute
   '/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/comprar': typeof ComprarRoute
+  '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
   '/set-password': typeof SetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
+  '/api/lemonsqueezy/webhook': typeof ApiLemonsqueezyWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/coach': typeof AuthenticatedCoachIndexRoute
   '/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
@@ -122,6 +146,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/comprar': typeof ComprarRoute
+  '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
   '/set-password': typeof SetPasswordRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
@@ -130,6 +156,7 @@ export interface FileRoutesById {
   '/_authenticated/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/_authenticated/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/_authenticated/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
+  '/api/lemonsqueezy/webhook': typeof ApiLemonsqueezyWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/coach/': typeof AuthenticatedCoachIndexRoute
   '/_authenticated/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
@@ -138,6 +165,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/comprar'
+    | '/gracias'
     | '/login'
     | '/set-password'
     | '/admin'
@@ -146,18 +175,22 @@ export interface FileRouteTypes {
     | '/coach/seguimientos'
     | '/modulos/$moduleId'
     | '/seguimientos/$followUpId'
+    | '/api/lemonsqueezy/webhook'
     | '/admin/'
     | '/coach/'
     | '/coach/clientes/$clientId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/comprar'
+    | '/gracias'
     | '/login'
     | '/set-password'
     | '/dashboard'
     | '/coach/seguimientos'
     | '/modulos/$moduleId'
     | '/seguimientos/$followUpId'
+    | '/api/lemonsqueezy/webhook'
     | '/admin'
     | '/coach'
     | '/coach/clientes/$clientId'
@@ -165,6 +198,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/comprar'
+    | '/gracias'
     | '/login'
     | '/set-password'
     | '/_authenticated/admin'
@@ -173,6 +208,7 @@ export interface FileRouteTypes {
     | '/_authenticated/coach/seguimientos'
     | '/_authenticated/modulos/$moduleId'
     | '/_authenticated/seguimientos/$followUpId'
+    | '/api/lemonsqueezy/webhook'
     | '/_authenticated/admin/'
     | '/_authenticated/coach/'
     | '/_authenticated/coach/clientes/$clientId'
@@ -181,8 +217,11 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  ComprarRoute: typeof ComprarRoute
+  GraciasRoute: typeof GraciasRoute
   LoginRoute: typeof LoginRoute
   SetPasswordRoute: typeof SetPasswordRoute
+  ApiLemonsqueezyWebhookRoute: typeof ApiLemonsqueezyWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -199,6 +238,20 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comprar': {
+      id: '/comprar'
+      path: '/comprar'
+      fullPath: '/comprar'
+      preLoaderRoute: typeof ComprarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gracias': {
+      id: '/gracias'
+      path: '/gracias'
+      fullPath: '/gracias'
+      preLoaderRoute: typeof GraciasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -271,6 +324,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSeguimientosFollowUpIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/lemonsqueezy/webhook': {
+      id: '/api/lemonsqueezy/webhook'
+      path: '/api/lemonsqueezy/webhook'
+      fullPath: '/api/lemonsqueezy/webhook'
+      preLoaderRoute: typeof ApiLemonsqueezyWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/coach/clientes/$clientId': {
       id: '/_authenticated/coach/clientes/$clientId'
       path: '/clientes/$clientId'
@@ -331,8 +391,11 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  ComprarRoute: ComprarRoute,
+  GraciasRoute: GraciasRoute,
   LoginRoute: LoginRoute,
   SetPasswordRoute: SetPasswordRoute,
+  ApiLemonsqueezyWebhookRoute: ApiLemonsqueezyWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

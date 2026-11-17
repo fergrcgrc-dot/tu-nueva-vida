@@ -79,7 +79,7 @@ function DashboardPage() {
             {firstName ? `Hola, ${firstName}` : "Bienvenido"}
           </h1>
           <p className="mt-2 text-muted-foreground">
-            Semana {activeModule?.week_number ?? 8} de 8 ·{" "}
+            Módulo {activeModule?.week_number ?? 8} de 8 ·{" "}
             {completedCount === 8
               ? "Programa completado"
               : `${completedCount} de 8 módulos completados`}
@@ -92,32 +92,12 @@ function DashboardPage() {
           </div>
         </section>
 
-        {/* Próxima sesión 1:1 */}
-        {data.nextSession && (
-          <section className="card-depth mb-10 flex flex-wrap items-center gap-4 rounded-2xl p-5">
-            <CalendarDays className="h-5 w-5 shrink-0 text-primary" aria-hidden />
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-foreground">
-                Sesión 1:1 · Cierre de la fase {data.nextSession.phase_number}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {data.nextSession.status === "scheduled" && data.nextSession.scheduled_at
-                  ? new Date(data.nextSession.scheduled_at).toLocaleString("es-ES", {
-                      dateStyle: "full",
-                      timeStyle: "short",
-                      timeZone: "UTC",
-                    })
-                  : "Pendiente de agendar con tu coach"}
-              </p>
-            </div>
-          </section>
-        )}
-
-        {/* Seguimientos de 30 y 60 días */}
+        {/* Próximo check-in del plan a 90 días */}
         {data.followUps.filter((f) => f.status === "pending").length > 0 && (
           <section className="mb-10 space-y-3">
             {data.followUps
               .filter((f) => f.status === "pending")
+              .slice(0, 1)
               .map((f) => (
                 <Link
                   key={f.id}
@@ -128,7 +108,7 @@ function DashboardPage() {
                   <CalendarDays className="h-5 w-5 shrink-0 text-gold" aria-hidden />
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-foreground">
-                      Seguimiento de {f.day_offset} días
+                      Check-in del plan · día {f.day_offset}
                     </p>
                     <p className="text-sm text-muted-foreground">
                       {new Date(f.due_at) > new Date()
@@ -154,14 +134,14 @@ function DashboardPage() {
                 {activeModule.status === "in_progress" ? "Continúa donde lo dejaste" : "Tu módulo activo"}
               </p>
               <p className="mt-1 font-display text-xl font-semibold">
-                Semana {activeModule.week_number} · {activeModule.title}
+                Módulo {activeModule.week_number} · {activeModule.title}
               </p>
             </div>
             <ArrowRight className="h-6 w-6 shrink-0" aria-hidden />
           </Link>
         )}
 
-        {/* Línea de tiempo: 8 semanas en 4 fases */}
+        {/* Línea de tiempo: 8 módulos en 4 fases */}
         <div className="space-y-10">
           {phases.map((phase) => (
             <section key={phase.phase}>
@@ -183,7 +163,7 @@ function DashboardPage() {
                           <StatusIcon status={m.status} />
                           <div>
                             <p className="text-xs text-muted-foreground">
-                              Semana {m.week_number}
+                              Módulo {m.week_number}
                             </p>
                             <h3 className="font-display text-lg font-semibold text-foreground">
                               {m.title}

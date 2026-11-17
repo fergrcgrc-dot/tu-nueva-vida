@@ -94,7 +94,7 @@ function SetPasswordPage() {
 
         {status === "invalid" && (
           <p role="alert" className="text-center text-sm text-destructive">
-            Este enlace no es válido o ha caducado. Pide a tu coach que te reenvíe la invitación.
+            Este enlace no es válido o ha caducado. Escribe a hola@tunuevavida.eu con el email de tu compra y te enviamos uno nuevo.
           </p>
         )}
 

@@ -39,9 +39,9 @@ Con él, se convierte en una prueba real.
 
 ---
 
-**Diapositiva 7 — Tu llamada de esta semana**
+**Diapositiva 7 — La revisión de fase**
 Esta sesión cierra la fase de Claridad.
-Tu llamada de esta semana trabaja exactamente este contraste.
+La revisión de fase trabaja exactamente este contraste.
 
 ---
 

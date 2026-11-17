@@ -84,13 +84,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Tu Nueva Vida es un programa privado de desarrollo personal: 8 semanas, 4 fases, guía con IA y acompañamiento humano 1:1.",
+          "Tu Nueva Vida: programa online de transformación personal en 8 módulos, con vídeos, ejercicios y un coach IA que revisa tu trabajo.",
       },
       { property: "og:title", content: "Tu Nueva Vida" },
       {
         property: "og:description",
         content:
-          "Programa privado de transformación personal: 8 semanas, 4 fases, con guía de IA y coach humano.",
+          "Programa online de transformación personal: 8 módulos, 4 fases y un coach IA. Acceso de por vida.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

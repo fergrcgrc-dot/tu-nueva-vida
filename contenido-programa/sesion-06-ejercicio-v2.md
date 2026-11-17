@@ -25,8 +25,8 @@ Valora: **"Qué tan seguro estoy de que estas restricciones son límites reales 
 ## Paso 4 — Tu dirección provisional
 *(✍️ escribe o 🎙️ graba tu voz)*
 
-De las opciones que sobreviven, elige la que sientas con más claridad como tu dirección. No tiene que ser definitiva — se confirma en tu llamada con el coach esta semana.
+De las opciones que sobreviven, elige la que sientas con más claridad como tu dirección. Escribe también qué miedo te trae elegirla. Al enviar el ejercicio, tu coach IA te pedirá que la ratifiques o la ajustes.
 
 ## Qué recibes al terminar
 
-Tu lista filtrada completa, tu dirección provisional, y si corresponde, una nota si alguna de tus restricciones podría estar funcionando como excusa. Todo esto se incorpora al informe que tu coach revisa antes de tu llamada de esta semana, la de comprometerte con una dirección.
+Tu lista filtrada completa, tu dirección provisional, y si corresponde, una nota si alguna de tus restricciones podría estar funcionando como excusa. Además, la revisión de cierre de la Fase 3, donde ratificas tu dirección por escrito.

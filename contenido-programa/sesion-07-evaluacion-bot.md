@@ -1,7 +1,7 @@
 # Sesión 7 · Evaluación del bot al cierre
 
 ## Lectura previa obligatoria
-El bot lee `direccion_elegida` (ratificada tras el checkpoint de la Sesión 6) para contrastar cada hito propuesto contra ella, y `restriccion_usada_como_excusa` de la Sesión 6 para prestar atención reforzada si algún hito parece esquivar, de nuevo, la misma restricción cuestionada entonces.
+El bot lee `direccion_elegida` (ratificada en la revisión de fase de la Sesión 6) para contrastar cada hito propuesto contra ella, y `restriccion_usada_como_excusa` de la Sesión 6 para prestar atención reforzada si algún hito parece esquivar, de nuevo, la misma restricción cuestionada entonces.
 
 ## Patrones a extraer de la respuesta
 - **Verificabilidad**: presencia real de fecha y criterio de cumplimiento binario (sí/no) en cada hito, frente a formulaciones que siguen siendo intenciones con una fecha pegada encima.
@@ -17,7 +17,7 @@ El bot lee `direccion_elegida` (ratificada tras el checkpoint de la Sesión 6) p
 1. **Lenguaje de crisis o desesperanza** — Monitorizado como siempre, con atención particular si aparece alrededor del hito más difícil ("sé que no lo voy a conseguir, nunca consigo estas cosas").
 2. **Bloqueo repetido** — Se activa específicamente si, tras dos rondas de la IA pidiendo precisar fecha y criterio de cumplimiento, los hitos siguen siendo formulaciones vagas sin verificabilidad real. Esta es la aplicación literal del trigger 2 a este módulo: "misma respuesta o ausencia de respuesta más de 2 veces".
 3. **Inactividad** — Criterio estándar.
-4. **Contradicción no resuelta** — Se activa si `relacion_hitos_con_direccion_elegida` resulta baja: el plan, en conjunto, no ejecuta la dirección comprometida la semana anterior, sino una versión notablemente más segura o distinta de ella, y el usuario no lo reconoce al señalársele. Se marca para que el coach lo revise antes del cierre del programa en la Sesión 8.
+4. **Contradicción no resuelta** — Se activa si `relacion_hitos_con_direccion_elegida` resulta baja: el plan, en conjunto, no ejecuta la dirección comprometida la semana anterior, sino una versión notablemente más segura o distinta de ella, y el usuario no lo reconoce al señalársele. Se marca para que se retome de forma explícita en el informe final de la Sesión 8.
 
 ## Tono del bot
 El bot no acepta un hito vago por cortesía ("vale, lo anoto así"); lo devuelve con precisión quirúrgica: "esto dice 'avanzar en mi búsqueda'. ¿Qué fecha, y cómo sabrás exactamente que se cumplió?". No felicita el plan una vez completo ("¡buen trabajo!"); se limita a confirmar que cada hito pasó la prueba de verificabilidad y a señalar, si la hay, cualquier desalineación con la dirección elegida, dejando al usuario decidir qué hacer con esa información antes de pasar a la última sesión.

@@ -53,7 +53,7 @@ No decidimos por ti ni sugerimos "la correcta".
 
 **Diapositiva 9 — Lo que no se resuelve hoy**
 No vas a elegir dirección esta semana.
-Eso llega en la semana 6, con tu coach.
+Eso llega en la semana 6.
 
 ---
 

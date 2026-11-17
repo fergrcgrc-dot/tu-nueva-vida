@@ -16,7 +16,7 @@ Sesión 1 es la primera: no hay perfil previo que consultar. El bot abre en modo
 
 ## Triggers de escalado aplicados a esta sesión
 
-1. **Lenguaje de crisis o desesperanza** — Se activa si en cualquier dominio (especialmente energía o insatisfacciones generales) aparecen marcadores de desesperanza sostenida, no solo cansancio puntual (p. ej. "no le veo sentido a seguir así", "no sé para qué sigo intentándolo"). Activa aviso inmediato al coach, independientemente del calendario de llamadas.
+1. **Lenguaje de crisis o desesperanza** — Se activa si en cualquier dominio (especialmente energía o insatisfacciones generales) aparecen marcadores de desesperanza sostenida, no solo cansancio puntual (p. ej. "no le veo sentido a seguir así", "no sé para qué sigo intentándolo"). Pausa el ejercicio de inmediato, muestra los recursos de ayuda profesional (024 y 112) y registra un aviso interno para el administrador.
 2. **Bloqueo repetido** — Se activa si el usuario da la misma respuesta genérica, o deja la respuesta en blanco, en 2 o más de las 9 preguntas pese a la repregunta de seguimiento. Marca `señal_bloqueo_s1 = true`.
 3. **Inactividad** — No aplica aún de forma retrospectiva en la primera sesión, pero el contador `dias_inactividad_semana_actual` empieza a correr desde la activación del módulo.
 4. **Contradicción no resuelta** — En esta sesión se registra como candidata, no se escala todavía: si aparece una discrepancia fuerte dentro del mismo bloque (p. ej. "mi trabajo me encanta" en la pregunta 1 y "evito hablar de lo agotado que estoy" en la pregunta 3), el bot la anota en `resumen_auditoria` para que la Sesión 2 la retome explícitamente, sin forzar su resolución ahora.

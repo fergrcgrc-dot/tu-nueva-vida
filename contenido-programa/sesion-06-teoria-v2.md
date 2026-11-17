@@ -14,12 +14,12 @@ Si hubiéramos pedido tus restricciones antes de generar la lista amplia, habrí
 
 ## Cómo lo revisamos
 
-No decidimos nosotros si una restricción es real o es excusa. La cruzamos con cosas que ya dijiste antes — por ejemplo, si marcas "geografía" como restricción ("no puedo cambiar de ciudad") pero en la semana 2 declaraste un coste emocional alto asociado precisamente a quedarte donde estás, señalamos esa tensión para que la hables con tu coach. No te decimos "esto no es real, es miedo".
+No decidimos nosotros si una restricción es real o es excusa. La cruzamos con cosas que ya dijiste antes — por ejemplo, si marcas "geografía" como restricción ("no puedo cambiar de ciudad") pero en la semana 2 declaraste un coste emocional alto asociado precisamente a quedarte donde estás, te señalamos esa tensión como una pregunta abierta. No te decimos "esto no es real, es miedo".
 
 ## Lo que más importa hoy
 
-Si, tras aplicar tus restricciones, ninguna de las opciones ancladas a tu valor de mayor distancia sobrevive, eso no es un resultado neutro. Es el tema central de tu llamada de esta semana — no uno más entre varios. Has llegado, con tus propias reglas, a un resultado que elimina sistemáticamente la posibilidad de atender lo que tú mismo identificaste, hace dos semanas, como lo más desatendido de tu vida. Nombrarlo con precisión, sin resolverlo todavía, es lo que permite que la siguiente fase empiece con un plan construido sobre una dirección real.
+Si, tras aplicar tus restricciones, ninguna de las opciones ancladas a tu valor de mayor distancia sobrevive, eso no es un resultado neutro. Es el tema central de la revisión de fase de esta semana — no uno más entre varios. Has llegado, con tus propias reglas, a un resultado que elimina sistemáticamente la posibilidad de atender lo que tú mismo identificaste, hace dos semanas, como lo más desatendido de tu vida. Nombrarlo con precisión, sin resolverlo todavía, es lo que permite que la siguiente fase empiece con un plan construido sobre una dirección real.
 
-## Tu llamada de esta semana
+## La revisión de fase
 
-Esta sesión cierra la fase de Diseño. Tu coach te ayuda esta semana a comprometerte con una dirección y a gestionar el miedo de decidir — no es un trámite, es cerrar puertas de verdad, y eso necesita acompañamiento.
+Esta sesión cierra la fase de Diseño. En la revisión de fase, tu coach IA te pide que ratifiques tu dirección por escrito y que nombres el miedo que trae decidirla — no es un trámite, es cerrar puertas de verdad. Esa dirección ratificada es lo que vas a ejecutar la semana que viene.

@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { CHECKIN_CONTENT, getModuleContent } from "@/lib/module-content";
+import { CHECKIN_CONTENT, COACH_PERSONA, getModuleContent } from "@/lib/module-content";
 import type { Database } from "@/integrations/supabase/types";
 
 /**
@@ -22,6 +22,8 @@ const ModuleClaudeInput = z.object({
   moduleId: z.string().uuid(),
   message: z.string().min(1).max(8000),
   history: z.array(HistoryMessage).max(60).optional(),
+  /** Borrador actual del ejercicio, en texto, para que el coach lo tenga delante. */
+  draft: z.string().max(30000).optional(),
 });
 
 const ModuleReply = z.object({
@@ -37,16 +39,17 @@ export type ModuleClaudeReply = z.infer<typeof ModuleReply> & {
 };
 
 /**
- * Triggers de escalado IA → coach, los 4 definidos para todo el programa
+ * Señales de la IA, los 4 triggers definidos para todo el programa
  * (documento base, sección 5). "inactividad" no aparece aquí porque no es
  * detectable dentro de un mensaje: se calcula por fecha de última actividad,
  * a nivel de sistema, no por el modelo.
  */
 const KNOWN_TRIGGERS: Record<string, string> = {
-  lenguaje_crisis: "Hemos avisado a tu coach. Te responderá en menos de 24 horas.",
-  bloqueo_repetido: "Hemos avisado a tu coach. Te contactará en 24 a 48 horas.",
-  contradiccion_no_resuelta: "Tu coach lo revisará contigo en la próxima sesión.",
-  seguimiento_estancado: "Se lo hemos trasladado a tu coach para retomarlo contigo.",
+  lenguaje_crisis:
+    "Si sientes que no puedes más, llama ahora al 024 (gratuito, 24 h) o al 112 si es una emergencia.",
+  bloqueo_repetido: "",
+  contradiccion_no_resuelta: "",
+  seguimiento_estancado: "",
 };
 
 /**
@@ -63,6 +66,14 @@ async function loadAccessibleModule(
   userId: string,
   moduleId: string,
 ) {
+  const { data: owner } = await supabase
+    .from("profiles")
+    .select("status")
+    .eq("id", userId)
+    .maybeSingle();
+  if (owner && owner.status !== "active") {
+    throw safeError("Tu acceso al programa no está activo.");
+  }
   const { data: moduleRow, error: moduleError } = await supabase
     .from("modules")
     .select("id, phase_number, phase_name, week_number, title, objective")
@@ -184,7 +195,14 @@ export const askModuleClaude = createServerFn({ method: "POST" })
     const content = getModuleContent(moduleRow.week_number);
 
     const systemPrompt = [
-      content.systemPrompt,
+      COACH_PERSONA,
+      "",
+      "## Tu papel en este chat",
+      "El usuario está trabajando el módulo dentro de la plataforma: ve el vídeo y la teoría, y rellena un ejercicio escrito que luego envía a revisión. Aquí le acompañas mientras lo hace: le ayudas a desatascarse con preguntas, a concretar respuestas genéricas y a entender la teoría. No escribes las respuestas del ejercicio por él ni le dices qué contestar.",
+      "",
+      `## Guía del módulo\n${content.systemPrompt}`,
+      "",
+      data.draft ? `## Borrador actual del ejercicio del usuario\n${data.draft}` : "El usuario todavía no ha escrito nada en el ejercicio.",
       "",
       `Contexto del programa: «Tu Nueva Vida». Fase ${moduleRow.phase_number} — «${moduleRow.phase_name}». Semana ${moduleRow.week_number} de 8. Módulo: «${moduleRow.title}». Objetivo: ${moduleRow.objective}`,
       previous.length > 0
@@ -195,7 +213,7 @@ export const askModuleClaude = createServerFn({ method: "POST" })
       '{"message": string, "should_save_deliverable": boolean, "deliverable_content": string | null, "flag": string | null}',
       "- message: tu respuesta al cliente, en español.",
       "- should_save_deliverable: true solo cuando la conversación del módulo esté completa; el cliente decide guardarlo con una acción explícita.",
-      "- flag: null normalmente. Usa exactamente \"lenguaje_crisis\" (desesperanza sostenida, indefensión total, deterioro grave de salud mental), \"bloqueo_repetido\" (misma respuesta vacía o genérica en 2 o más preguntas pese a la repregunta), o \"contradiccion_no_resuelta\" (discrepancia fuerte entre lo declarado ahora y el perfil acumulado del usuario, no reconocida pese a señalarla una vez). Usa un texto breve para cualquier otra señal que el coach humano deba revisar.",
+      "- flag: null normalmente. Usa exactamente \"lenguaje_crisis\" (desesperanza sostenida, indefensión total, deterioro grave de salud mental), \"bloqueo_repetido\" (misma respuesta vacía o genérica en 2 o más preguntas pese a la repregunta), o \"contradiccion_no_resuelta\" (discrepancia fuerte entre lo declarado ahora y el perfil acumulado del usuario, no reconocida pese a señalarla una vez). No uses otros valores.",
     ].join("\n");
 
     const messages = [
@@ -219,7 +237,7 @@ export const askModuleClaude = createServerFn({ method: "POST" })
       // respaldo de texto plano
     }
 
-    // Escalado automático al coach humano.
+    // Señal registrada para el administrador (no hay coach humano).
     if (reply.flag) {
       const raw = reply.flag.trim();
       const triggerType = raw in KNOWN_TRIGGERS ? raw : "senal_guia";
@@ -231,133 +249,18 @@ export const askModuleClaude = createServerFn({ method: "POST" })
         note: reply.flag.slice(0, 2000),
       });
       if (flagError) console.error("[claude] no se pudo registrar el aviso");
-      reply.escalated = true;
-      reply.escalation_message =
-        KNOWN_TRIGGERS[triggerType] ??
-        "Hemos avisado a tu coach. Te responderá en menos de 24 horas.";
+      const notice = KNOWN_TRIGGERS[triggerType];
+      if (notice) {
+        reply.escalated = true;
+        reply.escalation_message = notice;
+      }
     }
 
     return reply;
   });
 
-const MatrixItem = z.object({
-  text: z.string().min(1).max(500),
-  nonNegotiable: z.boolean(),
-});
-
-const GenerateDeliverableInput = z.object({
-  moduleId: z.string().uuid(),
-  history: z.array(HistoryMessage).min(1).max(60),
-  matrix: z.array(MatrixItem).max(40).optional(),
-});
-
-/**
- * Genera el entregable del módulo a partir del historial de la conversación,
- * lo guarda y marca el módulo como completado. Acción explícita del cliente.
- */
-export const generateDeliverable = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => GenerateDeliverableInput.parse(input))
-  .handler(async ({ data, context }): Promise<{ content: string }> => {
-    const { supabase, userId } = context;
-    const moduleRow = await loadAccessibleModule(supabase, userId, data.moduleId);
-    const content = getModuleContent(moduleRow.week_number);
-
-    const transcript = data.history
-      .map((m) => `${m.role === "user" ? "Cliente" : "Guía"}: ${m.content}`)
-      .join("\n\n");
-
-    const text = await callClaude(
-      [
-        `Extraes el entregable del Módulo ${moduleRow.week_number} («${moduleRow.title}») del programa «Tu Nueva Vida».`,
-        content.extractionPrompt,
-        "Escribe en español, en formato de documento claro con títulos. No inventes datos que el cliente no haya dicho.",
-      ].join("\n"),
-      [
-        {
-          role: "user",
-          content:
-            `Conversación completa:\n\n${transcript}` +
-            (data.matrix && data.matrix.length > 0
-              ? `\n\nMatriz de decisión completada por el cliente:\n${data.matrix
-                  .map(
-                    (i) =>
-                      `- ${i.text} → ${i.nonNegotiable ? "INNEGOCIABLE" : "dispuesto a arriesgar"}`,
-                  )
-                  .join("\n")}`
-              : ""),
-        },
-      ],
-      3000,
-    );
-
-    // Guardar entregable (uno por módulo).
-    const { data: existing } = await supabase
-      .from("deliverables")
-      .select("id")
-      .eq("user_id", userId)
-      .eq("module_id", data.moduleId)
-      .maybeSingle();
-
-    if (existing) {
-      const { error } = await supabase
-        .from("deliverables")
-        .update({ content: text })
-        .eq("id", existing.id);
-      if (error) throw safeError("No se pudo guardar el entregable.");
-    } else {
-      const { error } = await supabase
-        .from("deliverables")
-        .insert({ user_id: userId, module_id: data.moduleId, content: text });
-      if (error) throw safeError("No se pudo guardar el entregable.");
-    }
-
-    // Completar el módulo (la base de datos valida el estado y desbloquea).
-    const { error: completeError } = await supabase.rpc("complete_module", {
-      _user_id: userId,
-      _module_id: data.moduleId,
-    });
-    if (completeError) throw safeError("No se pudo completar el módulo.");
-
-    // Al cerrar la fase (semana par), la sesión 1:1 de esa fase queda pendiente.
-    if (moduleRow.week_number % 2 === 0) {
-      const phase = moduleRow.week_number / 2;
-      const { data: session } = await supabase
-        .from("sessions_1_1")
-        .select("id")
-        .eq("user_id", userId)
-        .eq("phase_number", phase)
-        .maybeSingle();
-      if (!session) {
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        await supabaseAdmin
-          .from("sessions_1_1")
-          .insert({ user_id: userId, phase_number: phase, status: "pending" });
-      }
-    }
-
-    // Cierre del programa: seguimientos automáticos a 30 y 60 días.
-    if (moduleRow.week_number === 8) {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const base = Date.now();
-      for (const offset of [30, 60]) {
-        await supabaseAdmin.from("follow_ups").upsert(
-          {
-            user_id: userId,
-            day_offset: offset,
-            due_at: new Date(base + offset * 86_400_000).toISOString(),
-            status: "pending" as const,
-          },
-          { onConflict: "user_id,day_offset", ignoreDuplicates: true },
-        );
-      }
-    }
-
-    return { content: text };
-  });
-
 /* ------------------------------------------------------------------ */
-/* Seguimientos a 30 y 60 días                                         */
+/* Check-ins de seguimiento del plan a 90 días                          */
 /* ------------------------------------------------------------------ */
 
 const FollowUpChatInput = z.object({
@@ -390,6 +293,8 @@ export const askFollowUpClaude = createServerFn({ method: "POST" })
     const previous = await loadPreviousDeliverables(supabase, userId, 9);
 
     const systemPrompt = [
+      COACH_PERSONA,
+      "",
       CHECKIN_CONTENT.systemPrompt,
       "",
       `Este es el check-in de los ${followUp.day_offset} días posteriores al cierre del programa «Tu Nueva Vida».`,
@@ -433,10 +338,11 @@ export const askFollowUpClaude = createServerFn({ method: "POST" })
         note: `Seguimiento de ${followUp.day_offset} días: ${reply.flag.slice(0, 1800)}`,
       });
       if (flagError) console.error("[claude] no se pudo registrar el aviso de seguimiento");
-      reply.escalated = true;
-      reply.escalation_message =
-        KNOWN_TRIGGERS[triggerType] ??
-        "Se lo hemos trasladado a tu coach para retomarlo contigo.";
+      const notice = KNOWN_TRIGGERS[triggerType];
+      if (notice) {
+        reply.escalated = true;
+        reply.escalation_message = notice;
+      }
     }
 
     return reply;
@@ -447,7 +353,7 @@ const CloseFollowUpInput = z.object({
   history: z.array(HistoryMessage).min(1).max(40),
 });
 
-/** Cierra el check-in guardando un resumen breve para el coach. */
+/** Cierra el check-in guardando un resumen breve en el perfil del usuario. */
 export const closeFollowUp = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => CloseFollowUpInput.parse(input))

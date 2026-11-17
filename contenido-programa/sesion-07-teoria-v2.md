@@ -1,6 +1,6 @@
 # Semana 7 · Plan a 90 días
 
-Tu dirección ya está decidida. La comprometiste con tu coach la semana pasada, y hoy no la volvemos a poner en duda. La pregunta de hoy no es "hacia dónde", sino con qué paso concreto, verificable y con fecha empiezas a ejecutarla.
+Tu dirección ya está decidida. La ratificaste por escrito la semana pasada, y hoy no la volvemos a poner en duda. La pregunta de hoy no es "hacia dónde", sino con qué paso concreto, verificable y con fecha empiezas a ejecutarla.
 
 ## La diferencia entre una intención y un hito
 
