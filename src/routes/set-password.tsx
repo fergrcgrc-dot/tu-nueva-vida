@@ -1,8 +1,9 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type FormEvent } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { LEGAL } from "@/lib/legal";
 import { getMyRole } from "@/lib/program.functions";
 
 export const Route = createFileRoute("/set-password")({
@@ -26,6 +27,7 @@ function SetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [consent, setConsent] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -49,12 +51,27 @@ function SetPasswordPage() {
       setError("Las contraseñas no coinciden.");
       return;
     }
+    if (!consent) {
+      setError("Para usar el programa necesitamos tu consentimiento.");
+      return;
+    }
     setSaving(true);
     const { error: updateError } = await supabase.auth.updateUser({ password });
     if (updateError) {
       setSaving(false);
       setError("No se pudo guardar la contraseña. Inténtalo de nuevo.");
       return;
+    }
+    // Registro del consentimiento explícito (RGPD art. 9.2.a).
+    const { data: userData } = await supabase.auth.getUser();
+    if (userData.user) {
+      await supabase
+        .from("profiles")
+        .update({
+          privacy_consent_at: new Date().toISOString(),
+          privacy_policy_version: LEGAL.actualizado,
+        })
+        .eq("id", userData.user.id);
     }
     try {
       const { role } = await fetchRole();
@@ -94,7 +111,8 @@ function SetPasswordPage() {
 
         {status === "invalid" && (
           <p role="alert" className="text-center text-sm text-destructive">
-            Este enlace no es válido o ha caducado. Escribe a hola@tunuevavida.eu con el email de tu compra y te enviamos uno nuevo.
+            Este enlace no es válido o ha caducado. Escribe a hola@tunuevavida.eu con el email de tu
+            compra y te enviamos uno nuevo.
           </p>
         )}
 
@@ -131,6 +149,31 @@ function SetPasswordPage() {
                 placeholder="••••••••"
               />
             </div>
+
+            <label className="flex items-start gap-3 text-xs leading-relaxed text-muted-foreground">
+              <input
+                type="checkbox"
+                required
+                checked={consent}
+                onChange={(e) => setConsent(e.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-primary"
+              />
+              <span>
+                He leído la{" "}
+                <Link
+                  to="/legal/$slug"
+                  params={{ slug: "privacidad" }}
+                  target="_blank"
+                  className="underline"
+                >
+                  política de privacidad
+                </Link>{" "}
+                y doy mi consentimiento explícito para que se traten los datos que comparta en el
+                programa, incluidos los relativos a mi salud y estado emocional, con el fin de
+                recibir el feedback del coach IA. Puedo retirarlo cuando quiera escribiendo a{" "}
+                {LEGAL.email}.
+              </span>
+            </label>
 
             {error && (
               <p role="alert" className="text-sm text-destructive">

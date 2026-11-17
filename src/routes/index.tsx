@@ -12,6 +12,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { LegalLinks } from "@/components/LegalLinks";
 import people from "@/assets/landing-people.jpg";
 import step1 from "@/assets/landing-step-1.jpg";
 import step2 from "@/assets/landing-step-2.jpg";
@@ -437,6 +438,17 @@ function Landing() {
               <ShieldCheck className="h-4 w-4 text-ember" aria-hidden />
               Garantía de 14 días: si no es para ti, te devolvemos el 100 %.
             </p>
+            <p className="mt-3 text-center text-xs text-muted-foreground">
+              Al comprar aceptas las{" "}
+              <Link to="/legal/$slug" params={{ slug: "condiciones" }} className="underline">
+                condiciones de venta
+              </Link>{" "}
+              y la{" "}
+              <Link to="/legal/$slug" params={{ slug: "privacidad" }} className="underline">
+                política de privacidad
+              </Link>
+              .
+            </p>
           </div>
         </div>
       </section>
@@ -484,16 +496,22 @@ function Landing() {
       </section>
 
       <footer className="landing-footer-bg px-5 py-10">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Tu nueva vida</p>
-          <div className="flex flex-wrap items-center gap-5">
-            <a href={`mailto:${SUPPORT_EMAIL}`} className="transition-colors hover:text-foreground">
-              {SUPPORT_EMAIL}
-            </a>
-            <Link to="/login" className="font-medium transition-colors hover:text-foreground">
-              Acceder al programa
-            </Link>
+        <div className="mx-auto flex max-w-6xl flex-col gap-5 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <p>© {new Date().getFullYear()} Tu nueva vida</p>
+            <div className="flex flex-wrap items-center gap-5">
+              <a
+                href={`mailto:${SUPPORT_EMAIL}`}
+                className="transition-colors hover:text-foreground"
+              >
+                {SUPPORT_EMAIL}
+              </a>
+              <Link to="/login" className="font-medium transition-colors hover:text-foreground">
+                Acceder al programa
+              </Link>
+            </div>
           </div>
+          <LegalLinks className="text-xs" />
         </div>
       </footer>
     </div>

@@ -40,6 +40,7 @@ Aplica, en este orden, desde el SQL Editor o con `supabase db push`:
 
 1. `supabase/migrations/20261117100000_faceless_autonomo.sql`: compras, ejercicios con revisión IA, bucket privado `module-videos` y `complete_module` solo desde el servidor.
 2. `supabase/migrations/20261117100100_contenido_faceless.sql`: teoría y ejercicios sin coach humano.
+3. `supabase/migrations/20261117120000_consentimiento_privacidad.sql`: registro del consentimiento RGPD al crear la cuenta.
 
 ## 4. Email de acceso (Supabase → Authentication → Emails → Invite user)
 
@@ -67,7 +68,17 @@ node scripts/videos/build-video.mjs all      # los 8
 SUPABASE_URL=… SUPABASE_SERVICE_ROLE_KEY=… node scripts/videos/upload-videos.mjs all
 ```
 
-## 6. Cómo funciona de punta a punta
+## 6. Páginas legales
+
+Están en `/legal/aviso-legal`, `/legal/privacidad`, `/legal/condiciones` y `/legal/cookies`, enlazadas en el pie de la landing y junto al botón de compra.
+
+**Antes de publicar, rellena tus datos en `src/lib/legal.ts`:** titular (nombre o razón social), NIF y domicilio. La LSSI obliga a mostrarlos aunque la marca sea faceless. Si facturas a través de una sociedad, el titular puede ser la sociedad.
+
+Al crear la contraseña, el cliente marca una casilla obligatoria de consentimiento explícito para tratar los datos de salud emocional que comparte en los ejercicios (RGPD art. 9). Queda registrado en `profiles.privacy_consent_at`.
+
+Recomendado: que un abogado o asesor revise los textos una vez rellenados.
+
+## 7. Cómo funciona de punta a punta
 
 1. Landing → botón «Empieza el programa · 399 €» → `/comprar` crea un checkout de Lemon Squeezy.
 2. Pago → webhook `order_created` → se crea la cuenta, el Módulo 1 queda abierto y llega el email para crear la contraseña. Redirección a `/gracias`.

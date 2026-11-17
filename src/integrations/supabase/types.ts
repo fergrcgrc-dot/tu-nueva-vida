@@ -353,6 +353,8 @@ export type Database = {
           full_name: string | null
           id: string
           last_active_at: string | null
+          privacy_consent_at: string | null
+          privacy_policy_version: string | null
           program_start_date: string | null
           role: Database["public"]["Enums"]["app_role"]
           status: Database["public"]["Enums"]["account_status"]
@@ -365,6 +367,8 @@ export type Database = {
           full_name?: string | null
           id: string
           last_active_at?: string | null
+          privacy_consent_at?: string | null
+          privacy_policy_version?: string | null
           program_start_date?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           status?: Database["public"]["Enums"]["account_status"]
@@ -377,6 +381,8 @@ export type Database = {
           full_name?: string | null
           id?: string
           last_active_at?: string | null
+          privacy_consent_at?: string | null
+          privacy_policy_version?: string | null
           program_start_date?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           status?: Database["public"]["Enums"]["account_status"]

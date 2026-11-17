@@ -33,7 +33,8 @@
 - [ ] Crear cuenta de Lemon Squeezy y configurar secretos
 - [ ] Aplicar migraciones 20261117100000 y 20261117100100
 - [ ] Validar vídeo piloto y generar los 7 restantes
-- [ ] Páginas legales: aviso legal, privacidad, condiciones de venta
+- [x] Páginas legales: aviso legal, privacidad, condiciones de venta y cookies
+- [ ] Rellenar titular, NIF y domicilio en src/lib/legal.ts
 
 ## Fase 4 · Captación (pendiente)
 - [ ] Contenido faceless para redes (shorts a partir del pipeline de vídeo)

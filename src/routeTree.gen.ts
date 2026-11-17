@@ -18,6 +18,7 @@ import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as LegalSlugRouteImport } from './routes/legal/$slug'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedCoachIndexRouteImport } from './routes/_authenticated/coach/index'
 import { Route as AuthenticatedCoachSeguimientosRouteImport } from './routes/_authenticated/coach/seguimientos'
@@ -70,6 +71,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const LegalSlugRoute = LegalSlugRouteImport.update({
+  id: '/legal/$slug',
+  path: '/legal/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -119,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/legal/$slug': typeof LegalSlugRoute
   '/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
@@ -134,6 +141,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/set-password': typeof SetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/legal/$slug': typeof LegalSlugRoute
   '/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
@@ -153,6 +161,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/coach': typeof AuthenticatedCoachRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/legal/$slug': typeof LegalSlugRoute
   '/_authenticated/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/_authenticated/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/_authenticated/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
@@ -172,6 +181,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/coach'
     | '/dashboard'
+    | '/legal/$slug'
     | '/coach/seguimientos'
     | '/modulos/$moduleId'
     | '/seguimientos/$followUpId'
@@ -187,6 +197,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/set-password'
     | '/dashboard'
+    | '/legal/$slug'
     | '/coach/seguimientos'
     | '/modulos/$moduleId'
     | '/seguimientos/$followUpId'
@@ -205,6 +216,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/coach'
     | '/_authenticated/dashboard'
+    | '/legal/$slug'
     | '/_authenticated/coach/seguimientos'
     | '/_authenticated/modulos/$moduleId'
     | '/_authenticated/seguimientos/$followUpId'
@@ -221,6 +233,7 @@ export interface RootRouteChildren {
   GraciasRoute: typeof GraciasRoute
   LoginRoute: typeof LoginRoute
   SetPasswordRoute: typeof SetPasswordRoute
+  LegalSlugRoute: typeof LegalSlugRoute
   ApiLemonsqueezyWebhookRoute: typeof ApiLemonsqueezyWebhookRoute
 }
 
@@ -288,6 +301,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/legal/$slug': {
+      id: '/legal/$slug'
+      path: '/legal/$slug'
+      fullPath: '/legal/$slug'
+      preLoaderRoute: typeof LegalSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -395,6 +415,7 @@ const rootRouteChildren: RootRouteChildren = {
   GraciasRoute: GraciasRoute,
   LoginRoute: LoginRoute,
   SetPasswordRoute: SetPasswordRoute,
+  LegalSlugRoute: LegalSlugRoute,
   ApiLemonsqueezyWebhookRoute: ApiLemonsqueezyWebhookRoute,
 }
 export const routeTree = rootRouteImport
