@@ -107,7 +107,7 @@ Tus ejercicios los revisa un modelo de inteligencia artificial, que decide si el
 
 Solo con los proveedores necesarios para prestar el servicio, que actúan como encargados del tratamiento con contrato y garantías:
 
-- **Supabase:** base de datos, autenticación y almacenamiento de vídeos.
+- **Supabase:** base de datos, autenticación y almacenamiento de vídeos, en servidores de la Unión Europea (Irlanda).
 - **Cloudflare:** alojamiento y entrega de la web.
 - **Anthropic:** modelo de IA que genera el feedback y las respuestas del coach IA. Recibe el texto de tus ejercicios y conversaciones solo para generar la respuesta y, según sus condiciones comerciales, no lo usa para entrenar sus modelos.
 - **Google Fonts:** al cargar la web, tu navegador solicita las tipografías a servidores de Google, que reciben tu dirección IP.

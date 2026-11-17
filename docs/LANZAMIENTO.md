@@ -34,7 +34,9 @@ Checklist para dejar la venta y el programa funcionando sin intervención humana
 
 Opcional: `LEMONSQUEEZY_CHECKOUT_URL` con un enlace de pago fijo de respaldo si la API falla.
 
-## 3. Base de datos (Supabase)
+## 3. Base de datos (Supabase) — ✅ HECHO el 17/11/2026
+
+Migraciones aplicadas, 8 vídeos subidos y enlazados, URL del sitio y redirecciones configuradas, enlaces de invitación válidos 24 h. Queda pendiente el email (punto 4).
 
 Aplica, en este orden, desde el SQL Editor o con `supabase db push`:
 
@@ -42,7 +44,15 @@ Aplica, en este orden, desde el SQL Editor o con `supabase db push`:
 2. `supabase/migrations/20261117100100_contenido_faceless.sql`: teoría y ejercicios sin coach humano.
 3. `supabase/migrations/20261117120000_consentimiento_privacidad.sql`: registro del consentimiento RGPD al crear la cuenta.
 
-## 4. Email de acceso (Supabase → Authentication → Emails → Invite user)
+## 4. Email de acceso — ⚠️ BLOQUEANTE: proveedor de email propio
+
+Sin un SMTP propio, Supabase solo envía emails a los miembros del equipo del proyecto y con un límite muy bajo por hora: **los compradores no recibirían el email para crear su contraseña**. Además, en el plan gratuito no deja cambiar las plantillas.
+
+1. Crea una cuenta en un proveedor de email transaccional (recomendado: Resend, gratis hasta 3.000 emails/mes) y verifica el dominio `tunuevavida.eu` (registros DNS en Cloudflare).
+2. En Supabase → Authentication → Emails → SMTP Settings: activa *Custom SMTP* con los datos del proveedor y remitente `hola@tunuevavida.eu`.
+3. Aplica las plantillas en español: `node scripts/apply-email-templates.mjs` (ya están en `supabase/email-templates/`).
+
+Referencia de la plantilla de invitación:
 
 Es el email que recibe el cliente tras pagar. Recomendado:
 
