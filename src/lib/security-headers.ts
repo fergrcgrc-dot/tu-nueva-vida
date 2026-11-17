@@ -8,12 +8,12 @@ const SUPABASE_WS = SUPABASE_URL.replace(/^https:/, "wss:");
 export const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
   // 'unsafe-inline' es necesario para el script de hidratación que inyecta el SSR.
-  "script-src 'self' 'unsafe-inline'",
+  "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com data:",
   `img-src 'self' data: blob: ${SUPABASE_URL}`,
   `media-src 'self' blob: ${SUPABASE_URL}`,
-  `connect-src 'self' ${SUPABASE_URL} ${SUPABASE_WS}`,
+  `connect-src 'self' ${SUPABASE_URL} ${SUPABASE_WS} https://cloudflareinsights.com`,
   "frame-src 'none'",
   "frame-ancestors 'none'",
   "object-src 'none'",
