@@ -1,12 +1,13 @@
 /**
  * Datos del titular para las páginas legales (LSSI art. 10 y RGPD art. 13).
  * Aunque la marca sea faceless, la ley exige identificar al titular.
- * ⚠️ Sustituye los valores entre corchetes antes de publicar.
+ * ⚠️ Pendiente: rellena titular, NIF y domicilio (obligatorios por la LSSI).
  */
 export const LEGAL = {
-  titular: "[NOMBRE Y APELLIDOS O RAZÓN SOCIAL]",
-  nif: "[NIF / CIF]",
-  domicilio: "[DOMICILIO COMPLETO, CÓDIGO POSTAL, LOCALIDAD, PROVINCIA]",
+  // Pendientes: mientras estén vacíos, las líneas correspondientes no se muestran.
+  titular: "",
+  nif: "",
+  domicilio: "",
   /** Solo si es una sociedad: datos registrales. Déjalo vacío si eres autónomo. */
   registro: "",
   email: "hola@tunuevavida.eu",
@@ -27,15 +28,18 @@ export const LEGAL_PAGES: Array<{ slug: LegalSlug; title: string }> = [
 
 const L = LEGAL;
 
+/** Línea de lista «- **Etiqueta:** valor» solo si hay valor. */
+const line = (label: string, value: string) => (value ? `- **${label}:** ${value}\n` : "");
+/** Nombre del titular para usar en frases; genérico mientras esté vacío. */
+const titular = L.titular || `el titular de ${L.dominio}`;
+
 const avisoLegal = `
 ## 1. Titular del sitio web
 
 En cumplimiento del artículo 10 de la Ley 34/2002, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI), te informamos de que el sitio web **${L.dominio}** y el programa **${L.marca}** son titularidad de:
 
-- **Titular:** ${L.titular}
-- **NIF:** ${L.nif}
-- **Domicilio:** ${L.domicilio}
-- **Email de contacto:** ${L.email}${L.registro ? `\n- **Datos registrales:** ${L.registro}` : ""}
+${line("Titular", L.titular)}${line("NIF", L.nif)}${line("Domicilio", L.domicilio)}- **Email de contacto:** ${L.email}
+${line("Datos registrales", L.registro)}
 
 ## 2. Objeto
 
@@ -73,10 +77,7 @@ Esta política explica qué datos personales tratamos cuando visitas ${L.dominio
 
 ## 1. Responsable del tratamiento
 
-- **Responsable:** ${L.titular}
-- **NIF:** ${L.nif}
-- **Domicilio:** ${L.domicilio}
-- **Contacto para privacidad:** ${L.email}
+${line("Responsable", L.titular)}${line("NIF", L.nif)}${line("Domicilio", L.domicilio)}- **Contacto para privacidad:** ${L.email}
 
 ## 2. Qué datos tratamos
 
@@ -150,7 +151,7 @@ Estas condiciones regulan la compra y el uso del programa online **${L.marca}**.
 
 ## 1. Quién presta el servicio y quién cobra
 
-- **Prestador del programa:** ${L.titular}, NIF ${L.nif}, con domicilio en ${L.domicilio}. Contacto: ${L.email}.
+- **Prestador del programa:** ${[titular, L.nif && `NIF ${L.nif}`, L.domicilio && `con domicilio en ${L.domicilio}`].filter(Boolean).join(", ")}. Contacto: ${L.email}.
 - **Pago:** lo gestiona **Lemon Squeezy, LLC** como vendedor registrado (*merchant of record*). Lemon Squeezy cobra, aplica los impuestos correspondientes y emite tu factura. En lo relativo al pago también se aplican sus condiciones.
 
 ## 2. Qué compras
@@ -185,7 +186,7 @@ Si el programa no es para ti, escribe a ${L.email} desde el email con el que com
 
 Como consumidor, la ley te reconoce un derecho de desistimiento de 14 días naturales desde la compra (art. 102 y siguientes del Real Decreto Legislativo 1/2007). Para contenidos digitales, este derecho puede perderse cuando empieza el acceso. **Nosotros no te pedimos que renuncies a él:** la garantía del apartado anterior te permite desistir durante esos 14 días aunque ya hayas empezado. Para ejercerlo basta con un email a ${L.email} indicando que quieres desistir; también puedes usar este modelo:
 
-> A la atención de ${L.titular}, ${L.domicilio}, ${L.email}: por la presente le comunico que desisto de mi contrato de compra del programa ${L.marca}, adquirido el [fecha], con el email [email de compra]. Nombre: [nombre]. Fecha: [fecha].
+> A la atención de ${[titular, L.domicilio, L.email].filter(Boolean).join(", ")}: por la presente le comunico que desisto de mi contrato de compra del programa ${L.marca}, adquirido el [fecha], con el email [email de compra]. Nombre: [nombre]. Fecha: [fecha].
 
 ## 7. Uso permitido
 
