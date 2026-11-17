@@ -25,8 +25,8 @@ const NARRATION_DIR = join(CONTENT, "videos");
 const OUT = join(ROOT, "videos-out");
 
 // Voz femenina dulce en español de España (Gemini TTS vía fal.ai).
-// Alternativas probadas: Achernar (suave), Sulafat (cálida).
-const VOICE = process.env.VIDEO_VOICE ?? "Vindemiatrix";
+// Alternativas probadas: Vindemiatrix y Achernar (más suaves).
+const VOICE = process.env.VIDEO_VOICE ?? "Sulafat";
 // En inglés a propósito: con instrucciones en español el filtro de contenido
 // de fal da falsos positivos. El idioma lo fija language_code.
 const VOICE_STYLE =
@@ -81,6 +81,7 @@ async function narrate(week, slides) {
     "El vídeo es faceless: solo diapositivas y una voz femenina en off. No hay coach humano ni llamadas en el programa: no los menciones. El acompañamiento es un coach IA dentro de la plataforma.",
     "Reglas: español de España, tuteo, frases cortas y naturales para ser dichas en voz alta, tono cálido, sereno y directo, sin jerga de autoayuda ni frases grandilocuentes. No leas la diapositiva literalmente: explícala y amplíala con la teoría. Entre 25 y 60 palabras por diapositiva (la portada, 15-25). Nada de emojis, listas, comillas tipográficas raras ni acotaciones.",
     "La voz es femenina, pero el oyente puede ser hombre o mujer: no marques nunca su género (evita «bienvenida/o», «lista/o», «cansada/o», «a ti misma/o»; usa construcciones neutras como «te damos la bienvenida», «cuando quieras», «a ti»). Llama al acompañante «tu coach IA».",
+    "El motor de voz tiene un filtro de contenido sensible: evita las palabras «diagnosticar», «suicidio» o «suicida», «crisis», «morir» o «muerte» (también en metáforas). Si la diapositiva habla de señales serias, di solo: «te mostramos enseguida dónde pedir ayuda profesional: el cero dos cuatro, gratuito y disponible las veinticuatro horas, o el uno uno dos si es urgente».",
     "La última diapositiva invita a hacer el ejercicio práctico que está justo debajo del vídeo y a enviarlo a revisión al coach IA.",
     `Devuelve SOLO un JSON: un array de ${slides.length} strings, una locución por diapositiva, en el mismo orden.`,
     "",
