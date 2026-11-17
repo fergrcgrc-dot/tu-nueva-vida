@@ -65,7 +65,13 @@ Es el email que recibe el cliente tras pagar. Recomendado:
 
 Y en Authentication → URL Configuration añade `https://tunuevavida.eu/set-password` a Redirect URLs.
 
-## 5. Vídeos de los módulos
+## 5. Despliegue — ✅ automático
+
+El Worker `tu-nueva-vida` está conectado a GitHub (Workers Builds): cada push a la rama `claude/modest-pascal-otdg4e` compila (`npm run build`) y publica (`npx wrangler deploy`) en tunuevavida.eu. Cuando se fusione a `main`, cambia la rama en Cloudflare → Workers & Pages → tu-nueva-vida → Settings → Build.
+
+Primera publicación de la versión faceless: 17/11/2026, comprobada en producción (landing, 404 de compra, legales, panel, Módulo 1 con vídeo, chat y revisión del coach IA).
+
+## 5 bis. Vídeos de los módulos
 
 Pipeline: guion de slides + teoría → narración (Claude vía OpenRouter) → voz femenina dulce en español de España (Gemini TTS vía fal.ai, voz Vindemiatrix) → diapositivas con la paleta, el fondo y la fuente de la landing → MP4.
 

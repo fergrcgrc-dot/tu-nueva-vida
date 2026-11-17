@@ -30,7 +30,8 @@
 - [x] Compra con Lemon Squeezy y alta automática por webhook (docs/LANZAMIENTO.md)
 - [x] Ejercicios dentro de la plataforma con revisión y feedback del coach IA
 - [x] Pipeline de vídeo faceless (scripts/videos) · piloto del Módulo 1
-- [ ] Crear cuenta de Lemon Squeezy y configurar secretos
+- [x] Publicado en producción con despliegue automático desde GitHub
+- [ ] Crear cuenta de Lemon Squeezy y configurar secretos (hasta entonces /comprar devuelve 404)
 - [x] Migraciones aplicadas, vídeos subidos, auth y email (Resend) configurados
 - [x] 8 vídeos generados y subidos
 - [x] Páginas legales: aviso legal, privacidad, condiciones de venta y cookies
