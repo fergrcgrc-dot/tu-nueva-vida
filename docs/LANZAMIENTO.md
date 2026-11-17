@@ -44,7 +44,11 @@ Aplica, en este orden, desde el SQL Editor o con `supabase db push`:
 2. `supabase/migrations/20261117100100_contenido_faceless.sql`: teoría y ejercicios sin coach humano.
 3. `supabase/migrations/20261117120000_consentimiento_privacidad.sql`: registro del consentimiento RGPD al crear la cuenta.
 
-## 4. Email de acceso — ⚠️ BLOQUEANTE: proveedor de email propio
+## 4. Email de acceso — ✅ HECHO el 17/11/2026
+
+Resend con el dominio `tunuevavida.eu` verificado (región UE; registros DKIM/SPF en el subdominio `send`, sin tocar Email Routing de Cloudflare), SMTP propio configurado en Supabase con remitente `Tu nueva vida <hola@tunuevavida.eu>` y una clave de solo envío, y plantillas de invitación y recuperación en español aplicadas. Límite: 100 emails/hora.
+
+Contexto (por qué hizo falta):
 
 Sin un SMTP propio, Supabase solo envía emails a los miembros del equipo del proyecto y con un límite muy bajo por hora: **los compradores no recibirían el email para crear su contraseña**. Además, en el plan gratuito no deja cambiar las plantillas.
 

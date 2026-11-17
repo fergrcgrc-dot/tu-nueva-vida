@@ -31,8 +31,8 @@
 - [x] Ejercicios dentro de la plataforma con revisión y feedback del coach IA
 - [x] Pipeline de vídeo faceless (scripts/videos) · piloto del Módulo 1
 - [ ] Crear cuenta de Lemon Squeezy y configurar secretos
-- [ ] Aplicar migraciones 20261117100000 y 20261117100100
-- [ ] Validar vídeo piloto y generar los 7 restantes
+- [x] Migraciones aplicadas, vídeos subidos, auth y email (Resend) configurados
+- [x] 8 vídeos generados y subidos
 - [x] Páginas legales: aviso legal, privacidad, condiciones de venta y cookies
 - [ ] Rellenar titular, NIF y domicilio en src/lib/legal.ts
 
