@@ -57,7 +57,11 @@ Y en Authentication → URL Configuration añade `https://tunuevavida.eu/set-pas
 
 ## 5. Despliegue — ✅ automático
 
-El Worker `tu-nueva-vida` está conectado a GitHub (Workers Builds): cada push a la rama `claude/modest-pascal-otdg4e` compila (`npm run build`) y publica (`npx wrangler deploy`) en tunuevavida.eu. Cuando se fusione a `main`, cambia la rama en Cloudflare → Workers & Pages → tu-nueva-vida → Settings → Build.
+El Worker `tu-nueva-vida` está conectado a GitHub (Workers Builds): cada push a **`main`** compila (`npm run build`) y publica (`npx wrangler deploy`) en tunuevavida.eu. `main` es la única rama de referencia (desde el 19/11/2026 `claude/modest-pascal-otdg4e` apunta al mismo commit; no desplegar desde otras ramas).
+
+- `wrangler.jsonc` lleva `keep_vars: true`: las variables definidas en el panel no se borran al desplegar. Aun así, guarda las claves siempre como **Secret**.
+- No despliegues con `wrangler` desde entornos con proxy que reescriba la cabecera `Authorization`: la subida de assets falla (401) y queda una versión sin parte de sus ficheros. Si pasa, vuelve a la versión anterior en Deployments o haz un push a `main`.
+- Ojo: editar un secreto en el panel crea una versión nueva a partir de la **última versión subida**, no de la desplegada.
 
 Primera publicación de la versión faceless: 17/11/2026, comprobada en producción (landing, 404 de compra, legales, panel, Módulo 1 con vídeo, chat y revisión del coach IA).
 
