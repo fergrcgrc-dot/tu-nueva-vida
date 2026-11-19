@@ -5,7 +5,7 @@
 
 ## Antes de empezar
 
-Te vamos a recordar tu dirección elegida, tal como quedó confirmada en tu llamada de la semana pasada. Todo lo que escribas aquí tiene que ejecutar esa dirección, no una versión alternativa o más cómoda de ella.
+Te vamos a recordar tu dirección elegida, tal como la ratificaste en la revisión de fase de la semana pasada. Todo lo que escribas aquí tiene que ejecutar esa dirección, no una versión alternativa o más cómoda de ella.
 
 ## Define entre 3 y 5 hitos
 *(✍️ por escrito, campo a campo)*

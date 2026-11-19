@@ -40,13 +40,13 @@ Tampoco lo vamos a suavizar si aparece.
 
 **Diapositiva 7 — Si aparece algo serio**
 Si sientes que no hay salida, no solo que las cosas están mal, dilo así.
-No esperamos a que acabe la semana para avisar a tu coach.
+Pausamos el ejercicio y te mostramos ayuda profesional. Sin esperar.
 
 ---
 
 **Diapositiva 8 — Esta semana cierra algo**
 Esta sesión cierra la primera fase.
-Tu llamada de esta semana no es para analizar más: es para sostener lo que hemos removido.
+La revisión de fase no es para analizar más: es para ver, ordenado, lo que hemos removido.
 
 ---
 

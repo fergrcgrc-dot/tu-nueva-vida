@@ -25,4 +25,4 @@ Valora: **"Mi compromiso real con sostener este plan, del 1 al 10: ___"**. Justi
 
 ## Qué recibes al terminar
 
-Tu sistema de check-ins activado, y un informe final con todo tu recorrido de las 8 semanas: tus valores, tu dirección y tu plan. Es lo que tu coach va a usar en la última llamada del programa, donde decidís juntos el siguiente paso.
+Tu sistema de check-ins activado, y un informe final con todo tu recorrido de las 8 semanas: tus valores, tu dirección y tu plan. Es tuyo, lo puedes releer siempre que quieras, y es la base de cada check-in de los próximos 90 días.

@@ -130,6 +130,48 @@ export type Database = {
           },
         ]
       }
+      exercise_submissions: {
+        Row: {
+          answers: Json
+          attempts: number
+          created_at: string
+          feedback: Json | null
+          id: string
+          module_id: string
+          reviewed_at: string | null
+          status: Database["public"]["Enums"]["submission_status"]
+          submitted_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          attempts?: number
+          created_at?: string
+          feedback?: Json | null
+          id?: string
+          module_id: string
+          reviewed_at?: string | null
+          status?: Database["public"]["Enums"]["submission_status"]
+          submitted_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          attempts?: number
+          created_at?: string
+          feedback?: Json | null
+          id?: string
+          module_id?: string
+          reviewed_at?: string | null
+          status?: Database["public"]["Enums"]["submission_status"]
+          submitted_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       flags: {
         Row: {
           created_at: string
@@ -279,6 +321,7 @@ export type Database = {
           phase_number: number
           title: string
           updated_at: string
+          video_path: string | null
           week_number: number
         }
         Insert: {
@@ -310,6 +353,8 @@ export type Database = {
           full_name: string | null
           id: string
           last_active_at: string | null
+          privacy_consent_at: string | null
+          privacy_policy_version: string | null
           program_start_date: string | null
           role: Database["public"]["Enums"]["app_role"]
           status: Database["public"]["Enums"]["account_status"]
@@ -322,6 +367,8 @@ export type Database = {
           full_name?: string | null
           id: string
           last_active_at?: string | null
+          privacy_consent_at?: string | null
+          privacy_policy_version?: string | null
           program_start_date?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           status?: Database["public"]["Enums"]["account_status"]
@@ -334,6 +381,8 @@ export type Database = {
           full_name?: string | null
           id?: string
           last_active_at?: string | null
+          privacy_consent_at?: string | null
+          privacy_policy_version?: string | null
           program_start_date?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           status?: Database["public"]["Enums"]["account_status"]
@@ -344,62 +393,44 @@ export type Database = {
       }
       purchases: {
         Row: {
-          amount_refunded: number
-          amount_tax: number
-          amount_total: number
           created_at: string
-          currency: string
+          currency: string | null
+          customer_name: string | null
           email: string
-          full_name: string | null
           id: string
-          livemode: boolean
-          paid_at: string | null
-          provisioning_note: string | null
-          status: Database["public"]["Enums"]["purchase_status"]
-          stripe_checkout_session_id: string
-          stripe_customer_id: string | null
-          stripe_invoice_id: string | null
-          stripe_payment_intent_id: string | null
+          order_id: string
+          provider: string
+          raw: Json
+          status: string
+          total_cents: number | null
           updated_at: string
           user_id: string | null
         }
         Insert: {
-          amount_refunded?: number
-          amount_tax?: number
-          amount_total: number
           created_at?: string
-          currency: string
+          currency?: string | null
+          customer_name?: string | null
           email: string
-          full_name?: string | null
           id?: string
-          livemode?: boolean
-          paid_at?: string | null
-          provisioning_note?: string | null
-          status?: Database["public"]["Enums"]["purchase_status"]
-          stripe_checkout_session_id: string
-          stripe_customer_id?: string | null
-          stripe_invoice_id?: string | null
-          stripe_payment_intent_id?: string | null
+          order_id: string
+          provider?: string
+          raw?: Json
+          status: string
+          total_cents?: number | null
           updated_at?: string
           user_id?: string | null
         }
         Update: {
-          amount_refunded?: number
-          amount_tax?: number
-          amount_total?: number
           created_at?: string
-          currency?: string
+          currency?: string | null
+          customer_name?: string | null
           email?: string
-          full_name?: string | null
           id?: string
-          livemode?: boolean
-          paid_at?: string | null
-          provisioning_note?: string | null
-          status?: Database["public"]["Enums"]["purchase_status"]
-          stripe_checkout_session_id?: string
-          stripe_customer_id?: string | null
-          stripe_invoice_id?: string | null
-          stripe_payment_intent_id?: string | null
+          order_id?: string
+          provider?: string
+          raw?: Json
+          status?: string
+          total_cents?: number | null
           updated_at?: string
           user_id?: string | null
         }
@@ -476,6 +507,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consume_rate_limit: {
+        Args: { _bucket: string; _max: number; _window_seconds: number }
+        Returns: boolean
+      }
       complete_module: {
         Args: { _module_id: string; _user_id: string }
         Returns: undefined
@@ -520,6 +555,7 @@ export type Database = {
         | "refunded"
         | "partially_refunded"
       session_status: "pending" | "scheduled" | "completed"
+      submission_status: "draft" | "submitted" | "needs_revision" | "approved"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -656,6 +692,7 @@ export const Constants = {
       next_step: ["acompanamiento_1_1", "retiro_leon"],
       purchase_status: ["pending", "paid", "failed", "refunded", "partially_refunded"],
       session_status: ["pending", "scheduled", "completed"],
+      submission_status: ["draft", "submitted", "needs_revision", "approved"],
     },
   },
 } as const

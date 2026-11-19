@@ -20,23 +20,24 @@ export type AppRole = "client" | "coach" | "platform_admin";
 /** Rol real del usuario con sesión, leído desde user_roles. */
 export const getMyRole = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{ role: AppRole; status: string }> => {
-    const [adminRes, coachRes, profileRes] = await Promise.all([
-      context.supabase.rpc("is_platform_admin", { _user_id: context.userId }),
-      context.supabase.rpc("has_role", { _user_id: context.userId, _role: "coach" }),
-      context.supabase
-        .from("profiles")
-        .select("status")
-        .eq("id", context.userId)
-        .maybeSingle(),
-    ]);
-    const role: AppRole = adminRes.data
-      ? "platform_admin"
-      : coachRes.data
-        ? "coach"
-        : "client";
-    return { role, status: profileRes.data?.status ?? "active" };
-  });
+  .handler(
+    async ({ context }): Promise<{ role: AppRole; status: string; aal: "aal1" | "aal2" }> => {
+      // Roles leídos de la propia fila (RLS), no de is_platform_admin: esa
+      // función exige 2FA y aquí hay que saber el rol antes de verificarlo.
+      const [rolesRes, profileRes] = await Promise.all([
+        context.supabase.from("user_roles").select("role").eq("user_id", context.userId),
+        context.supabase.from("profiles").select("status").eq("id", context.userId).maybeSingle(),
+      ]);
+      const roles = (rolesRes.data ?? []).map((r) => r.role);
+      const role: AppRole = roles.includes("platform_admin")
+        ? "platform_admin"
+        : roles.includes("coach")
+          ? "coach"
+          : "client";
+      const aal = context.claims?.["aal"] === "aal2" ? "aal2" : "aal1";
+      return { role, status: profileRes.data?.status ?? "active", aal };
+    },
+  );
 
 /* ------------------------------------------------------------------ */
 /* Panel del cliente                                                   */
@@ -50,17 +51,17 @@ export const getDashboard = createServerFn({ method: "GET" })
     const [profileRes, modulesRes, progressRes, sessionsRes, followUpsRes] = await Promise.all([
       supabase
         .from("profiles")
-        .select("full_name, program_start_date")
+        .select("full_name, program_start_date, status")
         .eq("id", userId)
         .maybeSingle(),
-      supabase
-        .from("modules")
-        .select("*")
-        .order("week_number", { ascending: true })
-        .overrideTypes<
-          Array<{ theory_content?: string | null; slides_content?: import("@/integrations/supabase/types").Json; exercise_content?: string | null }>,
-          { merge: true }
-        >(),
+      supabase.from("modules").select("*").order("week_number", { ascending: true }).overrideTypes<
+        Array<{
+          theory_content?: string | null;
+          slides_content?: import("@/integrations/supabase/types").Json;
+          exercise_content?: string | null;
+        }>,
+        { merge: true }
+      >(),
       supabase
         .from("module_progress")
         .select("module_id, status, started_at, completed_at")
@@ -78,15 +79,22 @@ export const getDashboard = createServerFn({ method: "GET" })
     ]);
 
     if (
-      profileRes.error || modulesRes.error || progressRes.error ||
-      sessionsRes.error || followUpsRes.error
+      profileRes.error ||
+      modulesRes.error ||
+      progressRes.error ||
+      sessionsRes.error ||
+      followUpsRes.error
     ) {
       throw safeError("No se pudo cargar tu programa.");
     }
 
-    const progressByModule = new Map(
-      (progressRes.data ?? []).map((p) => [p.module_id, p]),
-    );
+    if (!profileRes.data || profileRes.data.status !== "active") {
+      throw safeError(
+        "Tu acceso al programa no está activo. Si crees que es un error, escribe a hola@tunuevavida.eu.",
+      );
+    }
+
+    const progressByModule = new Map((progressRes.data ?? []).map((p) => [p.module_id, p]));
 
     const modules = (modulesRes.data ?? []).map((m) => ({
       ...m,
@@ -125,76 +133,6 @@ export const startModule = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-/**
- * Completa un módulo. La lógica (estado válido, desbloqueo de la semana
- * siguiente) vive íntegramente en la función de base de datos; desde el
- * navegador no se puede saltar ninguna semana.
- */
-export const completeModule = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => ModuleIdInput.parse(input))
-  .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.rpc("complete_module", {
-      _user_id: context.userId,
-      _module_id: data.moduleId,
-    });
-    if (error) {
-      if (error.message.includes("module_locked")) {
-        throw safeError("Este módulo todavía está bloqueado.");
-      }
-      throw safeError("No se pudo completar el módulo.");
-    }
-    return { ok: true };
-  });
-
-const SaveDeliverableInput = z.object({
-  moduleId: z.string().uuid(),
-  content: z.string().min(1).max(20000),
-});
-
-/** Guarda el entregable del módulo (acción explícita del cliente). */
-export const saveDeliverable = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => SaveDeliverableInput.parse(input))
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-
-    // Solo en módulos no bloqueados.
-    const { data: progress } = await supabase
-      .from("module_progress")
-      .select("status")
-      .eq("user_id", userId)
-      .eq("module_id", data.moduleId)
-      .maybeSingle();
-    if (!progress || progress.status === "locked") {
-      throw safeError("Este módulo todavía está bloqueado.");
-    }
-
-    const { data: existing } = await supabase
-      .from("deliverables")
-      .select("id")
-      .eq("user_id", userId)
-      .eq("module_id", data.moduleId)
-      .maybeSingle();
-
-    if (existing) {
-      const { error } = await supabase
-        .from("deliverables")
-        .update({ content: data.content })
-        .eq("id", existing.id);
-      if (error) throw safeError("No se pudo guardar el entregable.");
-      return { ok: true, deliverableId: existing.id };
-    }
-
-    const { data: inserted, error } = await supabase
-      .from("deliverables")
-      .insert({ user_id: userId, module_id: data.moduleId, content: data.content })
-      .select("id")
-      .single();
-    if (error) throw safeError("No se pudo guardar el entregable.");
-    return { ok: true, deliverableId: inserted.id as string };
-  });
-
 /** Entregables del propio cliente (para saber cuáles módulos tienen trabajo guardado). */
 export const getMyDeliverables = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -206,24 +144,6 @@ export const getMyDeliverables = createServerFn({ method: "GET" })
       .order("created_at", { ascending: true });
     if (error) throw safeError("No se pudieron cargar tus entregables.");
     return data ?? [];
-  });
-
-/** "Hablar con alguien": crea un aviso abierto para el coach humano. */
-export const requestHumanContact = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ moduleId: z.string().uuid().nullable().optional() }).parse(input),
-  )
-  .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("flags").insert({
-      user_id: context.userId,
-      module_id: data.moduleId ?? null,
-      trigger_type: "solicitud_explicita",
-      status: "open",
-      note: "El cliente ha pedido hablar con una persona.",
-    });
-    if (error) throw safeError("No se pudo enviar tu solicitud. Inténtalo de nuevo.");
-    return { ok: true };
   });
 
 /* ------------------------------------------------------------------ */
@@ -243,7 +163,7 @@ async function assertCoach(supabase: AuthedClient, userId: string) {
   if (!roleRes.data && !adminRes.data) {
     throw safeError("No tienes permiso para ver esta sección.");
   }
-  if (profileRes.data && profileRes.data.status !== "active") {
+  if (!profileRes.data || profileRes.data.status !== "active") {
     throw safeError("Tu cuenta no está activa. Contacta con el administrador.");
   }
 }
@@ -293,7 +213,10 @@ export const getCoachClients = createServerFn({ method: "GET" })
       const openFlags = (flagsRes.data ?? []).filter(
         (f) => f.user_id === a.client_id && f.status === "open",
       ).length;
-      const profile = a.profiles as { full_name: string | null; program_start_date: string | null } | null;
+      const profile = a.profiles as {
+        full_name: string | null;
+        program_start_date: string | null;
+      } | null;
       return {
         clientId: a.client_id,
         fullName: profile?.full_name ?? null,
@@ -334,37 +257,41 @@ export const getClientDetail = createServerFn({ method: "GET" })
       if (!assigned) throw safeError("Este cliente no está asignado a ti.");
     }
 
-    const [profileRes, progressRes, deliverablesRes, flagsRes, sessionsRes] =
-      await Promise.all([
-        supabase
-          .from("profiles")
-          .select("full_name, program_start_date")
-          .eq("id", data.clientId)
-          .maybeSingle(),
-        supabase
-          .from("module_progress")
-          .select("status, started_at, completed_at, modules:module_id(id, week_number, phase_number, title)")
-          .eq("user_id", data.clientId),
-        supabase
-          .from("deliverables")
-          .select("id, content, updated_at, modules:module_id(week_number, title)")
-          .eq("user_id", data.clientId)
-          .order("created_at", { ascending: true }),
-        supabase
-          .from("flags")
-          .select("id, trigger_type, status, note, created_at, modules:module_id(week_number, title)")
-          .eq("user_id", data.clientId)
-          .order("created_at", { ascending: false }),
-        supabase
-          .from("sessions_1_1")
-          .select("id, phase_number, scheduled_at, status, coach_notes, next_step_recommended")
-          .eq("user_id", data.clientId)
-          .order("phase_number", { ascending: true }),
-      ]);
+    const [profileRes, progressRes, deliverablesRes, flagsRes, sessionsRes] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("full_name, program_start_date")
+        .eq("id", data.clientId)
+        .maybeSingle(),
+      supabase
+        .from("module_progress")
+        .select(
+          "status, started_at, completed_at, modules:module_id(id, week_number, phase_number, title)",
+        )
+        .eq("user_id", data.clientId),
+      supabase
+        .from("deliverables")
+        .select("id, content, updated_at, modules:module_id(week_number, title)")
+        .eq("user_id", data.clientId)
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("flags")
+        .select("id, trigger_type, status, note, created_at, modules:module_id(week_number, title)")
+        .eq("user_id", data.clientId)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("sessions_1_1")
+        .select("id, phase_number, scheduled_at, status, coach_notes, next_step_recommended")
+        .eq("user_id", data.clientId)
+        .order("phase_number", { ascending: true }),
+    ]);
 
     if (
-      profileRes.error || progressRes.error || deliverablesRes.error ||
-      flagsRes.error || sessionsRes.error
+      profileRes.error ||
+      progressRes.error ||
+      deliverablesRes.error ||
+      flagsRes.error ||
+      sessionsRes.error
     ) {
       throw safeError("No se pudo cargar el detalle del cliente.");
     }
@@ -378,7 +305,10 @@ export const getClientDetail = createServerFn({ method: "GET" })
           startedAt: p.started_at,
           completedAt: p.completed_at,
           module: p.modules as {
-            id: string; week_number: number; phase_number: number; title: string;
+            id: string;
+            week_number: number;
+            phase_number: number;
+            title: string;
           } | null,
         }))
         .filter((p) => p.module)
@@ -408,10 +338,7 @@ const UpdateSessionInput = z.object({
   scheduledAt: z.string().datetime({ offset: true }).nullable().optional(),
   status: z.enum(["pending", "scheduled", "completed"]).optional(),
   coachNotes: z.string().max(10000).optional(),
-  nextStepRecommended: z
-    .enum(["acompanamiento_1_1", "retiro_leon"])
-    .nullable()
-    .optional(),
+  nextStepRecommended: z.enum(["acompanamiento_1_1", "retiro_leon"]).nullable().optional(),
 });
 
 export const updateSession = createServerFn({ method: "POST" })
@@ -465,4 +392,3 @@ export const getCoachFollowUps = createServerFn({ method: "GET" })
       fullName: nameById.get(f.user_id) ?? null,
     }));
   });
-

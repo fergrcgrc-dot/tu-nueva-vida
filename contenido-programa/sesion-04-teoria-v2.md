@@ -20,8 +20,8 @@ Vas a describir tu mejor versión con un ejemplo concreto y reciente, no con adj
 
 Si reconoces la discrepancia sin rodeos, no te vamos a felicitar por ser honesto — simplemente lo registramos y seguimos. No es el momento de celebrar ni de resolverlo: es el momento de nombrarlo con precisión.
 
-## Tu llamada de esta semana
+## La revisión de fase
 
-Esta sesión cierra la segunda fase del programa, y tu llamada de esta semana trabaja exactamente este contraste. Resolver una contradicción como esta no es trabajo para un ejercicio escrito: necesita una conversación real, con matices, con alguien que pueda sostenerla contigo. Lo que hagas hoy es la materia prima de esa conversación.
+Esta sesión cierra la segunda fase del programa. Al enviar el ejercicio, tu coach IA hace la revisión de fase y trabaja exactamente este contraste contigo: te devuelve tus propias palabras y te pregunta lo que todavía no has contestado. Resolver una contradicción como esta no se hace en una tarde. Lo que hagas hoy no es para cerrarla: es para no volver a perderla de vista.
 
 A partir de la semana que viene dejamos la claridad y entramos en diseño: ya no se trata de nombrar qué importa, sino de generar opciones que no eviten, precisamente, lo que hoy has puesto sobre la mesa.

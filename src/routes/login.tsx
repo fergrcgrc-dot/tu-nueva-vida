@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type FormEvent } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { track } from "@/lib/analytics";
 import { getMyRole } from "@/lib/program.functions";
 
 const REMEMBERED_EMAIL_KEY = "tnv_remembered_email";
@@ -18,15 +19,16 @@ function readRememberedEmail(): string {
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
+      { name: "robots", content: "noindex, nofollow" },
       { title: "Iniciar sesión — Tu Nueva Vida" },
       {
         name: "description",
-        content: "Acceso privado para clientes y coach del programa Tu Nueva Vida.",
+        content: "Acceso privado al programa Tu Nueva Vida.",
       },
       { property: "og:title", content: "Iniciar sesión — Tu Nueva Vida" },
       {
         property: "og:description",
-        content: "Acceso privado para clientes y coach del programa Tu Nueva Vida.",
+        content: "Acceso privado al programa Tu Nueva Vida.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -37,7 +39,7 @@ export const Route = createFileRoute("/login")({
 
 /**
  * Solo inicio de sesión: no existe registro público. Los clientes son
- * invitados manualmente por el coach.
+ * dados de alta automáticamente al comprar el programa.
  */
 function LoginPage() {
   const navigate = useNavigate();
@@ -47,6 +49,7 @@ function LoginPage() {
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   useEffect(() => {
     const remembered = readRememberedEmail();
@@ -67,6 +70,7 @@ function LoginPage() {
       setError("Correo o contraseña incorrectos.");
       return;
     }
+    track("login", { method: "email" });
     try {
       if (rememberMe) localStorage.setItem(REMEMBERED_EMAIL_KEY, email);
       else localStorage.removeItem(REMEMBERED_EMAIL_KEY);
@@ -86,6 +90,24 @@ function LoginPage() {
     }
   }
 
+  /**
+   * Recuperación de contraseña. La respuesta es siempre la misma, exista o no
+   * la cuenta, para no revelar qué emails están registrados.
+   */
+  async function handleReset() {
+    setError(null);
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      setError("Escribe tu email arriba y vuelve a pulsar.");
+      return;
+    }
+    setLoading(true);
+    await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/set-password`,
+    });
+    setLoading(false);
+    setResetSent(true);
+  }
+
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4">
       {/* Fogata: un punto de luz cálida sobre el cielo nocturno */}
@@ -101,9 +123,7 @@ function LoginPage() {
         <div className="mb-8 text-center">
           <div className="ember-glow mx-auto mb-5 h-2.5 w-2.5 rounded-full bg-ember" />
           <h1 className="text-3xl font-semibold text-foreground">Tu Nueva Vida</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Un espacio privado. Accede con tu invitación.
-          </p>
+          <p className="mt-2 text-sm text-muted-foreground">Accede con el email de tu compra.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -163,8 +183,29 @@ function LoginPage() {
           </button>
         </form>
 
+        <div className="mt-4 text-center text-xs">
+          {resetSent ? (
+            <p className="text-muted-foreground">
+              Si ese email tiene acceso, te hemos enviado un enlace para crear una contraseña nueva.
+              Caduca en 1 hora.
+            </p>
+          ) : (
+            <button
+              type="button"
+              onClick={handleReset}
+              disabled={loading}
+              className="font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+            >
+              ¿Has olvidado tu contraseña o no te llegó el email de acceso?
+            </button>
+          )}
+        </div>
+
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          El acceso es solo por invitación de tu coach.
+          ¿Aún no tienes acceso?{" "}
+          <a href="/#precio" className="font-medium text-primary hover:underline">
+            Empieza el programa
+          </a>
         </p>
       </div>
     </div>

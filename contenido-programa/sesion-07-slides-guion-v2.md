@@ -9,7 +9,7 @@ Semana 7 · Plan a 90 días
 ---
 
 **Diapositiva 2 — Tu dirección ya está decidida**
-La comprometiste con tu coach la semana pasada.
+La ratificaste por escrito la semana pasada.
 Hoy no volvemos a discutir el "hacia dónde".
 
 ---

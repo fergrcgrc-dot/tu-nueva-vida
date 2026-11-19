@@ -21,7 +21,7 @@ Atención especial en el que marcaste como más difícil.
 ---
 
 **Diapositiva 4 — Si te quedas en silencio**
-Una ausencia prolongada se la hacemos saber a tu coach.
+Si una ausencia se alarga, te escribimos para retomarlo.
 No es vigilancia: es sostener lo que decidiste.
 
 ---
@@ -46,13 +46,13 @@ Tu hoguera personal · tu dirección elegida · tu plan de hitos
 
 **Diapositiva 8 — Si quedó algo sin resolver**
 Si hubo una tensión señalada en semanas anteriores, no desaparece.
-La nombramos de nuevo aquí, para tu coach.
+La nombramos de nuevo aquí, para que la tengas presente.
 
 ---
 
 **Diapositiva 9 — El siguiente paso**
-Seguir con tu coach · Un retiro presencial · Ambos
-Lo decidís juntos en vuestra última llamada.
+Tus check-ins de los próximos 90 días.
+Tu informe, siempre disponible. Acceso de por vida.
 
 ---
 

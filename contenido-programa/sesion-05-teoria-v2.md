@@ -18,7 +18,7 @@ Ten presente tu valor con mayor distancia, el que trabajaste hace dos semanas. N
 
 ## Nuestro papel aquí
 
-Podemos proponerte categorías o ángulos que no hayas considerado — cambio de sector, cambio de modalidad, redefinir tu rol actual, cambiar de geografía, cambiar tu relación con el trabajo en sí — pero no te vamos a sugerir cuál deberías elegir. Esa decisión, y el miedo que trae consigo, es trabajo para tu coach, no para hoy.
+Podemos proponerte categorías o ángulos que no hayas considerado — cambio de sector, cambio de modalidad, redefinir tu rol actual, cambiar de geografía, cambiar tu relación con el trabajo en sí — pero no te vamos a sugerir cuál deberías elegir. Esa decisión, y el miedo que trae consigo, es trabajo de la semana que viene, no de hoy.
 
 ## Lo que esta semana no resuelve
 

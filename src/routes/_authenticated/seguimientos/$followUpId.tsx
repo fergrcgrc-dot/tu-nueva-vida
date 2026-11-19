@@ -68,10 +68,7 @@ function FollowUpPage() {
       });
       setChat((c) => [...c, { role: "assistant", content: reply.message }]);
       if (reply.escalated) {
-        toast(
-          reply.escalation_message ??
-            "Se lo hemos trasladado a tu coach para retomarlo contigo.",
-        );
+        if (reply.escalation_message) toast(reply.escalation_message, { duration: 12000 });
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo hablar con la guía.");
@@ -85,7 +82,7 @@ function FollowUpPage() {
     setClosing(true);
     try {
       await callClose({ data: { followUpId, history: chat.slice(-40) } });
-      toast.success("Seguimiento cerrado. Tu coach verá el resumen.");
+      toast.success("Check-in cerrado. El resumen queda guardado en tu perfil.");
       await queryClient.invalidateQueries();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo cerrar el seguimiento.");

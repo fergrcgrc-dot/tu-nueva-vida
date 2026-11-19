@@ -42,4 +42,4 @@ No le des más de cinco segundos a la respuesta.
 
 ## Qué recibes al terminar
 
-Un resumen breve con los temas que han salido, sin juicios ni consejos. Un resumen algo más detallado queda guardado para tu coach, por si hace falta tenerlo en cuenta antes de vuestra próxima llamada.
+Cuando envíes el ejercicio, tu coach IA lo revisa y te devuelve feedback: los temas que han salido y el patrón que detecta, sin juicios ni consejos. Si alguna respuesta se queda en lo general, te pedirá que la precises antes de dar el módulo por cerrado.

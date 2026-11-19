@@ -59,13 +59,13 @@ Si tu respuesta es general, te lo vamos a volver a preguntar.
 
 **Diapositiva 9 — Si algo serio aparece**
 Si en algún momento aparece algo serio — no cansancio, sino una desesperanza real —
-avisamos a tu coach de inmediato. No esperamos a que termines la semana.
+pausamos el ejercicio y te mostramos recursos de ayuda profesional. Sin esperar.
 
 ---
 
 **Diapositiva 10 — Lo que pasa con lo que cuentes**
 Nada de lo que digas hoy desaparece.
-Tu coach lo va a tener en cuenta si hace falta.
+Se guarda en tu perfil, solo para ti.
 Y es la base de lo que trabajaremos la semana que viene.
 
 ---

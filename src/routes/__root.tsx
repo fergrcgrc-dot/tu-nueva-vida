@@ -14,6 +14,8 @@ import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "../integrations/supabase/client";
+import { CookieBanner } from "../components/CookieBanner";
+import { initAnalytics } from "../lib/analytics";
 
 function NotFoundComponent() {
   return (
@@ -84,13 +86,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Tu Nueva Vida es un programa privado de desarrollo personal: 8 semanas, 4 fases, guía con IA y acompañamiento humano 1:1.",
+          "Programa online de reinvención profesional en 8 módulos, con vídeos, ejercicios prácticos y un coach IA que revisa tu trabajo.",
       },
       { property: "og:title", content: "Tu Nueva Vida" },
       {
         property: "og:description",
         content:
-          "Programa privado de transformación personal: 8 semanas, 4 fases, con guía de IA y coach humano.",
+          "Programa online de transformación personal: 8 módulos, 4 fases y un coach IA. Acceso de por vida.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -99,12 +101,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/logo.svg", type: "image/svg+xml" },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Karla:wght@300;400;500;600;700&display=swap",
-      },
     ],
   }),
   shellComponent: RootShell,
@@ -142,11 +138,18 @@ function RootComponent() {
     return () => subscription.unsubscribe();
   }, [queryClient, router]);
 
+  // Analítica (solo con consentimiento). Las vistas de página al navegar las
+  // registra la «medición mejorada» de GA4 (cambios del historial del navegador).
+  useEffect(() => {
+    initAnalytics();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster theme="light" position="bottom-right" />
+      <CookieBanner />
     </QueryClientProvider>
   );
 }

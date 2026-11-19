@@ -26,7 +26,7 @@ Convención: `snake_case`, un campo por fila. "Origen" indica la sesión que lo 
 | `patrones_lenguaje_detectados_s1` | lista de enums (`evasion`, `repeticion`, `minimizacion`, `catastrofizacion`, `racionalizacion`) | Patrones detectados por dominio |
 | `señal_bloqueo_s1` | booleano | Ver evaluación de sesión 1 |
 | `señal_crisis_s1` | booleano | Ver evaluación de sesión 1 |
-| `resumen_auditoria` | texto (≤200 palabras) | Síntesis para el coach, no para el usuario |
+| `resumen_auditoria` | texto (≤200 palabras) | Síntesis interna para el coach IA |
 
 **Se consulta en:** Sesión 2 (para dirigir la proyección a 5 años hacia los dominios con mayor carga), Sesión 8 (para medir cambio de lenguaje desde el inicio).
 
@@ -41,7 +41,7 @@ Convención: `snake_case`, un campo por fila. "Origen" indica la sesión que lo 
 | `discrepancia_proyeccion_vs_auditoria` | texto + booleano (calculado) | Compara severidad declarada aquí contra `insatisfacciones_declaradas` de S1; `true` si hay minimización significativa |
 | `señal_bloqueo_s2` | booleano | — |
 | `señal_crisis_s2` | booleano | — |
-| `resumen_fase1_cierre` | texto | Síntesis S1+S2 para el checkpoint 1:1 de fin de semana 2 (contención emocional) |
+| `resumen_fase1_cierre` | texto | Síntesis S1+S2 para la revisión de fase de fin de semana 2 (contención emocional) |
 
 **Se consulta en:** Sesión 3 (los dominios de mayor coste orientan las sugerencias iniciales de valores), Sesión 4, Sesión 6 (para distinguir restricción real de excusa), Sesión 8 (informe final).
 
@@ -70,7 +70,7 @@ Convención: `snake_case`, un campo por fila. "Origen" indica la sesión que lo 
 | `coherencia_valores_vs_hoguera` | texto + escala (calculado) | Contraste entre `valor_mayor_gap` y lo descrito aquí |
 | `contradiccion_valores_vida` | booleano + texto | Si hay discrepancia relevante entre valores declarados y vida real |
 | `señal_contradiccion_no_resuelta_s4` | booleano | — |
-| `resumen_fase2_cierre` | texto | Checkpoint 1:1 fin semana 4: contraste valores vs. vida actual |
+| `resumen_fase2_cierre` | texto | Revisión de fase fin semana 4: contraste valores vs. vida actual |
 
 **Se consulta en:** Sesión 5 (brief de diseño: qué gap deben atacar las opciones), Sesión 8 (informe final).
 
@@ -97,7 +97,7 @@ Convención: `snake_case`, un campo por fila. "Origen" indica la sesión que lo 
 | `restriccion_usada_como_excusa` | booleano + texto (calculado) | Cruza justificaciones con `señal_autocensura_detectada` y `coste_emocional_declarado` |
 | `señal_contradiccion_no_resuelta_s6` | booleano | — |
 | `direccion_elegida` | texto (provisional hasta ratificación en checkpoint) | — |
-| `resumen_fase3_cierre` | texto | Checkpoint 1:1 fin semana 6: compromiso con una dirección |
+| `resumen_fase3_cierre` | texto | Revisión de fase fin semana 6: compromiso con una dirección |
 
 **Se consulta en:** Sesión 7 (objeto directo del plan a 90 días), Sesión 8 (informe final).
 
@@ -124,7 +124,6 @@ Convención: `snake_case`, un campo por fila. "Origen" indica la sesión que lo 
 | `señal_inactividad` | booleano (operativo) | Mecanismo que nace aquí, se evalúa cada semana activa |
 | `señal_abandono_riesgo` | booleano (calculado) | — |
 | `informe_final_generado` | texto largo | Resumen del recorrido: valores, dirección, plan |
-| `recomendacion_siguiente_escalon` | enum (`1:1_continuado`, `retiro_leon`, `ambos`) | Calculado a partir de todo el perfil |
 
 ## 6. Meta-campos transversales (activos desde Sesión 1, actualizados cada semana)
 
@@ -134,8 +133,7 @@ Convención: `snake_case`, un campo por fila. "Origen" indica la sesión que lo 
 | `fecha_ultima_actividad` | date | — |
 | `dias_inactividad_semana_actual` | number | Alimenta el trigger 3 (inactividad) |
 | `contador_bloqueo_por_modulo` | mapa `{modulo: contador}` | Alimenta el trigger 2 (bloqueo repetido) |
-| `triggers_activados_historial` | lista de objetos `{sesion, trigger, fecha, resuelto_por_coach}` | Auditoría completa de escalados |
-| `notas_coach_privadas` | texto, solo escritura humana | El bot **no** las usa para generar preguntas, salvo que una contradicción marcada aquí como resuelta deba dejar de aparecer en sesiones futuras |
+| `triggers_activados_historial` | lista de objetos `{sesion, trigger, fecha, resuelto}` | Auditoría completa de escalados |
 
 ## 7. Regla de consulta obligatoria
 

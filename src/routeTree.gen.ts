@@ -11,18 +11,24 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as ComprarRouteImport } from './routes/comprar'
+import { Route as GraciasRouteImport } from './routes/gracias'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as SetPasswordRouteImport } from './routes/set-password'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as CompraGraciasRouteImport } from './routes/compra/gracias'
+import { Route as AuthenticatedVerificacion2faRouteImport } from './routes/_authenticated/verificacion-2fa'
+import { Route as BlogIndexRouteImport } from './routes/blog/index'
+import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
+import { Route as LegalSlugRouteImport } from './routes/legal/$slug'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedCoachIndexRouteImport } from './routes/_authenticated/coach/index'
 import { Route as AuthenticatedCoachSeguimientosRouteImport } from './routes/_authenticated/coach/seguimientos'
 import { Route as AuthenticatedModulosModuleIdRouteImport } from './routes/_authenticated/modulos/$moduleId'
 import { Route as AuthenticatedSeguimientosFollowUpIdRouteImport } from './routes/_authenticated/seguimientos/$followUpId'
-import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
+import { Route as ApiLemonsqueezyWebhookRouteImport } from './routes/api/lemonsqueezy/webhook'
 import { Route as AuthenticatedCoachClientesClientIdRouteImport } from './routes/_authenticated/coach/clientes/$clientId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -34,6 +40,16 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComprarRoute = ComprarRouteImport.update({
+  id: '/comprar',
+  path: '/comprar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GraciasRoute = GraciasRouteImport.update({
+  id: '/gracias',
+  path: '/gracias',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -42,6 +58,11 @@ const LoginRoute = LoginRouteImport.update({
 const SetPasswordRoute = SetPasswordRouteImport.update({
   id: '/set-password',
   path: '/set-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -59,9 +80,25 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const CompraGraciasRoute = CompraGraciasRouteImport.update({
-  id: '/compra/gracias',
-  path: '/compra/gracias',
+const AuthenticatedVerificacion2faRoute =
+  AuthenticatedVerificacion2faRouteImport.update({
+    id: '/verificacion-2fa',
+    path: '/verificacion-2fa',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalSlugRoute = LegalSlugRouteImport.update({
+  id: '/legal/$slug',
+  path: '/legal/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
@@ -92,9 +129,9 @@ const AuthenticatedSeguimientosFollowUpIdRoute =
     path: '/seguimientos/$followUpId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
-  id: '/api/stripe/webhook',
-  path: '/api/stripe/webhook',
+const ApiLemonsqueezyWebhookRoute = ApiLemonsqueezyWebhookRouteImport.update({
+  id: '/api/lemonsqueezy/webhook',
+  path: '/api/lemonsqueezy/webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedCoachClientesClientIdRoute =
@@ -106,30 +143,42 @@ const AuthenticatedCoachClientesClientIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/comprar': typeof ComprarRoute
+  '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
   '/set-password': typeof SetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/compra/gracias': typeof CompraGraciasRoute
+  '/verificacion-2fa': typeof AuthenticatedVerificacion2faRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/legal/$slug': typeof LegalSlugRoute
+  '/blog/': typeof BlogIndexRoute
   '/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
-  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/api/lemonsqueezy/webhook': typeof ApiLemonsqueezyWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/coach/': typeof AuthenticatedCoachIndexRoute
   '/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/comprar': typeof ComprarRoute
+  '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
   '/set-password': typeof SetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/compra/gracias': typeof CompraGraciasRoute
+  '/verificacion-2fa': typeof AuthenticatedVerificacion2faRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/legal/$slug': typeof LegalSlugRoute
+  '/blog': typeof BlogIndexRoute
   '/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
-  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/api/lemonsqueezy/webhook': typeof ApiLemonsqueezyWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/coach': typeof AuthenticatedCoachIndexRoute
   '/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
@@ -138,16 +187,22 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/comprar': typeof ComprarRoute
+  '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
   '/set-password': typeof SetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/coach': typeof AuthenticatedCoachRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/compra/gracias': typeof CompraGraciasRoute
+  '/_authenticated/verificacion-2fa': typeof AuthenticatedVerificacion2faRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/legal/$slug': typeof LegalSlugRoute
+  '/blog/': typeof BlogIndexRoute
   '/_authenticated/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/_authenticated/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/_authenticated/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
-  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/api/lemonsqueezy/webhook': typeof ApiLemonsqueezyWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/coach/': typeof AuthenticatedCoachIndexRoute
   '/_authenticated/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
@@ -156,30 +211,42 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/comprar'
+    | '/gracias'
     | '/login'
     | '/set-password'
+    | '/sitemap.xml'
     | '/admin'
     | '/coach'
     | '/dashboard'
-    | '/compra/gracias'
+    | '/verificacion-2fa'
+    | '/blog/$slug'
+    | '/legal/$slug'
+    | '/blog/'
     | '/coach/seguimientos'
     | '/modulos/$moduleId'
     | '/seguimientos/$followUpId'
-    | '/api/stripe/webhook'
+    | '/api/lemonsqueezy/webhook'
     | '/admin/'
     | '/coach/'
     | '/coach/clientes/$clientId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/comprar'
+    | '/gracias'
     | '/login'
     | '/set-password'
+    | '/sitemap.xml'
     | '/dashboard'
-    | '/compra/gracias'
+    | '/verificacion-2fa'
+    | '/blog/$slug'
+    | '/legal/$slug'
+    | '/blog'
     | '/coach/seguimientos'
     | '/modulos/$moduleId'
     | '/seguimientos/$followUpId'
-    | '/api/stripe/webhook'
+    | '/api/lemonsqueezy/webhook'
     | '/admin'
     | '/coach'
     | '/coach/clientes/$clientId'
@@ -187,16 +254,22 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/comprar'
+    | '/gracias'
     | '/login'
     | '/set-password'
+    | '/sitemap.xml'
     | '/_authenticated/admin'
     | '/_authenticated/coach'
     | '/_authenticated/dashboard'
-    | '/compra/gracias'
+    | '/_authenticated/verificacion-2fa'
+    | '/blog/$slug'
+    | '/legal/$slug'
+    | '/blog/'
     | '/_authenticated/coach/seguimientos'
     | '/_authenticated/modulos/$moduleId'
     | '/_authenticated/seguimientos/$followUpId'
-    | '/api/stripe/webhook'
+    | '/api/lemonsqueezy/webhook'
     | '/_authenticated/admin/'
     | '/_authenticated/coach/'
     | '/_authenticated/coach/clientes/$clientId'
@@ -205,10 +278,15 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  ComprarRoute: typeof ComprarRoute
+  GraciasRoute: typeof GraciasRoute
   LoginRoute: typeof LoginRoute
   SetPasswordRoute: typeof SetPasswordRoute
-  CompraGraciasRoute: typeof CompraGraciasRoute
-  ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  BlogSlugRoute: typeof BlogSlugRoute
+  LegalSlugRoute: typeof LegalSlugRoute
+  BlogIndexRoute: typeof BlogIndexRoute
+  ApiLemonsqueezyWebhookRoute: typeof ApiLemonsqueezyWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -227,6 +305,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/comprar': {
+      id: '/comprar'
+      path: '/comprar'
+      fullPath: '/comprar'
+      preLoaderRoute: typeof ComprarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gracias': {
+      id: '/gracias'
+      path: '/gracias'
+      fullPath: '/gracias'
+      preLoaderRoute: typeof GraciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -239,6 +331,13 @@ declare module '@tanstack/react-router' {
       path: '/set-password'
       fullPath: '/set-password'
       preLoaderRoute: typeof SetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -262,11 +361,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/compra/gracias': {
-      id: '/compra/gracias'
-      path: '/compra/gracias'
-      fullPath: '/compra/gracias'
-      preLoaderRoute: typeof CompraGraciasRouteImport
+    '/_authenticated/verificacion-2fa': {
+      id: '/_authenticated/verificacion-2fa'
+      path: '/verificacion-2fa'
+      fullPath: '/verificacion-2fa'
+      preLoaderRoute: typeof AuthenticatedVerificacion2faRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/$slug': {
+      id: '/legal/$slug'
+      path: '/legal/$slug'
+      fullPath: '/legal/$slug'
+      preLoaderRoute: typeof LegalSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
@@ -304,11 +424,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSeguimientosFollowUpIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/stripe/webhook': {
-      id: '/api/stripe/webhook'
-      path: '/api/stripe/webhook'
-      fullPath: '/api/stripe/webhook'
-      preLoaderRoute: typeof ApiStripeWebhookRouteImport
+    '/api/lemonsqueezy/webhook': {
+      id: '/api/lemonsqueezy/webhook'
+      path: '/api/lemonsqueezy/webhook'
+      fullPath: '/api/lemonsqueezy/webhook'
+      preLoaderRoute: typeof ApiLemonsqueezyWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/coach/clientes/$clientId': {
@@ -352,6 +472,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedCoachRoute: typeof AuthenticatedCoachRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedVerificacion2faRoute: typeof AuthenticatedVerificacion2faRoute
   AuthenticatedModulosModuleIdRoute: typeof AuthenticatedModulosModuleIdRoute
   AuthenticatedSeguimientosFollowUpIdRoute: typeof AuthenticatedSeguimientosFollowUpIdRoute
 }
@@ -360,6 +481,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedCoachRoute: AuthenticatedCoachRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedVerificacion2faRoute: AuthenticatedVerificacion2faRoute,
   AuthenticatedModulosModuleIdRoute: AuthenticatedModulosModuleIdRoute,
   AuthenticatedSeguimientosFollowUpIdRoute:
     AuthenticatedSeguimientosFollowUpIdRoute,
@@ -371,10 +493,15 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  ComprarRoute: ComprarRoute,
+  GraciasRoute: GraciasRoute,
   LoginRoute: LoginRoute,
   SetPasswordRoute: SetPasswordRoute,
-  CompraGraciasRoute: CompraGraciasRoute,
-  ApiStripeWebhookRoute: ApiStripeWebhookRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  BlogSlugRoute: BlogSlugRoute,
+  LegalSlugRoute: LegalSlugRoute,
+  BlogIndexRoute: BlogIndexRoute,
+  ApiLemonsqueezyWebhookRoute: ApiLemonsqueezyWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

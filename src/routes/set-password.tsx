@@ -1,14 +1,19 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type FormEvent } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { track } from "@/lib/analytics";
+import { LEGAL } from "@/lib/legal";
 import { getMyRole } from "@/lib/program.functions";
 
 export const Route = createFileRoute("/set-password")({
   ssr: false,
   head: () => ({
-    meta: [{ title: "Crea tu contraseña — Tu Nueva Vida" }],
+    meta: [
+      { title: "Crea tu contraseña — Tu Nueva Vida" },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
   }),
   component: SetPasswordPage,
 });
@@ -26,6 +31,7 @@ function SetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [consent, setConsent] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -41,20 +47,48 @@ function SetPasswordPage() {
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setError(null);
-    if (password.length < 8) {
-      setError("La contraseña debe tener al menos 8 caracteres.");
+    if (
+      password.length < 10 ||
+      !/[a-z]/.test(password) ||
+      !/[A-Z]/.test(password) ||
+      !/\d/.test(password)
+    ) {
+      setError("Usa al menos 10 caracteres, con mayúsculas, minúsculas y algún número.");
       return;
     }
     if (password !== confirmPassword) {
       setError("Las contraseñas no coinciden.");
       return;
     }
+    if (!consent) {
+      setError("Para usar el programa necesitamos tu consentimiento.");
+      return;
+    }
     setSaving(true);
     const { error: updateError } = await supabase.auth.updateUser({ password });
     if (updateError) {
       setSaving(false);
-      setError("No se pudo guardar la contraseña. Inténtalo de nuevo.");
+      const code = (updateError as { code?: string }).code ?? "";
+      setError(
+        code === "weak_password"
+          ? "Esa contraseña es demasiado débil o aparece en filtraciones conocidas. Elige otra."
+          : code === "same_password"
+            ? "La contraseña nueva tiene que ser distinta de la anterior."
+            : "No se pudo guardar la contraseña. Inténtalo de nuevo.",
+      );
       return;
+    }
+    track("sign_up", { method: "email" });
+    // Registro del consentimiento explícito (RGPD art. 9.2.a).
+    const { data: userData } = await supabase.auth.getUser();
+    if (userData.user) {
+      await supabase
+        .from("profiles")
+        .update({
+          privacy_consent_at: new Date().toISOString(),
+          privacy_policy_version: LEGAL.actualizado,
+        })
+        .eq("id", userData.user.id);
     }
     try {
       const { role } = await fetchRole();
@@ -94,7 +128,8 @@ function SetPasswordPage() {
 
         {status === "invalid" && (
           <p role="alert" className="text-center text-sm text-destructive">
-            Este enlace no es válido o ha caducado. Pide a tu coach que te reenvíe la invitación.
+            Este enlace no es válido o ha caducado. Escribe a hola@tunuevavida.eu con el email de tu
+            compra y te enviamos uno nuevo.
           </p>
         )}
 
@@ -108,12 +143,12 @@ function SetPasswordPage() {
                 id="password"
                 type="password"
                 required
-                minLength={8}
+                minLength={10}
                 autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full rounded-lg border border-input bg-secondary px-3.5 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-ring"
-                placeholder="Mínimo 8 caracteres"
+                placeholder="Mínimo 10, con mayúsculas y números"
               />
             </div>
             <div className="space-y-2">
@@ -131,6 +166,31 @@ function SetPasswordPage() {
                 placeholder="••••••••"
               />
             </div>
+
+            <label className="flex items-start gap-3 text-xs leading-relaxed text-muted-foreground">
+              <input
+                type="checkbox"
+                required
+                checked={consent}
+                onChange={(e) => setConsent(e.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-primary"
+              />
+              <span>
+                He leído la{" "}
+                <Link
+                  to="/legal/$slug"
+                  params={{ slug: "privacidad" }}
+                  target="_blank"
+                  className="underline"
+                >
+                  política de privacidad
+                </Link>{" "}
+                y doy mi consentimiento explícito para que se traten los datos que comparta en el
+                programa, incluidos los relativos a mi salud y estado emocional, con el fin de
+                recibir el feedback del coach IA. Puedo retirarlo cuando quiera escribiendo a{" "}
+                {LEGAL.email}.
+              </span>
+            </label>
 
             {error && (
               <p role="alert" className="text-sm text-destructive">

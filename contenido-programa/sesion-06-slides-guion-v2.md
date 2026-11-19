@@ -47,13 +47,13 @@ Revisa cada opción de tu lista.
 
 **Diapositiva 8 — El escenario que más importa**
 Si el filtro elimina TODAS las opciones ancladas a tu valor de mayor distancia...
-Eso no es neutro. Es el tema central de tu llamada de esta semana.
+Eso no es neutro. Es el tema central de la revisión de fase.
 
 ---
 
-**Diapositiva 9 — Tu llamada de esta semana**
+**Diapositiva 9 — La revisión de fase**
 Esta sesión cierra la fase de Diseño.
-Tu coach te ayuda a comprometerte con una dirección, y a gestionar el miedo de decidir.
+Ratificas tu dirección por escrito, y nombras el miedo de decidir.
 
 ---
 
