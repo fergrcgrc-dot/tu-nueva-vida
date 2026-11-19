@@ -5,6 +5,9 @@
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/server.ts",
   // Logs del Worker en Cloudflare (Workers → tu-nueva-vida → Logs) para vigilar errores y abusos.
+  // Conserva las variables definidas en el panel de Cloudflare al desplegar
+  // (si no, `wrangler deploy` borra las de texto plano que no estén aquí).
+  "keep_vars": true,
   "observability": { "enabled": true, "head_sampling_rate": 1 },
   // Sirve los .html estáticos tal cual (sin redirigir a la URL sin extensión):
   // Google Search Console exige que su archivo de verificación responda 200.
