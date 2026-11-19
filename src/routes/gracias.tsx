@@ -5,7 +5,7 @@ export const Route = createFileRoute("/gracias")({
   head: () => ({
     meta: [
       { title: "Gracias por tu compra — Tu nueva vida" },
-      { name: "robots", content: "noindex" },
+      { name: "robots", content: "noindex, nofollow" },
     ],
   }),
   component: Gracias,

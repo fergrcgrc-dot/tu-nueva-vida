@@ -1,14 +1,17 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
+# tunuevavida.eu
 User-agent: *
 Allow: /
+# Zona privada del programa, cuentas y endpoints: no aportan nada al buscador.
+Disallow: /dashboard
+Disallow: /modulos/
+Disallow: /seguimientos/
+Disallow: /admin
+Disallow: /coach
+Disallow: /verificacion-2fa
+Disallow: /set-password
+Disallow: /login
+Disallow: /gracias
+Disallow: /comprar
+Disallow: /api/
+
+Sitemap: https://tunuevavida.eu/sitemap.xml

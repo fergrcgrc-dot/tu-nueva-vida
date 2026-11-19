@@ -1,6 +1,10 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+/* Tipografías alojadas en el propio dominio (sin bloqueo de render ni envío de IP a Google). */
+@import "@fontsource-variable/karla/index.css";
+@import "@fontsource-variable/lora/wght.css";
+@import "@fontsource-variable/lora/wght-italic.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -54,8 +58,8 @@
 /* Tu Nueva Vida — identidad nocturna permanente (fogata en cielo nocturno) */
 :root {
   --radius: 0.75rem;
-  --font-display: "Lora", Georgia, serif;
-  --font-body: "Karla", system-ui, sans-serif;
+  --font-display: "Lora Variable", "Lora", Georgia, serif;
+  --font-body: "Karla Variable", "Karla", system-ui, sans-serif;
 
   /* Hoguera de día: crema, ámbar, terracota, negro */
   --background: oklch(0.985 0.012 85);
@@ -201,5 +205,12 @@
 
   .text-glow {
     text-shadow: none;
+  }
+}
+
+/* Naranja de marca para texto pequeño: contraste AA (≥ 4,5:1) sobre fondo claro. */
+@layer utilities {
+  .text-ember-strong {
+    color: oklch(0.5 0.15 42);
   }
 }

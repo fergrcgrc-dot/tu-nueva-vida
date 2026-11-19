@@ -3,6 +3,8 @@
  * Aunque la marca sea faceless, la ley exige identificar al titular.
  * ⚠️ Pendiente: rellena titular, NIF y domicilio (obligatorios por la LSSI).
  */
+import { ANALYTICS_ENABLED } from "@/lib/analytics";
+
 export const LEGAL = {
   // Pendientes: mientras estén vacíos, las líneas correspondientes no se muestran.
   titular: "",
@@ -19,11 +21,31 @@ export const LEGAL = {
 
 export type LegalSlug = "aviso-legal" | "privacidad" | "condiciones" | "cookies";
 
-export const LEGAL_PAGES: Array<{ slug: LegalSlug; title: string }> = [
-  { slug: "aviso-legal", title: "Aviso legal" },
-  { slug: "privacidad", title: "Política de privacidad" },
-  { slug: "condiciones", title: "Condiciones de venta" },
-  { slug: "cookies", title: "Política de cookies" },
+export const LEGAL_PAGES: Array<{ slug: LegalSlug; title: string; description: string }> = [
+  {
+    slug: "aviso-legal",
+    title: "Aviso legal",
+    description:
+      "Aviso legal de Tu nueva vida: titular del sitio, condiciones de uso, propiedad intelectual y naturaleza del programa online de reinvención profesional.",
+  },
+  {
+    slug: "privacidad",
+    title: "Política de privacidad",
+    description:
+      "Cómo trata Tu nueva vida tus datos personales: qué datos, para qué, proveedores, conservación y cómo ejercer tus derechos según el RGPD.",
+  },
+  {
+    slug: "condiciones",
+    title: "Condiciones de venta",
+    description:
+      "Condiciones de compra del programa Tu nueva vida: precio de 399 €, acceso de por vida, garantía de 14 días y derecho de desistimiento.",
+  },
+  {
+    slug: "cookies",
+    title: "Política de cookies",
+    description:
+      "Qué cookies y tecnologías de almacenamiento usa tunuevavida.eu, para qué sirven y cómo puedes gestionarlas desde tu navegador.",
+  },
 ];
 
 const L = LEGAL;
@@ -97,7 +119,7 @@ ${line("Responsable", L.titular)}${line("NIF", L.nif)}${line("Domicilio", L.domi
 | Detectar señales de riesgo grave en lo que escribes para mostrarte recursos de ayuda (024, 112) y registrar un aviso interno | Tu consentimiento explícito y el interés vital de la persona afectada (art. 9.2.c RGPD) |
 | Gestionar compras, reembolsos y obligaciones contables y fiscales | Obligación legal (art. 6.1.c RGPD) |
 | Mantener la seguridad de la plataforma y prevenir fraudes | Interés legítimo (art. 6.1.f RGPD) |
-
+${ANALYTICS_ENABLED ? "| Medir de forma agregada cómo se usa la web (Google Analytics) | Tu consentimiento, que puedes retirar en «Preferencias de cookies» (art. 6.1.a RGPD) |\n" : ""}
 No usamos tus datos para publicidad ni los vendemos. Si algún día quisiéramos enviarte comunicaciones comerciales, te pediríamos antes tu consentimiento.
 
 ## 4. El coach IA y las decisiones automatizadas
@@ -110,8 +132,7 @@ Solo con los proveedores necesarios para prestar el servicio, que actúan como e
 
 - **Supabase:** base de datos, autenticación y almacenamiento de vídeos, en servidores de la Unión Europea (Irlanda).
 - **Cloudflare:** alojamiento y entrega de la web.
-- **Anthropic:** modelo de IA que genera el feedback y las respuestas del coach IA. Recibe el texto de tus ejercicios y conversaciones solo para generar la respuesta y, según sus condiciones comerciales, no lo usa para entrenar sus modelos.
-- **Google Fonts:** al cargar la web, tu navegador solicita las tipografías a servidores de Google, que reciben tu dirección IP.
+${ANALYTICS_ENABLED ? "- **Google Analytics (Google Ireland Ltd.):** solo si aceptas las cookies de análisis. Mide de forma agregada las visitas (páginas vistas, origen del tráfico, clics en botones); no recibe el contenido de tus ejercicios ni conversaciones.\n" : ""}- **Anthropic:** modelo de IA que genera el feedback y las respuestas del coach IA. Recibe el texto de tus ejercicios y conversaciones solo para generar la respuesta y, según sus condiciones comerciales, no lo usa para entrenar sus modelos.
 
 **Lemon Squeezy, LLC** gestiona el pago como vendedor registrado (*merchant of record*) y trata tus datos de pago como **responsable independiente**, según su propia política de privacidad.
 
@@ -218,24 +239,23 @@ Las cookies y tecnologías similares (como el almacenamiento local del navegador
 
 ## 2. Qué usamos en ${L.dominio}
 
-**Solo usamos elementos técnicos estrictamente necesarios.** No usamos cookies de análisis, de publicidad ni de redes sociales.
+${ANALYTICS_ENABLED ? "Usamos elementos **técnicos**, necesarios para que la web funcione, y cookies de **análisis**, que solo se activan si las aceptas en el aviso de cookies. No usamos cookies de publicidad ni de redes sociales." : "**Solo usamos elementos técnicos estrictamente necesarios.** No usamos cookies de análisis, de publicidad ni de redes sociales."}
 
 | Elemento | Tipo | Para qué sirve | Duración |
 |---|---|---|---|
 | Sesión de la plataforma (almacenamiento local) | Técnica, propia | Mantener tu sesión iniciada en el programa y la opción «recordarme» | Hasta que cierras sesión |
-
-Estos elementos están exentos de consentimiento según el artículo 22.2 de la LSSI, porque son necesarios para prestar el servicio que pides. Por eso esta web no muestra un banner de cookies.
+${ANALYTICS_ENABLED ? "| Preferencia de cookies (almacenamiento local) | Técnica, propia | Recordar si aceptaste o rechazaste las cookies de análisis | Hasta que la cambies |\n| `_ga`, `_ga_*` | Análisis, de terceros (Google) | Distinguir visitas de forma anónima para medir el uso de la web. Solo con tu consentimiento | 2 años |\n" : ""}
+${ANALYTICS_ENABLED ? "Los elementos técnicos están exentos de consentimiento según el artículo 22.2 de la LSSI. Las cookies de análisis solo se instalan si pulsas «Aceptar» en el aviso; si pulsas «Rechazar», no se carga Google Analytics. Puedes cambiar tu elección cuando quieras desde «Preferencias de cookies», al pie de la web." : "Estos elementos están exentos de consentimiento según el artículo 22.2 de la LSSI, porque son necesarios para prestar el servicio que pides. Por eso esta web no muestra un banner de cookies."}
 
 ## 3. Servicios de terceros
 
-- **Google Fonts:** para mostrar las tipografías, tu navegador se conecta a servidores de Google, que reciben tu dirección IP. No instala cookies de seguimiento.
 - **Lemon Squeezy:** al pagar, sales a la página de pago de Lemon Squeezy, que usa sus propias cookies según su política.
 
 ## 4. Cómo gestionarlas
 
 Puedes borrar o bloquear las cookies y el almacenamiento local desde la configuración de tu navegador. Si lo haces, tendrás que volver a iniciar sesión en el programa.
 
-Si en el futuro incorporamos cookies que requieran tu consentimiento (por ejemplo, de análisis), actualizaremos esta política y te lo pediremos antes.
+${ANALYTICS_ENABLED ? "" : "Si en el futuro incorporamos cookies que requieran tu consentimiento (por ejemplo, de análisis), actualizaremos esta política y te lo pediremos antes."}
 
 *Última actualización: ${L.actualizado}.*
 `;

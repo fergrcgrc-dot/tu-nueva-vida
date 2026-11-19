@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type FormEvent } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { track } from "@/lib/analytics";
 import { getMyRole } from "@/lib/program.functions";
 
 const REMEMBERED_EMAIL_KEY = "tnv_remembered_email";
@@ -18,6 +19,7 @@ function readRememberedEmail(): string {
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
+      { name: "robots", content: "noindex, nofollow" },
       { title: "Iniciar sesión — Tu Nueva Vida" },
       {
         name: "description",
@@ -68,6 +70,7 @@ function LoginPage() {
       setError("Correo o contraseña incorrectos.");
       return;
     }
+    track("login", { method: "email" });
     try {
       if (rememberMe) localStorage.setItem(REMEMBERED_EMAIL_KEY, email);
       else localStorage.removeItem(REMEMBERED_EMAIL_KEY);

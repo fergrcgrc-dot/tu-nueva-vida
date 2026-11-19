@@ -15,6 +15,7 @@ import { Route as ComprarRouteImport } from './routes/comprar'
 import { Route as GraciasRouteImport } from './routes/gracias'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as SetPasswordRouteImport } from './routes/set-password'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -55,6 +56,11 @@ const LoginRoute = LoginRouteImport.update({
 const SetPasswordRoute = SetPasswordRouteImport.update({
   id: '/set-password',
   path: '/set-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -129,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
   '/set-password': typeof SetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
   '/set-password': typeof SetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/verificacion-2fa': typeof AuthenticatedVerificacion2faRoute
   '/legal/$slug': typeof LegalSlugRoute
@@ -167,6 +175,7 @@ export interface FileRoutesById {
   '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
   '/set-password': typeof SetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/coach': typeof AuthenticatedCoachRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/gracias'
     | '/login'
     | '/set-password'
+    | '/sitemap.xml'
     | '/admin'
     | '/coach'
     | '/dashboard'
@@ -207,6 +217,7 @@ export interface FileRouteTypes {
     | '/gracias'
     | '/login'
     | '/set-password'
+    | '/sitemap.xml'
     | '/dashboard'
     | '/verificacion-2fa'
     | '/legal/$slug'
@@ -225,6 +236,7 @@ export interface FileRouteTypes {
     | '/gracias'
     | '/login'
     | '/set-password'
+    | '/sitemap.xml'
     | '/_authenticated/admin'
     | '/_authenticated/coach'
     | '/_authenticated/dashboard'
@@ -246,6 +258,7 @@ export interface RootRouteChildren {
   GraciasRoute: typeof GraciasRoute
   LoginRoute: typeof LoginRoute
   SetPasswordRoute: typeof SetPasswordRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   LegalSlugRoute: typeof LegalSlugRoute
   ApiLemonsqueezyWebhookRoute: typeof ApiLemonsqueezyWebhookRoute
 }
@@ -292,6 +305,13 @@ declare module '@tanstack/react-router' {
       path: '/set-password'
       fullPath: '/set-password'
       preLoaderRoute: typeof SetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -437,6 +457,7 @@ const rootRouteChildren: RootRouteChildren = {
   GraciasRoute: GraciasRoute,
   LoginRoute: LoginRoute,
   SetPasswordRoute: SetPasswordRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   LegalSlugRoute: LegalSlugRoute,
   ApiLemonsqueezyWebhookRoute: ApiLemonsqueezyWebhookRoute,
 }

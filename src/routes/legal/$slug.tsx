@@ -9,10 +9,21 @@ export const Route = createFileRoute("/legal/$slug")({
   loader: ({ params }) => {
     const page = LEGAL_PAGES.find((p) => p.slug === params.slug);
     if (!page) throw notFound();
-    return { title: page.title, content: LEGAL_CONTENT[page.slug as LegalSlug] };
+    return {
+      title: page.title,
+      description: page.description,
+      slug: page.slug,
+      content: LEGAL_CONTENT[page.slug as LegalSlug],
+    };
   },
   head: ({ loaderData }) => ({
-    meta: [{ title: `${loaderData?.title ?? "Legal"} — ${LEGAL.marca}` }],
+    meta: [
+      { title: `${loaderData?.title ?? "Legal"} | ${LEGAL.marca}` },
+      { name: "description", content: loaderData?.description ?? "" },
+    ],
+    links: loaderData
+      ? [{ rel: "canonical", href: `https://${LEGAL.dominio}/legal/${loaderData.slug}` }]
+      : [],
   }),
   component: LegalPage,
 });

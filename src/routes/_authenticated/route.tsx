@@ -8,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
  * Supabase vive en el navegador.
  */
 export const Route = createFileRoute("/_authenticated")({
+  // Zona privada: nunca indexable.
+  head: () => ({ meta: [{ name: "robots", content: "noindex, nofollow" }] }),
   ssr: false,
   beforeLoad: async () => {
     const { data, error } = await supabase.auth.getUser();

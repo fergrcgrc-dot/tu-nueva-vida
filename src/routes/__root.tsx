@@ -14,6 +14,8 @@ import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "../integrations/supabase/client";
+import { CookieBanner } from "../components/CookieBanner";
+import { initAnalytics, trackPageView } from "../lib/analytics";
 
 function NotFoundComponent() {
   return (
@@ -84,7 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Tu Nueva Vida: programa online de transformación personal en 8 módulos, con vídeos, ejercicios y un coach IA que revisa tu trabajo.",
+          "Programa online de reinvención profesional en 8 módulos, con vídeos, ejercicios prácticos y un coach IA que revisa tu trabajo.",
       },
       { property: "og:title", content: "Tu Nueva Vida" },
       {
@@ -99,12 +101,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/logo.svg", type: "image/svg+xml" },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Karla:wght@300;400;500;600;700&display=swap",
-      },
     ],
   }),
   shellComponent: RootShell,
@@ -142,11 +138,22 @@ function RootComponent() {
     return () => subscription.unsubscribe();
   }, [queryClient, router]);
 
+  // Analítica (solo con consentimiento): carga inicial y page_view en cada navegación interna.
+  useEffect(() => {
+    initAnalytics();
+    return router.subscribe("onResolved", (e) => {
+      if (e.fromLocation && e.fromLocation.pathname !== e.toLocation.pathname) {
+        trackPageView(e.toLocation.pathname);
+      }
+    });
+  }, [router]);
+
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster theme="light" position="bottom-right" />
+      <CookieBanner />
     </QueryClientProvider>
   );
 }

@@ -3,13 +3,17 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type FormEvent } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { track } from "@/lib/analytics";
 import { LEGAL } from "@/lib/legal";
 import { getMyRole } from "@/lib/program.functions";
 
 export const Route = createFileRoute("/set-password")({
   ssr: false,
   head: () => ({
-    meta: [{ title: "Crea tu contraseña — Tu Nueva Vida" }],
+    meta: [
+      { title: "Crea tu contraseña — Tu Nueva Vida" },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
   }),
   component: SetPasswordPage,
 });
@@ -74,6 +78,7 @@ function SetPasswordPage() {
       );
       return;
     }
+    track("sign_up", { method: "email" });
     // Registro del consentimiento explícito (RGPD art. 9.2.a).
     const { data: userData } = await supabase.auth.getUser();
     if (userData.user) {

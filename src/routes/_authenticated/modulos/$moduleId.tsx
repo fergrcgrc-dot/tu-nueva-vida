@@ -38,6 +38,7 @@ import {
   type ExerciseFeedback,
   type SubmissionStatus,
 } from "@/lib/exercise.functions";
+import { track } from "@/lib/analytics";
 import { getDashboard, getMyRole } from "@/lib/program.functions";
 
 const dashboardQuery = queryOptions({
@@ -226,6 +227,8 @@ function UnlockedModule({
     setSubmitting(true);
     try {
       const result = await callSubmit({ data: { moduleId, answers } });
+      track("exercise_submitted", { module: week, result: result.status });
+      if (result.status === "approved") track("module_completed", { module: week });
       setStatus(result.status);
       setFeedback(result.feedback);
       setDirty(false);

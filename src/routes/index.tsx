@@ -12,30 +12,56 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { CookieSettingsLink } from "@/components/CookieBanner";
 import { LegalLinks } from "@/components/LegalLinks";
-import people from "@/assets/landing-people.jpg";
-import step1 from "@/assets/landing-step-1.jpg";
-import step2 from "@/assets/landing-step-2.jpg";
-import step3 from "@/assets/landing-step-3.jpg";
+import people800 from "@/assets/landing-people-800.webp";
+import people1600 from "@/assets/landing-people-1600.webp";
+import step1Small from "@/assets/landing-step-1-560.webp";
+import step1Large from "@/assets/landing-step-1-1104.webp";
+import step2Small from "@/assets/landing-step-2-560.webp";
+import step2Large from "@/assets/landing-step-2-1104.webp";
+import step3Small from "@/assets/landing-step-3-560.webp";
+import step3Large from "@/assets/landing-step-3-1104.webp";
+
+const SITE_URL = "https://tunuevavida.eu";
+const SEO_TITLE = "Programa online de reinvención profesional | Tu nueva vida";
+const SEO_DESCRIPTION =
+  "Reinvéntate profesionalmente con un programa online de 8 módulos y un coach IA: claridad, valores y un plan a 90 días. 399 €, acceso de por vida.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Tu nueva vida — Programa de transformación profesional" },
-      {
-        name: "description",
-        content:
-          "Programa online guiado semana a semana para profesionales de alto rendimiento que necesitan claridad real antes de dar el siguiente paso.",
-      },
-      { property: "og:title", content: "Tu nueva vida — Programa de transformación profesional" },
-      {
-        property: "og:description",
-        content:
-          "8 módulos con vídeo, ejercicios prácticos y un coach IA que revisa tu trabajo. Acceso de por vida y garantía de 14 días.",
-      },
+      { title: SEO_TITLE },
+      { name: "description", content: SEO_DESCRIPTION },
+      { property: "og:title", content: SEO_TITLE },
+      { property: "og:description", content: SEO_DESCRIPTION },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: `${SITE_URL}/` },
+      { property: "og:site_name", content: "Tu nueva vida" },
+      { property: "og:locale", content: "es_ES" },
+      { property: "og:image", content: `${SITE_URL}/og-image.jpg` },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      {
+        property: "og:image:alt",
+        content: "Tu nueva vida, programa online de reinvención profesional",
+      },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: `${SITE_URL}/og-image.jpg` },
     ],
+    links: [
+      { rel: "canonical", href: `${SITE_URL}/` },
+      // La imagen del hero es el LCP en escritorio: se descarga con prioridad.
+      {
+        rel: "preload",
+        as: "image",
+        href: people1600,
+        imageSrcSet: `${people800} 800w, ${people1600} 1600w`,
+        imageSizes: "(max-width: 1024px) 100vw, 1024px",
+        fetchPriority: "high",
+      },
+    ],
+    scripts: [{ type: "application/ld+json", children: JSON.stringify(structuredData()) }],
   }),
   component: Landing,
 });
@@ -84,19 +110,22 @@ const STEPS = [
     number: "01",
     title: "Descubre tu punto de partida",
     text: "Completa el primer módulo y los ejercicios de diagnóstico: dónde estás, qué duele de verdad y qué te está costando seguir igual.",
-    image: step1,
+    image: { small: step1Small, large: step1Large },
+    alt: "Persona reflexionando sobre su situación profesional actual al empezar el programa",
   },
   {
     number: "02",
     title: "Construye tus opciones reales",
     text: "Semana a semana trabajas tus valores, tus creencias limitantes y lo que estás dispuesto a arriesgar, hasta tener direcciones concretas sobre la mesa.",
-    image: step2,
+    image: { small: step2Small, large: step2Large },
+    alt: "Profesional trabajando sus valores y opciones de cambio de carrera",
   },
   {
     number: "03",
     title: "Da el primer paso",
     text: "Sales con una hoja de ruta a 90 días con hitos medibles, un informe final de todo tu recorrido y check-ins automáticos que te ayudan a sostenerlo.",
-    image: step3,
+    image: { small: step3Small, large: step3Large },
+    alt: "Persona dando el primer paso de su plan de reinvención profesional a 90 días",
   },
 ];
 
@@ -126,7 +155,7 @@ const MODULES = [
       {
         n: 3,
         title: "Mapa de valores",
-        text: "Eliges y ordenas tus cinco valores y mides cuánta atención real recibe cada uno hoy, con ejemplos de tu última semana.",
+        text: "Descubres tus valores de verdad: eliges y ordenas cinco y mides cuánta atención real recibe cada uno hoy, con ejemplos de tu última semana.",
         outcome: "La distancia entre lo que dices que importa y lo que vives.",
       },
       {
@@ -188,6 +217,22 @@ const INCLUDED = [
 
 const FAQS = [
   {
+    q: "¿Es para mí si estoy en plena crisis profesional a los 40 o a los 50?",
+    a: "Sí. Está pensado para profesionales que llevan tiempo con la sensación de que su trabajo o su vida actual ya no encajan, y que quieren reinventarse profesionalmente con método y no a base de impulsos. No importa la edad: importa que estés dispuesto a mirar tu situación con honestidad.",
+  },
+  {
+    q: "¿Y si no sé qué quiero hacer con mi vida profesional?",
+    a: "Es el punto de partida más habitual. El programa no te pide que llegues con una respuesta: primero aclaras de dónde vienes y qué valoras de verdad, después generas opciones sin autocensura y solo al final eliges una dirección y la conviertes en un plan a 90 días.",
+  },
+  {
+    q: "¿Tengo que dejar mi trabajo para hacer el programa?",
+    a: "No. Lo haces compatible con tu trabajo actual, a tu ritmo. De hecho, una de las claves del programa es no tomar decisiones drásticas en caliente: antes de dejar un trabajo, sales con una dirección clara y un plan con hitos medibles y de bajo riesgo.",
+  },
+  {
+    q: "¿En qué se diferencia de un coach de vida tradicional?",
+    a: "Un proceso de coaching de vida clásico se basa en sesiones con una persona. Aquí sigues un método estructurado de 8 módulos y te acompaña un coach IA que revisa cada ejercicio y te da feedback al momento, a cualquier hora y por un pago único, en lugar de pagar por sesión.",
+  },
+  {
     q: "¿Cuánto dura el programa?",
     a: "Lo haces a tu ritmo. Recomendamos un módulo por semana, así que el recorrido completo son unas 8 semanas, con 45-60 minutos de trabajo por módulo.",
   },
@@ -210,6 +255,10 @@ const FAQS = [
   {
     q: "¿Qué hace exactamente el coach IA?",
     a: "Revisa cada ejercicio y te da feedback concreto: qué está bien trabajado, qué precisar y el patrón que detecta en tus respuestas. También puedes hablar con él en cada módulo cuando te atascas. Usa método socrático: te pregunta y te refleja, no decide por ti ni te da respuestas hechas.",
+  },
+  {
+    q: "¿Sirve si estoy quemado en el trabajo?",
+    a: "Puede ayudarte a entender qué está fallando y a decidir qué cambiar. Pero si el agotamiento afecta a tu salud (insomnio, ansiedad, bajas), lo primero es hablar con tu médico o con un profesional de la salud mental: este programa no sustituye ese acompañamiento.",
   },
   {
     q: "¿Es terapia?",
@@ -265,14 +314,14 @@ function Landing() {
       <section id="inicio" className="landing-hero-bg px-5 pt-20 pb-16">
         <div className="mx-auto max-w-4xl text-center">
           <p className="text-xs font-semibold tracking-[0.2em] text-accent-foreground uppercase">
-            Programa de transformación profesional
+            Programa online de reinvención profesional
           </p>
           <h1 className="landing-hero-title-gradient mx-auto mt-6 max-w-3xl text-5xl leading-[1.05] font-bold tracking-tight sm:text-6xl md:text-7xl">
-            Tu nueva vida empieza cuando la actual ya no tiene sentido
+            Reinvéntate profesionalmente cuando tu vida actual ya no tiene sentido
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-            Un programa guiado semana a semana para profesionales de alto rendimiento que necesitan
-            claridad real antes de dar el siguiente paso.
+            Para profesionales en plena crisis profesional que no saben qué hacer con su vida: ocho
+            módulos guiados y un coach IA para pasar de la duda a un plan concreto a 90 días.
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
             <a
@@ -295,10 +344,14 @@ function Landing() {
         </div>
         <div className="mx-auto mt-14 max-w-5xl overflow-hidden rounded-[2rem] landing-soft-card">
           <img
-            src={people}
-            alt="Profesionales de distintas edades y orígenes"
+            src={people1600}
+            srcSet={`${people800} 800w, ${people1600} 1600w`}
+            sizes="(max-width: 1024px) 100vw, 1024px"
+            alt="Profesionales de distintas edades que se plantean un cambio de vida profesional"
             width={1600}
             height={704}
+            fetchPriority="high"
+            decoding="async"
             className="h-auto w-full object-cover"
           />
         </div>
@@ -307,7 +360,7 @@ function Landing() {
       <section id="programa" className="px-5 py-20">
         <div className="mx-auto max-w-6xl">
           <h2 className="max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">
-            Qué incluye el programa
+            Qué incluye el programa de coaching online
           </h2>
           <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((f) => (
@@ -323,7 +376,7 @@ function Landing() {
               <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-card/25">
                 <Flame className="h-5 w-5 text-card" aria-hidden />
               </span>
-              <h3 className="mt-5 text-xl font-bold tracking-tight text-card">Empieza hoy</h3>
+              <p className="mt-5 text-xl font-bold tracking-tight text-card">Empieza hoy</p>
               <p className="mt-2 text-sm leading-relaxed text-card/90">
                 Da el primer paso hacia claridad real sobre tu próximo camino.
               </p>
@@ -340,7 +393,9 @@ function Landing() {
 
       <section id="metodo" className="landing-band-mint px-5 py-20">
         <div className="mx-auto max-w-6xl">
-          <h2 className="max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">Cómo funciona</h2>
+          <h2 className="max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">
+            Cómo funciona: de la crisis profesional a un plan de acción
+          </h2>
           <div className="mt-14 space-y-16">
             {STEPS.map((step, i) => (
               <div
@@ -356,9 +411,12 @@ function Landing() {
                 </div>
                 <figure className="overflow-hidden rounded-[2rem] landing-soft-card">
                   <img
-                    src={step.image}
-                    alt={step.title}
+                    src={step.image.large}
+                    srcSet={`${step.image.small} 560w, ${step.image.large} 1104w`}
+                    sizes="(max-width: 768px) 100vw, 560px"
+                    alt={step.alt}
                     loading="lazy"
+                    decoding="async"
                     width={1104}
                     height={912}
                     className="h-full w-full object-cover"
@@ -372,7 +430,9 @@ function Landing() {
 
       <section id="modulos" className="px-5 py-20">
         <div className="mx-auto max-w-6xl">
-          <h2 className="max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">Los 8 módulos</h2>
+          <h2 className="max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">
+            Los 8 módulos del programa
+          </h2>
           <p className="mt-4 max-w-2xl text-muted-foreground">
             Cada módulo tiene un vídeo, la teoría y un ejercicio práctico que haces en la plataforma
             y revisa tu coach IA. Se abren en orden: el siguiente se desbloquea al completar el
@@ -381,7 +441,7 @@ function Landing() {
           <div className="mt-12 grid gap-6 md:grid-cols-2">
             {MODULES.map((phase) => (
               <div key={phase.phase} className="landing-soft-card rounded-3xl p-7">
-                <p className="text-xs font-semibold tracking-[0.2em] text-ember uppercase">
+                <p className="text-xs font-semibold tracking-[0.2em] text-ember-strong uppercase">
                   {phase.phase}
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground italic">{phase.question}</p>
@@ -397,7 +457,7 @@ function Landing() {
                           {m.text}
                         </p>
                         <p className="mt-2 text-sm font-medium">
-                          <span className="text-ember">Te llevas:</span> {m.outcome}
+                          <span className="text-ember-strong">Te llevas:</span> {m.outcome}
                         </p>
                       </div>
                     </li>
@@ -455,14 +515,16 @@ function Landing() {
 
       <section id="preguntas" className="px-5 py-20">
         <div className="mx-auto max-w-3xl">
-          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl">Preguntas frecuentes</h2>
+          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl">
+            Preguntas frecuentes sobre el programa
+          </h2>
           <div className="mt-10 divide-y divide-border/70 border-y border-border/70">
             {FAQS.map((f) => (
               <details key={f.q} className="group py-5">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-base font-semibold">
                   {f.q}
                   <span
-                    className="text-xl text-ember transition-transform group-open:rotate-45"
+                    className="text-xl text-ember-strong transition-transform group-open:rotate-45"
                     aria-hidden
                   >
                     +
@@ -511,9 +573,77 @@ function Landing() {
               </Link>
             </div>
           </div>
-          <LegalLinks className="text-xs" />
+          <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs">
+            <LegalLinks />
+            <CookieSettingsLink />
+          </div>
         </div>
       </footer>
     </div>
   );
+}
+
+/** Datos estructurados (Schema.org) de la home: organización, web, curso y FAQ. */
+function structuredData() {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${SITE_URL}/#organization`,
+        name: "Tu nueva vida",
+        url: `${SITE_URL}/`,
+        logo: `${SITE_URL}/logo.svg`,
+        email: SUPPORT_EMAIL,
+        areaServed: { "@type": "Country", name: "España" },
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
+        url: `${SITE_URL}/`,
+        name: "Tu nueva vida",
+        inLanguage: "es-ES",
+        publisher: { "@id": `${SITE_URL}/#organization` },
+      },
+      {
+        "@type": "Course",
+        "@id": `${SITE_URL}/#programa`,
+        name: "Tu nueva vida: programa online de reinvención profesional",
+        description: SEO_DESCRIPTION,
+        inLanguage: "es-ES",
+        provider: { "@id": `${SITE_URL}/#organization` },
+        image: `${SITE_URL}/og-image.jpg`,
+        numberOfCredits: 8,
+        syllabusSections: MODULES.flatMap((phase) =>
+          phase.items.map((m) => ({
+            "@type": "Syllabus",
+            name: `Módulo ${m.n}: ${m.title}`,
+            description: m.text,
+          })),
+        ),
+        hasCourseInstance: {
+          "@type": "CourseInstance",
+          courseMode: "Online",
+          courseWorkload: "PT8H",
+          courseSchedule: { "@type": "Schedule", repeatFrequency: "P1W", repeatCount: 8 },
+        },
+        offers: {
+          "@type": "Offer",
+          category: "Paid",
+          price: "399",
+          priceCurrency: "EUR",
+          url: `${SITE_URL}/#precio`,
+        },
+      },
+      {
+        "@type": "FAQPage",
+        "@id": `${SITE_URL}/#faq`,
+        mainEntity: FAQS.map((f) => ({
+          "@type": "Question",
+          name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+      },
+    ],
+  };
 }
