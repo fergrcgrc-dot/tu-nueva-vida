@@ -214,3 +214,27 @@
     color: oklch(0.5 0.15 42);
   }
 }
+
+/* Tipografía de lectura para los artículos del blog. */
+.blog-prose > div {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+.blog-prose h2 {
+  margin-top: 2.5rem;
+  font-size: 1.6rem;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+.blog-prose h3 {
+  margin-top: 1.75rem;
+  font-size: 1.2rem;
+}
+.blog-prose a {
+  color: oklch(0.5 0.15 42);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.blog-prose blockquote {
+  font-style: italic;
+}

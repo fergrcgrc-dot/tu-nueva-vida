@@ -71,6 +71,7 @@ const NAV = [
   { label: "Módulos", href: "#modulos" },
   { label: "Precio", href: "#precio" },
   { label: "Preguntas", href: "#preguntas" },
+  { label: "Blog", href: "/blog" },
 ];
 
 const PRICE = "399 €";
@@ -568,6 +569,9 @@ function Landing() {
               >
                 {SUPPORT_EMAIL}
               </a>
+              <Link to="/blog" className="transition-colors hover:text-foreground">
+                Blog
+              </Link>
               <Link to="/login" className="font-medium transition-colors hover:text-foreground">
                 Acceder al programa
               </Link>

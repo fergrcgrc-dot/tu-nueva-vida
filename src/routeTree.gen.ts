@@ -20,6 +20,8 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedVerificacion2faRouteImport } from './routes/_authenticated/verificacion-2fa'
+import { Route as BlogIndexRouteImport } from './routes/blog/index'
+import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as LegalSlugRouteImport } from './routes/legal/$slug'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedCoachIndexRouteImport } from './routes/_authenticated/coach/index'
@@ -84,6 +86,16 @@ const AuthenticatedVerificacion2faRoute =
     path: '/verificacion-2fa',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LegalSlugRoute = LegalSlugRouteImport.update({
   id: '/legal/$slug',
   path: '/legal/$slug',
@@ -140,7 +152,9 @@ export interface FileRoutesByFullPath {
   '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/verificacion-2fa': typeof AuthenticatedVerificacion2faRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/legal/$slug': typeof LegalSlugRoute
+  '/blog/': typeof BlogIndexRoute
   '/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
@@ -158,7 +172,9 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/verificacion-2fa': typeof AuthenticatedVerificacion2faRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/legal/$slug': typeof LegalSlugRoute
+  '/blog': typeof BlogIndexRoute
   '/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
@@ -180,7 +196,9 @@ export interface FileRoutesById {
   '/_authenticated/coach': typeof AuthenticatedCoachRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/verificacion-2fa': typeof AuthenticatedVerificacion2faRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/legal/$slug': typeof LegalSlugRoute
+  '/blog/': typeof BlogIndexRoute
   '/_authenticated/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/_authenticated/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/_authenticated/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
@@ -202,7 +220,9 @@ export interface FileRouteTypes {
     | '/coach'
     | '/dashboard'
     | '/verificacion-2fa'
+    | '/blog/$slug'
     | '/legal/$slug'
+    | '/blog/'
     | '/coach/seguimientos'
     | '/modulos/$moduleId'
     | '/seguimientos/$followUpId'
@@ -220,7 +240,9 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/dashboard'
     | '/verificacion-2fa'
+    | '/blog/$slug'
     | '/legal/$slug'
+    | '/blog'
     | '/coach/seguimientos'
     | '/modulos/$moduleId'
     | '/seguimientos/$followUpId'
@@ -241,7 +263,9 @@ export interface FileRouteTypes {
     | '/_authenticated/coach'
     | '/_authenticated/dashboard'
     | '/_authenticated/verificacion-2fa'
+    | '/blog/$slug'
     | '/legal/$slug'
+    | '/blog/'
     | '/_authenticated/coach/seguimientos'
     | '/_authenticated/modulos/$moduleId'
     | '/_authenticated/seguimientos/$followUpId'
@@ -259,7 +283,9 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   SetPasswordRoute: typeof SetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  BlogSlugRoute: typeof BlogSlugRoute
   LegalSlugRoute: typeof LegalSlugRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   ApiLemonsqueezyWebhookRoute: typeof ApiLemonsqueezyWebhookRoute
 }
 
@@ -341,6 +367,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/verificacion-2fa'
       preLoaderRoute: typeof AuthenticatedVerificacion2faRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/legal/$slug': {
       id: '/legal/$slug'
@@ -458,7 +498,9 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   SetPasswordRoute: SetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  BlogSlugRoute: BlogSlugRoute,
   LegalSlugRoute: LegalSlugRoute,
+  BlogIndexRoute: BlogIndexRoute,
   ApiLemonsqueezyWebhookRoute: ApiLemonsqueezyWebhookRoute,
 }
 export const routeTree = rootRouteImport

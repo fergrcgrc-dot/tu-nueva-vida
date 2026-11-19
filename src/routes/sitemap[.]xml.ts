@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { POSTS } from "@/lib/blog";
 import { LEGAL_PAGES } from "@/lib/legal";
 
 const SITE_URL = "https://tunuevavida.eu";
@@ -13,6 +14,13 @@ export const Route = createFileRoute("/sitemap.xml")({
       GET: () => {
         const urls = [
           { loc: `${SITE_URL}/`, priority: "1.0", changefreq: "weekly" },
+          { loc: `${SITE_URL}/blog`, priority: "0.7", changefreq: "weekly" },
+          ...POSTS.map((p) => ({
+            loc: `${SITE_URL}/blog/${p.slug}`,
+            priority: "0.8",
+            changefreq: "monthly",
+            lastmod: p.updated,
+          })),
           ...LEGAL_PAGES.map((p) => ({
             loc: `${SITE_URL}/legal/${p.slug}`,
             priority: "0.2",
@@ -25,7 +33,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           urls
             .map(
               (u) =>
-                `  <url><loc>${u.loc}</loc><lastmod>${LAST_MODIFIED}</lastmod><changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority></url>`,
+                `  <url><loc>${u.loc}</loc><lastmod>${"lastmod" in u && u.lastmod ? u.lastmod : LAST_MODIFIED}</lastmod><changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority></url>`,
             )
             .join("\n") +
           `\n</urlset>\n`;
