@@ -3,9 +3,12 @@ import { ArrowRight } from "lucide-react";
 
 import { BlogLayout } from "@/components/BlogLayout";
 import { Markdown } from "@/components/Markdown";
+import { ValuesTest } from "@/components/ValuesTest";
 import { POSTS, formatDate, getPost } from "@/lib/blog";
 
 const SITE_URL = "https://tunuevavida.eu";
+/** Marcador en el Markdown donde se inserta el test interactivo de valores. */
+const TOOL_MARKER = "<!-- herramienta:test-valores -->";
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: ({ params }) => {
@@ -107,7 +110,12 @@ function BlogPostPage() {
         </header>
         <div className="px-5 py-10">
           <div className="blog-prose mx-auto max-w-2xl">
-            <Markdown content={post.body} />
+            {post.body.split(TOOL_MARKER).map((part, i) => (
+              <div key={i}>
+                {i > 0 && <ValuesTest />}
+                <Markdown content={part} />
+              </div>
+            ))}
           </div>
         </div>
       </article>

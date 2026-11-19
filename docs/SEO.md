@@ -95,6 +95,8 @@ Fuente: autocompletado de Google (es-ES), como alternativa a AnswerThePublic, qu
 | descubrir mis valores / test para descubrir mis valores | Informativa | Parcial (módulo 3) | Texto del módulo 3; lead magnet propuesto |
 | cómo encontrar mi propósito (profesional) | Informativa | ❌ | Artículo propuesto |
 
+**Artículos publicados:** crisis de los 40 en el trabajo · reinventarse profesionalmente a los 50 · no sé qué hacer con mi vida profesional · test de valores personales (con test interactivo).
+
 **Artículos propuestos (fase 2, captación):**
 1. Crisis profesional a los 40: señales, causas y cómo salir con un plan
 2. Cómo reinventarse profesionalmente a los 50 sin dejar tu trabajo de golpe

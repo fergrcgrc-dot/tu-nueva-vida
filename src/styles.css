@@ -216,7 +216,7 @@
 }
 
 /* Tipografía de lectura para los artículos del blog. */
-.blog-prose > div {
+.blog-prose > div > div {
   font-size: 1.0625rem;
   line-height: 1.75;
 }
@@ -237,4 +237,9 @@
 }
 .blog-prose blockquote {
   font-style: italic;
+}
+/* El test incrustado no hereda el estilo de enlace del artículo. */
+.blog-prose .not-prose a {
+  color: var(--primary-foreground);
+  text-decoration: none;
 }

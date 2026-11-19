@@ -81,7 +81,7 @@ Puede resultar incómodo, y de eso se trata: que el coste de no moverte deje de 
 
 ### 3. Mira tus valores con datos, no con frases
 
-Todo el mundo dice que valora la familia, la salud o la libertad. Lo interesante es comprobar cuánto tiempo real les dedicas. Elige cinco valores, ordénalos y puntúa del 1 al 10 la atención que recibe cada uno en tu semana actual. La diferencia entre lo que dices que te importa y lo que de verdad cuidas suele explicar buena parte de ese malestar.
+Todo el mundo dice que valora la familia, la salud o la libertad. Lo interesante es comprobar cuánto tiempo real les dedicas. Elige cinco valores, ordénalos y puntúa del 1 al 10 la atención que recibe cada uno en tu semana actual. La diferencia entre lo que dices que te importa y lo que de verdad cuidas suele explicar buena parte de ese malestar. Puedes hacerlo en diez minutos con este [test de valores personales](/blog/test-de-valores-personales).
 
 Si te atascas aquí, en el artículo sobre [qué hacer cuando no sabes qué hacer con tu vida profesional](/blog/no-se-que-hacer-con-mi-vida-profesional) tienes más preguntas para tirar del hilo.
 

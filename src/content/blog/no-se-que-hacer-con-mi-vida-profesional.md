@@ -53,7 +53,7 @@ Proyectos en los que te felicitaron y tú pensaste «pero si esto es fácil». A
 
 ### 5. ¿Qué no estás dispuesto a perder?
 
-Tiempo con tu familia, estabilidad económica, vivir en tu ciudad, no tener jefe. Cualquier opción que no respete esto va a fracasar, por bonita que sea. Saberlo de antemano te ahorra perseguir caminos que, en el fondo, no vas a recorrer.
+Tiempo con tu familia, estabilidad económica, vivir en tu ciudad, no tener jefe. Cualquier opción que no respete esto va a fracasar, por bonita que sea. Saberlo de antemano te ahorra perseguir caminos que, en el fondo, no vas a recorrer. Si no lo tienes claro, el [test de valores personales](/blog/test-de-valores-personales) te ayuda a ordenarlo.
 
 ### 6. ¿Qué harías aunque te pagaran algo menos?
 
