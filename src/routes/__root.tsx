@@ -15,7 +15,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "../integrations/supabase/client";
 import { CookieBanner } from "../components/CookieBanner";
-import { initAnalytics, trackPageView } from "../lib/analytics";
+import { initAnalytics } from "../lib/analytics";
 
 function NotFoundComponent() {
   return (
@@ -138,15 +138,11 @@ function RootComponent() {
     return () => subscription.unsubscribe();
   }, [queryClient, router]);
 
-  // Analítica (solo con consentimiento): carga inicial y page_view en cada navegación interna.
+  // Analítica (solo con consentimiento). Las vistas de página al navegar las
+  // registra la «medición mejorada» de GA4 (cambios del historial del navegador).
   useEffect(() => {
     initAnalytics();
-    return router.subscribe("onResolved", (e) => {
-      if (e.fromLocation && e.fromLocation.pathname !== e.toLocation.pathname) {
-        trackPageView(e.toLocation.pathname);
-      }
-    });
-  }, [router]);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

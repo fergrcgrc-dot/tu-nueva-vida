@@ -2,7 +2,8 @@
  * Google Analytics 4 con consentimiento previo (LSSI art. 22.2 / RGPD).
  * - Solo se activa si existe VITE_GA4_MEASUREMENT_ID (formato G-XXXXXXX).
  * - gtag.js no se descarga hasta que el visitante acepta las cookies de análisis.
- * - Eventos: page_view (también en navegación interna), begin_checkout,
+ * - Vistas de página: las registra la «medición mejorada» de GA4.
+ * - Eventos propios: begin_checkout,
  *   contact_email, login, sign_up, exercise_submitted, module_completed.
  */
 const RAW_ID = (import.meta.env["VITE_GA4_MEASUREMENT_ID"] as string | undefined) ?? "";
@@ -101,8 +102,4 @@ export function initAnalytics() {
 export function track(event: string, params: Record<string, unknown> = {}) {
   if (!loaded || !window.gtag) return;
   window.gtag("event", event, params);
-}
-
-export function trackPageView(path: string) {
-  track("page_view", { page_path: path, page_location: window.location.href });
 }
