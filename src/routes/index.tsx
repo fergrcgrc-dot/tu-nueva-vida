@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import people from "@/assets/landing-people.jpg";
+import { BuyProgramButton } from "@/components/BuyProgramButton";
 import step1 from "@/assets/landing-step-1.jpg";
 import step2 from "@/assets/landing-step-2.jpg";
 import step3 from "@/assets/landing-step-3.jpg";
@@ -165,13 +166,10 @@ function Landing() {
             necesitan claridad real antes de dar el siguiente paso.
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <a
-              href="#contacto"
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-            >
-              Empieza tu nueva vida
+            <BuyProgramButton className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
+              Empieza tu nueva vida · 399 €
               <ArrowRight className="h-4 w-4" aria-hidden />
-            </a>
+            </BuyProgramButton>
             <a
               href="#contacto"
               className="inline-flex items-center rounded-full border border-primary/25 px-7 py-3.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
@@ -216,12 +214,15 @@ function Landing() {
               <p className="mt-2 text-sm leading-relaxed text-card/90">
                 Da el primer paso hacia claridad real sobre tu próximo camino.
               </p>
-              <a
-                href="#contacto"
-                className="mt-6 inline-flex rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-              >
-                Empieza ahora
-              </a>
+              <p className="mt-4 text-card">
+                <span className="text-3xl font-bold tracking-tight">399 €</span>
+                <span className="ml-2 text-sm text-card/90">pago único · IVA incluido</span>
+              </p>
+              <div className="mt-5">
+                <BuyProgramButton className="inline-flex rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
+                  Empieza ahora
+                </BuyProgramButton>
+              </div>
             </article>
           </div>
         </div>

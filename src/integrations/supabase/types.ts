@@ -342,6 +342,69 @@ export type Database = {
         }
         Relationships: []
       }
+      purchases: {
+        Row: {
+          amount_refunded: number
+          amount_tax: number
+          amount_total: number
+          created_at: string
+          currency: string
+          email: string
+          full_name: string | null
+          id: string
+          livemode: boolean
+          paid_at: string | null
+          provisioning_note: string | null
+          status: Database["public"]["Enums"]["purchase_status"]
+          stripe_checkout_session_id: string
+          stripe_customer_id: string | null
+          stripe_invoice_id: string | null
+          stripe_payment_intent_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_refunded?: number
+          amount_tax?: number
+          amount_total: number
+          created_at?: string
+          currency: string
+          email: string
+          full_name?: string | null
+          id?: string
+          livemode?: boolean
+          paid_at?: string | null
+          provisioning_note?: string | null
+          status?: Database["public"]["Enums"]["purchase_status"]
+          stripe_checkout_session_id: string
+          stripe_customer_id?: string | null
+          stripe_invoice_id?: string | null
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_refunded?: number
+          amount_tax?: number
+          amount_total?: number
+          created_at?: string
+          currency?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          livemode?: boolean
+          paid_at?: string | null
+          provisioning_note?: string | null
+          status?: Database["public"]["Enums"]["purchase_status"]
+          stripe_checkout_session_id?: string
+          stripe_customer_id?: string | null
+          stripe_invoice_id?: string | null
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       sessions_1_1: {
         Row: {
           coach_notes: string | null
@@ -450,6 +513,12 @@ export type Database = {
       follow_up_status: "pending" | "completed"
       module_status: "locked" | "unlocked" | "in_progress" | "completed"
       next_step: "acompanamiento_1_1" | "retiro_leon"
+      purchase_status:
+        | "pending"
+        | "paid"
+        | "failed"
+        | "refunded"
+        | "partially_refunded"
       session_status: "pending" | "scheduled" | "completed"
     }
     CompositeTypes: {
@@ -585,6 +654,7 @@ export const Constants = {
       follow_up_status: ["pending", "completed"],
       module_status: ["locked", "unlocked", "in_progress", "completed"],
       next_step: ["acompanamiento_1_1", "retiro_leon"],
+      purchase_status: ["pending", "paid", "failed", "refunded", "partially_refunded"],
       session_status: ["pending", "scheduled", "completed"],
     },
   },

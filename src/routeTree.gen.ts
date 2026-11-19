@@ -16,11 +16,13 @@ import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as CompraGraciasRouteImport } from './routes/compra/gracias'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedCoachIndexRouteImport } from './routes/_authenticated/coach/index'
 import { Route as AuthenticatedCoachSeguimientosRouteImport } from './routes/_authenticated/coach/seguimientos'
 import { Route as AuthenticatedModulosModuleIdRouteImport } from './routes/_authenticated/modulos/$moduleId'
 import { Route as AuthenticatedSeguimientosFollowUpIdRouteImport } from './routes/_authenticated/seguimientos/$followUpId'
+import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
 import { Route as AuthenticatedCoachClientesClientIdRouteImport } from './routes/_authenticated/coach/clientes/$clientId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -57,6 +59,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const CompraGraciasRoute = CompraGraciasRouteImport.update({
+  id: '/compra/gracias',
+  path: '/compra/gracias',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -85,6 +92,11 @@ const AuthenticatedSeguimientosFollowUpIdRoute =
     path: '/seguimientos/$followUpId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
+  id: '/api/stripe/webhook',
+  path: '/api/stripe/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedCoachClientesClientIdRoute =
   AuthenticatedCoachClientesClientIdRouteImport.update({
     id: '/clientes/$clientId',
@@ -99,9 +111,11 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/compra/gracias': typeof CompraGraciasRoute
   '/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/coach/': typeof AuthenticatedCoachIndexRoute
   '/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
@@ -111,9 +125,11 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/set-password': typeof SetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/compra/gracias': typeof CompraGraciasRoute
   '/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/coach': typeof AuthenticatedCoachIndexRoute
   '/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
@@ -127,9 +143,11 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/coach': typeof AuthenticatedCoachRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/compra/gracias': typeof CompraGraciasRoute
   '/_authenticated/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/_authenticated/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/_authenticated/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/coach/': typeof AuthenticatedCoachIndexRoute
   '/_authenticated/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
@@ -143,9 +161,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/coach'
     | '/dashboard'
+    | '/compra/gracias'
     | '/coach/seguimientos'
     | '/modulos/$moduleId'
     | '/seguimientos/$followUpId'
+    | '/api/stripe/webhook'
     | '/admin/'
     | '/coach/'
     | '/coach/clientes/$clientId'
@@ -155,9 +175,11 @@ export interface FileRouteTypes {
     | '/login'
     | '/set-password'
     | '/dashboard'
+    | '/compra/gracias'
     | '/coach/seguimientos'
     | '/modulos/$moduleId'
     | '/seguimientos/$followUpId'
+    | '/api/stripe/webhook'
     | '/admin'
     | '/coach'
     | '/coach/clientes/$clientId'
@@ -170,9 +192,11 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/coach'
     | '/_authenticated/dashboard'
+    | '/compra/gracias'
     | '/_authenticated/coach/seguimientos'
     | '/_authenticated/modulos/$moduleId'
     | '/_authenticated/seguimientos/$followUpId'
+    | '/api/stripe/webhook'
     | '/_authenticated/admin/'
     | '/_authenticated/coach/'
     | '/_authenticated/coach/clientes/$clientId'
@@ -183,6 +207,8 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
   SetPasswordRoute: typeof SetPasswordRoute
+  CompraGraciasRoute: typeof CompraGraciasRoute
+  ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -236,6 +262,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/compra/gracias': {
+      id: '/compra/gracias'
+      path: '/compra/gracias'
+      fullPath: '/compra/gracias'
+      preLoaderRoute: typeof CompraGraciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
@@ -270,6 +303,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/seguimientos/$followUpId'
       preLoaderRoute: typeof AuthenticatedSeguimientosFollowUpIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/stripe/webhook': {
+      id: '/api/stripe/webhook'
+      path: '/api/stripe/webhook'
+      fullPath: '/api/stripe/webhook'
+      preLoaderRoute: typeof ApiStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/coach/clientes/$clientId': {
       id: '/_authenticated/coach/clientes/$clientId'
@@ -333,6 +373,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   LoginRoute: LoginRoute,
   SetPasswordRoute: SetPasswordRoute,
+  CompraGraciasRoute: CompraGraciasRoute,
+  ApiStripeWebhookRoute: ApiStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
