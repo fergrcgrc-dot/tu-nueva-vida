@@ -1,11 +1,16 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { ShieldCheck } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { getMyRole } from "@/lib/program.functions";
 
 export const Route = createFileRoute("/_authenticated/verificacion-2fa")({
+  beforeLoad: async () => {
+    const { role } = await getMyRole();
+    if (role !== "platform_admin") throw redirect({ to: "/dashboard" });
+  },
   head: () => ({ meta: [{ title: "Verificación en dos pasos — Tu Nueva Vida" }] }),
   component: TwoFactorPage,
 });
