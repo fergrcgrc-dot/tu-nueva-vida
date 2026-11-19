@@ -20,15 +20,24 @@ export type AppRole = "client" | "coach" | "platform_admin";
 /** Rol real del usuario con sesión, leído desde user_roles. */
 export const getMyRole = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{ role: AppRole; status: string }> => {
-    const [adminRes, coachRes, profileRes] = await Promise.all([
-      context.supabase.rpc("is_platform_admin", { _user_id: context.userId }),
-      context.supabase.rpc("has_role", { _user_id: context.userId, _role: "coach" }),
-      context.supabase.from("profiles").select("status").eq("id", context.userId).maybeSingle(),
-    ]);
-    const role: AppRole = adminRes.data ? "platform_admin" : coachRes.data ? "coach" : "client";
-    return { role, status: profileRes.data?.status ?? "active" };
-  });
+  .handler(
+    async ({ context }): Promise<{ role: AppRole; status: string; aal: "aal1" | "aal2" }> => {
+      // Roles leídos de la propia fila (RLS), no de is_platform_admin: esa
+      // función exige 2FA y aquí hay que saber el rol antes de verificarlo.
+      const [rolesRes, profileRes] = await Promise.all([
+        context.supabase.from("user_roles").select("role").eq("user_id", context.userId),
+        context.supabase.from("profiles").select("status").eq("id", context.userId).maybeSingle(),
+      ]);
+      const roles = (rolesRes.data ?? []).map((r) => r.role);
+      const role: AppRole = roles.includes("platform_admin")
+        ? "platform_admin"
+        : roles.includes("coach")
+          ? "coach"
+          : "client";
+      const aal = context.claims?.["aal"] === "aal2" ? "aal2" : "aal1";
+      return { role, status: profileRes.data?.status ?? "active", aal };
+    },
+  );
 
 /* ------------------------------------------------------------------ */
 /* Panel del cliente                                                   */
@@ -45,18 +54,14 @@ export const getDashboard = createServerFn({ method: "GET" })
         .select("full_name, program_start_date, status")
         .eq("id", userId)
         .maybeSingle(),
-      supabase
-        .from("modules")
-        .select("*")
-        .order("week_number", { ascending: true })
-        .overrideTypes<
-          Array<{
-            theory_content?: string | null;
-            slides_content?: import("@/integrations/supabase/types").Json;
-            exercise_content?: string | null;
-          }>,
-          { merge: true }
-        >(),
+      supabase.from("modules").select("*").order("week_number", { ascending: true }).overrideTypes<
+        Array<{
+          theory_content?: string | null;
+          slides_content?: import("@/integrations/supabase/types").Json;
+          exercise_content?: string | null;
+        }>,
+        { merge: true }
+      >(),
       supabase
         .from("module_progress")
         .select("module_id, status, started_at, completed_at")

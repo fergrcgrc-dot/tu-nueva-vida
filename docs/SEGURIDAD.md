@@ -22,7 +22,7 @@ Revisión completa de la app (código, base de datos Supabase, configuración de
 | 6 | Validación en el servidor | ✅ Arreglado | Todas las funciones de servidor validan con zod. Nuevo: las respuestas de los ejercicios se reconstruyen en el servidor según el esquema del módulo (campos desconocidos fuera, textos recortados, números en rango); historial del chat acotado a 30 mensajes y 40.000 caracteres |
 | 7 | XSS | ✅ Verificado | React escapa todo el texto; el markdown no admite HTML; no hay `dangerouslySetInnerHTML`. Probado: una carga `<img onerror>`/`<script>` guardada en un ejercicio se muestra como texto. CSP como segunda barrera |
 | 8 | Registro y vigilancia | ✅ Arreglado | Eventos `security.*` en `audit_logs` (visibles en /admin): límites superados, accesos denegados a admin, firmas de webhook falsas, pedidos rechazados, señales de crisis. Logs del Worker activados en Cloudflare |
-| 9 | Rutas de administración | ✅ Verificado + registro | Cada función de admin comprueba el rol en la base de datos y que la cuenta esté activa; los intentos fallidos quedan registrados. ⚠️ Recomendado: activar 2FA (TOTP) en la cuenta de administrador |
+| 9 | Rutas de administración | ✅ Arreglado | Rol comprobado en la base de datos, cuenta activa y **2FA obligatorio (TOTP)** en tres capas: interfaz (redirige a /verificacion-2fa), funciones de servidor (exigen `aal2`) y base de datos (`is_platform_admin` solo es verdadero con `aal2`, así que las políticas RLS de admin no se aplican con solo contraseña). Intentos fallidos registrados |
 | 10 | Consultas parametrizadas | ✅ Verificado | Todo el acceso a datos usa el cliente de Supabase (parametrizado). El único SQL dinámico (`rls_auto_enable`, de Supabase) usa `format()` con identificadores del propio sistema |
 | 11 | Variables de entorno | ✅ Verificado | Solo variables `VITE_` públicas en el cliente; `.env` contiene únicamente valores públicos; secretos en Cloudflare Workers |
 | 12 | Límite de peticiones | ✅ Arreglado | Por usuario, en base de datos: chat IA 20/10 min y 150/día; revisión IA 8/hora y 30/día; borradores 60/10 min. Si el limitador falla, se deniega. Auth de Supabase con sus propios límites |
@@ -51,7 +51,13 @@ Ninguna clave se ha filtrado, pero durante la configuración se crearon accesos 
 
 ## Pendiente / mejoras opcionales
 
-- 2FA (TOTP) para la cuenta de administrador.
 - CAPTCHA (Cloudflare Turnstile) en login y recuperación de contraseña.
 - Plan Pro de Supabase: contraseñas filtradas (HIBP) y caducidad de sesión por inactividad.
 - CSP con *nonce* en lugar de `'unsafe-inline'` para scripts cuando TanStack Start lo soporte en este despliegue.
+
+## 2FA de administración
+
+- Alta: entrar en `/admin` → te lleva a `/verificacion-2fa` → escanear el QR con la app de autenticación → introducir el código.
+- Cada inicio de sesión de admin pide el código de 6 dígitos.
+- **Si pierdes el móvil:** el factor se puede borrar desde Supabase (Authentication → Users → tu usuario → MFA factors → eliminar) o por SQL con acceso de servidor: `delete from auth.mfa_factors where user_id = '<id>';`. Al volver a entrar en `/admin` se pide dar de alta uno nuevo.
+- Recomendado: guardar la clave de texto que aparece bajo el QR en un gestor de contraseñas como copia de seguridad.

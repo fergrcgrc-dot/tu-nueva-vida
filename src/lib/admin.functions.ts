@@ -19,14 +19,27 @@ function safeError(message: string): Error {
  * Comprueba en base de datos que quien llama es administrador de plataforma
  * y que su cuenta está activa. El frontend nunca decide esto por su cuenta.
  */
-export async function assertPlatformAdmin(supabase: AuthedClient, userId: string) {
-  const { data: isAdmin } = await supabase.rpc("is_platform_admin", {
-    _user_id: userId,
-  });
-  if (!isAdmin) {
-    const { logSecurityEvent } = await import("@/lib/security.server");
+export async function assertPlatformAdmin(
+  supabase: AuthedClient,
+  userId: string,
+  claims?: { aal?: unknown },
+) {
+  // El rol se lee de la propia fila del usuario (RLS «Users read own roles»).
+  const { data: roleRow } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("role", "platform_admin")
+    .maybeSingle();
+  const { logSecurityEvent } = await import("@/lib/security.server");
+  if (!roleRow) {
     await logSecurityEvent("admin_access_denied", userId);
     throw safeError("No tienes permiso para acceder a esta sección.");
+  }
+  // 2FA obligatorio: la sesión tiene que estar verificada con el segundo factor.
+  if (claims?.aal !== "aal2") {
+    await logSecurityEvent("admin_access_denied", userId, { motivo: "sin_2fa" });
+    throw safeError("Verifica tu segundo factor (2FA) para acceder a la administración.");
   }
 
   const { data: profile } = await supabase
@@ -65,7 +78,7 @@ export const getAdminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    await assertPlatformAdmin(supabase, userId);
+    await assertPlatformAdmin(supabase, userId, context.claims);
 
     const [profilesRes, rolesRes, assignRes, flagsRes, sessionsRes, progressRes] =
       await Promise.all([
@@ -196,7 +209,7 @@ export const getAuditLogs = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    await assertPlatformAdmin(supabase, userId);
+    await assertPlatformAdmin(supabase, userId, context.claims);
 
     const { data, error } = await supabase
       .from("audit_logs")
@@ -228,7 +241,7 @@ export const adminInviteClient = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => InviteClientInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertPlatformAdmin(supabase, userId);
+    await assertPlatformAdmin(supabase, userId, context.claims);
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -318,7 +331,7 @@ export const adminCreateCoach = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => CreateCoachInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertPlatformAdmin(supabase, userId);
+    await assertPlatformAdmin(supabase, userId, context.claims);
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -384,7 +397,7 @@ export const adminSetAccountStatus = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => SetStatusInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertPlatformAdmin(supabase, userId);
+    await assertPlatformAdmin(supabase, userId, context.claims);
 
     if (data.targetUserId === userId) {
       throw safeError("No puedes cambiar el estado de tu propia cuenta.");
@@ -422,7 +435,7 @@ export const adminAssignCoach = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => AssignCoachInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertPlatformAdmin(supabase, userId);
+    await assertPlatformAdmin(supabase, userId, context.claims);
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -486,7 +499,7 @@ export const adminSetModuleLock = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => SetModuleLockInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertPlatformAdmin(supabase, userId);
+    await assertPlatformAdmin(supabase, userId, context.claims);
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 

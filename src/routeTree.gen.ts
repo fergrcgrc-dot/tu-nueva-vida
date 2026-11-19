@@ -18,6 +18,7 @@ import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedVerificacion2faRouteImport } from './routes/_authenticated/verificacion-2fa'
 import { Route as LegalSlugRouteImport } from './routes/legal/$slug'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedCoachIndexRouteImport } from './routes/_authenticated/coach/index'
@@ -71,6 +72,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedVerificacion2faRoute =
+  AuthenticatedVerificacion2faRouteImport.update({
+    id: '/verificacion-2fa',
+    path: '/verificacion-2fa',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const LegalSlugRoute = LegalSlugRouteImport.update({
   id: '/legal/$slug',
   path: '/legal/$slug',
@@ -125,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/verificacion-2fa': typeof AuthenticatedVerificacion2faRoute
   '/legal/$slug': typeof LegalSlugRoute
   '/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
@@ -141,6 +149,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/set-password': typeof SetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/verificacion-2fa': typeof AuthenticatedVerificacion2faRoute
   '/legal/$slug': typeof LegalSlugRoute
   '/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
@@ -161,6 +170,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/coach': typeof AuthenticatedCoachRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/verificacion-2fa': typeof AuthenticatedVerificacion2faRoute
   '/legal/$slug': typeof LegalSlugRoute
   '/_authenticated/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/_authenticated/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/coach'
     | '/dashboard'
+    | '/verificacion-2fa'
     | '/legal/$slug'
     | '/coach/seguimientos'
     | '/modulos/$moduleId'
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/set-password'
     | '/dashboard'
+    | '/verificacion-2fa'
     | '/legal/$slug'
     | '/coach/seguimientos'
     | '/modulos/$moduleId'
@@ -216,6 +228,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/coach'
     | '/_authenticated/dashboard'
+    | '/_authenticated/verificacion-2fa'
     | '/legal/$slug'
     | '/_authenticated/coach/seguimientos'
     | '/_authenticated/modulos/$moduleId'
@@ -300,6 +313,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/verificacion-2fa': {
+      id: '/_authenticated/verificacion-2fa'
+      path: '/verificacion-2fa'
+      fullPath: '/verificacion-2fa'
+      preLoaderRoute: typeof AuthenticatedVerificacion2faRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/legal/$slug': {
@@ -392,6 +412,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedCoachRoute: typeof AuthenticatedCoachRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedVerificacion2faRoute: typeof AuthenticatedVerificacion2faRoute
   AuthenticatedModulosModuleIdRoute: typeof AuthenticatedModulosModuleIdRoute
   AuthenticatedSeguimientosFollowUpIdRoute: typeof AuthenticatedSeguimientosFollowUpIdRoute
 }
@@ -400,6 +421,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedCoachRoute: AuthenticatedCoachRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedVerificacion2faRoute: AuthenticatedVerificacion2faRoute,
   AuthenticatedModulosModuleIdRoute: AuthenticatedModulosModuleIdRoute,
   AuthenticatedSeguimientosFollowUpIdRoute:
     AuthenticatedSeguimientosFollowUpIdRoute,
