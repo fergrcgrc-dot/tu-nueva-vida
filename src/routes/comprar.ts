@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 /**
- * /comprar → redirige a un checkout de Lemon Squeezy recién creado.
+ * /comprar → redirige a una Stripe Checkout Session recién creada.
  * Todos los CTA de la landing apuntan aquí.
  */
 const NOT_FOUND_HTML = `<!doctype html><html lang="es"><head><meta charset="utf-8">
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/comprar")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const { createCheckoutUrl } = await import("@/lib/lemonsqueezy.server");
+        const { createCheckoutUrl } = await import("@/lib/stripe.server");
         const url = await createCheckoutUrl(request);
         if (!url) {
           // Pasarela aún sin configurar: 404 explícito, sin redirigir a ningún sitio.
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/comprar")({
           });
         }
         return new Response(null, {
-          status: 302,
+          status: 303,
           headers: { Location: url, "Cache-Control": "no-store" },
         });
       },

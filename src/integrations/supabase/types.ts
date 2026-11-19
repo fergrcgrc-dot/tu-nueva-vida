@@ -548,12 +548,6 @@ export type Database = {
       follow_up_status: "pending" | "completed"
       module_status: "locked" | "unlocked" | "in_progress" | "completed"
       next_step: "acompanamiento_1_1" | "retiro_leon"
-      purchase_status:
-        | "pending"
-        | "paid"
-        | "failed"
-        | "refunded"
-        | "partially_refunded"
       session_status: "pending" | "scheduled" | "completed"
       submission_status: "draft" | "submitted" | "needs_revision" | "approved"
     }
@@ -690,7 +684,6 @@ export const Constants = {
       follow_up_status: ["pending", "completed"],
       module_status: ["locked", "unlocked", "in_progress", "completed"],
       next_step: ["acompanamiento_1_1", "retiro_leon"],
-      purchase_status: ["pending", "paid", "failed", "refunded", "partially_refunded"],
       session_status: ["pending", "scheduled", "completed"],
       submission_status: ["draft", "submitted", "needs_revision", "approved"],
     },

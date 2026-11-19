@@ -15,7 +15,7 @@ Revisión completa de la app (código, base de datos Supabase, configuración de
 | # | Protección | Estado | Detalle |
 |---|---|---|---|
 | 1 | Autenticación | ✅ Arreglado | Registro público cerrado; contraseñas de 10+ caracteres con mayúsculas, minúsculas y números (validado en Supabase y en la web); rotación de tokens de sesión; recuperación de contraseña sin revelar qué emails existen. ⚠️ La comprobación de contraseñas filtradas (HaveIBeenPwned), la caducidad de sesión por inactividad y el CAPTCHA requieren el plan Pro de Supabase o configuración adicional |
-| 2 | Claves fuera del navegador | ✅ Verificado | El paquete del navegador solo contiene la URL y la clave publicable de Supabase. Anthropic, service_role, Lemon Squeezy y Resend solo existen como secretos del servidor |
+| 2 | Claves fuera del navegador | ✅ Verificado | El paquete del navegador solo contiene la URL y la clave publicable de Supabase. Anthropic, service_role, Stripe y Resend solo existen como secretos del servidor |
 | 3 | Base de datos | ✅ Arreglado | RLS activo en todas las tablas; `anon` sin ningún permiso; `authenticated` solo lectura (filtrada por RLS) y escritura en columnas concretas; sin TRUNCATE; funciones SECURITY DEFINER que ya no permiten consultar roles de terceros; `complete_module` solo desde el servidor |
 | 4 | HTTPS | ✅ Arreglado | Redirección 301 de HTTP a HTTPS y de `www` al dominio principal; HSTS de 1 año con subdominios |
 | 5 | Contraseñas con hash | ✅ Verificado | Las gestiona Supabase Auth (bcrypt). La app nunca guarda ni registra contraseñas |
@@ -32,7 +32,7 @@ Revisión completa de la app (código, base de datos Supabase, configuración de
 | 16 | CSRF | ✅ Verificado | Middleware CSRF de TanStack Start en todas las funciones de servidor (probado: 403 desde otro origen); el webhook se autentica por firma HMAC |
 | 17 | Caducidad de enlaces | ✅ Arreglado | Enlaces de invitación y recuperación: 1 hora y un solo uso (antes 24 h). Nuevo «¿Has olvidado tu contraseña?» en el login |
 | 18 | Subida de archivos | ✅ Arreglado | La app no permite subir archivos a los usuarios. El bucket de vídeos solo acepta MP4 de hasta 100 MB, es privado y no tiene políticas de escritura |
-| 19 | Precios y pagos | ✅ Arreglado | El precio lo fija Lemon Squeezy; el acceso solo lo concede el webhook firmado. Nuevo: se exigen producto y tienda configurados, moneda EUR y se rechazan pedidos de prueba en producción (salvo `LEMONSQUEEZY_ALLOW_TEST_MODE=true`) |
+| 19 | Precios y pagos | ✅ Arreglado | El precio lo fija Stripe (lookup key en el servidor); el acceso solo lo concede el webhook firmado. Se exige la marca de producto puesta por `/comprar`, moneda EUR y se rechazan eventos de test en producción (salvo `STRIPE_ALLOW_TEST_MODE=true`) |
 | 20 | Modo depuración | ✅ Verificado | Build de producción, sin source maps públicos, sin `console.log`, páginas de error genéricas y errores al usuario sin detalles internos |
 | 21 | Dependencias vulnerables | ✅ Arreglado | zod 3.25 → 4.6.7 (agotamiento de memoria en validación), vite 8.1.5 → 8.3.8, nanoid 3.3.20, js-yaml 4.3.2, source-map-js 1.2.2. ⚠️ Quedan avisos solo en herramientas de compilación sin versión corregida (picomatch, brace-expansion/minimatch de ESLint); no llegan a producción |
 | 22 | Paquetes sin uso | ✅ Arreglado | Eliminados 46 componentes de interfaz sin usar y 38 paquetes (142 paquetes menos instalados) |

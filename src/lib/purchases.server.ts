@@ -1,10 +1,23 @@
 /**
- * Alta y baja automáticas a partir de los pedidos de Lemon Squeezy.
+ * Alta y baja automáticas a partir de los pagos (Stripe).
  * Solo servidor (service role). Sin intervención humana.
+ * Idempotente por (provider, order_id): el proveedor reintenta los webhooks.
  */
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import type { Json } from "@/integrations/supabase/types";
-import type { OrderEvent } from "@/lib/lemonsqueezy.server";
+
+export type PaidOrder = {
+  provider: "stripe";
+  /** Id del pedido en el proveedor (Stripe: id de la Checkout Session). */
+  orderId: string;
+  email: string;
+  name: string | null;
+  totalCents: number | null;
+  currency: string | null;
+  testMode: boolean;
+  /** Datos de referencia no sensibles (ids de pago, factura, IVA). */
+  extra?: Record<string, Json>;
+};
 
 async function findUserIdByEmail(email: string): Promise<string | null> {
   for (let page = 1; page <= 20; page++) {
@@ -61,13 +74,14 @@ async function ensureClientSetup(userId: string, fullName: string | null) {
   }
 }
 
-export async function provisionPurchase(order: OrderEvent, origin: string) {
+export async function provisionPurchase(order: PaidOrder, origin: string) {
   const { data: existing } = await supabaseAdmin
     .from("purchases")
     .select("id, user_id, status")
-    .eq("provider", "lemonsqueezy")
+    .eq("provider", order.provider)
     .eq("order_id", order.orderId)
     .maybeSingle();
+  if (existing?.status === "refunded") return; // reembolsado antes de procesarse
   if (existing?.user_id && existing.status === "paid") return; // ya procesado
 
   let userId = await findUserIdByEmail(order.email);
@@ -83,7 +97,7 @@ export async function provisionPurchase(order: OrderEvent, origin: string) {
   await ensureClientSetup(userId, order.name);
 
   const row = {
-    provider: "lemonsqueezy",
+    provider: order.provider,
     order_id: order.orderId,
     email: order.email,
     customer_name: order.name,
@@ -91,7 +105,7 @@ export async function provisionPurchase(order: OrderEvent, origin: string) {
     status: "paid",
     total_cents: order.totalCents,
     currency: order.currency,
-    raw: { test_mode: order.testMode, variant_id: order.variantId } as Json,
+    raw: { test_mode: order.testMode, ...(order.extra ?? {}) } as Json,
   };
   const { error } = existing
     ? await supabaseAdmin.from("purchases").update(row).eq("id", existing.id)
@@ -107,11 +121,15 @@ export async function provisionPurchase(order: OrderEvent, origin: string) {
   });
 }
 
-export async function revokePurchase(order: OrderEvent) {
+export async function revokePurchase(order: {
+  provider: PaidOrder["provider"];
+  orderId: string;
+  email: string;
+}) {
   const { data: purchase } = await supabaseAdmin
     .from("purchases")
     .select("id, user_id")
-    .eq("provider", "lemonsqueezy")
+    .eq("provider", order.provider)
     .eq("order_id", order.orderId)
     .maybeSingle();
 

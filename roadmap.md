@@ -27,11 +27,11 @@
 ## Fase 3 · Faceless y autónomo (noviembre 2026)
 - [x] Contenido sin coach humano, llamadas ni retiro; revisiones de fase a cargo del coach IA
 - [x] Landing con los 8 módulos, precio (399 €), garantía 14 días y FAQ; sin testimonios
-- [x] Compra con Lemon Squeezy y alta automática por webhook (docs/LANZAMIENTO.md)
+- [x] Compra con Stripe (Checkout + Tax + factura) y alta automática por webhook (docs/LANZAMIENTO.md)
 - [x] Ejercicios dentro de la plataforma con revisión y feedback del coach IA
 - [x] Pipeline de vídeo faceless (scripts/videos) · piloto del Módulo 1
 - [x] Publicado en producción con despliegue automático desde GitHub
-- [ ] Crear cuenta de Lemon Squeezy y configurar secretos (hasta entonces /comprar devuelve 404)
+- [ ] Secretos de Stripe en Cloudflare (hasta entonces /comprar devuelve 404)
 - [x] Migraciones aplicadas, vídeos subidos, auth y email (Resend) configurados
 - [x] 8 vídeos generados y subidos
 - [x] Páginas legales: aviso legal, privacidad, condiciones de venta y cookies

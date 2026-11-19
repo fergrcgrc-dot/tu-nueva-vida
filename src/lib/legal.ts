@@ -104,7 +104,7 @@ ${line("Responsable", L.titular)}${line("NIF", L.nif)}${line("Domicilio", L.domi
 ## 2. Qué datos tratamos
 
 1. **Datos de cuenta:** nombre y email.
-2. **Datos de compra:** los que nos comunica Lemon Squeezy al confirmar el pago (nombre, email, número de pedido, importe, moneda y estado). **No recibimos ni guardamos los datos de tu tarjeta.**
+2. **Datos de compra y facturación:** los que introduces en la página de pago y nos comunica Stripe al confirmarlo (nombre, email, dirección de facturación, NIF si lo indicas, número de pedido, importe, impuestos y estado). **No recibimos ni guardamos los datos de tu tarjeta.**
 3. **Datos del programa:** tu progreso, las respuestas de tus ejercicios, el feedback del coach IA, tus entregables, tus conversaciones con el coach IA y tus check-ins de seguimiento.
 4. **Datos especialmente protegidos:** en los ejercicios puedes contar cosas sobre tu estado emocional, tu salud o tus relaciones. Estos datos pertenecen a categorías especiales (art. 9 RGPD) y **solo los tratamos con tu consentimiento explícito**, que te pedimos al crear tu cuenta.
 5. **Datos técnicos:** dirección IP, tipo de navegador y registros de acceso necesarios para la seguridad del servicio.
@@ -134,7 +134,7 @@ Solo con los proveedores necesarios para prestar el servicio, que actúan como e
 - **Cloudflare:** alojamiento y entrega de la web.
 ${ANALYTICS_ENABLED ? "- **Google Analytics (Google Ireland Ltd.):** solo si aceptas las cookies de análisis. Mide de forma agregada las visitas (páginas vistas, origen del tráfico, clics en botones); no recibe el contenido de tus ejercicios ni conversaciones.\n" : ""}- **Anthropic:** modelo de IA que genera el feedback y las respuestas del coach IA. Recibe el texto de tus ejercicios y conversaciones solo para generar la respuesta y, según sus condiciones comerciales, no lo usa para entrenar sus modelos.
 
-**Lemon Squeezy, LLC** gestiona el pago como vendedor registrado (*merchant of record*) y trata tus datos de pago como **responsable independiente**, según su propia política de privacidad.
+**Stripe Payments Europe, Ltd.** procesa el pago y emite la factura en nuestro nombre. Trata los datos de tu medio de pago como **responsable independiente** (por sus obligaciones de prevención del fraude y del blanqueo de capitales), según su propia política de privacidad.
 
 También podremos comunicar datos a autoridades cuando lo exija la ley.
 
@@ -173,7 +173,7 @@ Estas condiciones regulan la compra y el uso del programa online **${L.marca}**.
 ## 1. Quién presta el servicio y quién cobra
 
 - **Prestador del programa:** ${[titular, L.nif && `NIF ${L.nif}`, L.domicilio && `con domicilio en ${L.domicilio}`].filter(Boolean).join(", ")}. Contacto: ${L.email}.
-- **Pago:** lo gestiona **Lemon Squeezy, LLC** como vendedor registrado (*merchant of record*). Lemon Squeezy cobra, aplica los impuestos correspondientes y emite tu factura. En lo relativo al pago también se aplican sus condiciones.
+- **Pago:** el vendedor es el prestador del programa. El cobro se procesa de forma segura con **Stripe**, y recibirás por email la factura con el IVA correspondiente.
 
 ## 2. Qué compras
 
@@ -191,7 +191,7 @@ Los módulos se desbloquean en orden: el siguiente se abre cuando el coach IA ap
 
 ## 3. Precio y pago
 
-El precio es de **${L.precio}, pago único, impuestos incluidos**. No hay suscripciones ni cargos recurrentes. Puedes pagar con los métodos que ofrece Lemon Squeezy en el momento de la compra.
+El precio es de **${L.precio}, pago único, impuestos incluidos**. No hay suscripciones ni cargos recurrentes. Puedes pagar con los métodos que aparezcan en la página de pago de Stripe en el momento de la compra. Si compras como profesional o empresa, puedes indicar tu NIF para que figure en la factura.
 
 ## 4. Acceso
 
@@ -201,7 +201,7 @@ Al confirmarse el pago recibes un email para crear tu contraseña y empezar al m
 
 ## 5. Garantía de 14 días
 
-Si el programa no es para ti, escribe a ${L.email} desde el email con el que compraste **dentro de los 14 días naturales siguientes a la compra** y te devolveremos el **100 % del importe**, sin preguntas y aunque ya hayas empezado los módulos. El reembolso se hace a través de Lemon Squeezy al mismo medio de pago y, una vez tramitado, se desactiva el acceso al programa.
+Si el programa no es para ti, escribe a ${L.email} desde el email con el que compraste **dentro de los 14 días naturales siguientes a la compra** y te devolveremos el **100 % del importe**, sin preguntas y aunque ya hayas empezado los módulos. El reembolso se hace a través de Stripe al mismo medio de pago y, una vez tramitado, se desactiva el acceso al programa.
 
 ## 6. Derecho de desistimiento
 
@@ -249,7 +249,7 @@ ${ANALYTICS_ENABLED ? "Los elementos técnicos están exentos de consentimiento 
 
 ## 3. Servicios de terceros
 
-- **Lemon Squeezy:** al pagar, sales a la página de pago de Lemon Squeezy, que usa sus propias cookies según su política.
+- **Stripe:** al pagar, sales a la página de pago de Stripe, que usa sus propias cookies (necesarias para el pago y la prevención del fraude) según su política.
 
 ## 4. Cómo gestionarlas
 

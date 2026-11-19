@@ -271,7 +271,7 @@ const FAQS = [
   },
   {
     q: "¿Cómo se paga?",
-    a: `Pago único de ${PRICE}, con tarjeta u otros métodos, a través de Lemon Squeezy, que emite tu factura. Al terminar el pago recibes un email para crear tu contraseña y empezar al momento.`,
+    a: `Pago único de ${PRICE}, con tarjeta u otros métodos, procesado de forma segura con Stripe. Recibes la factura por email (con tu NIF si lo indicas). Al terminar el pago recibes un email para crear tu contraseña y empezar al momento.`,
   },
 ];
 
@@ -331,7 +331,7 @@ function Landing() {
             >
               Empieza el programa · {PRICE}
               <ArrowRight className="h-4 w-4" aria-hidden />
-            </BuyProgramButton>
+            </a>
             <a
               href="#modulos"
               className="inline-flex items-center rounded-full border border-primary/25 px-7 py-3.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"

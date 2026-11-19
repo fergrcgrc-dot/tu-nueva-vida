@@ -2,37 +2,27 @@
 
 Checklist para dejar la venta y el programa funcionando sin intervención humana.
 
-## 1. Lemon Squeezy (pago, factura e IVA)
+## 1. Stripe (pago, factura e IVA) — ✅ HECHO el 19/11/2026
 
-1. Crea la cuenta en https://app.lemonsqueezy.com/register y completa la verificación de identidad y los datos de cobro (banco). Lemon Squeezy es *merchant of record*: cobra, factura y liquida el IVA por ti.
-2. **Store** → crea la tienda «Tu nueva vida» en EUR.
-3. **Products → New product**: «Tu nueva vida · Programa completo».
-   - Precio: **399 €**, pago único.
-   - Settings → Tax: marca el precio **con impuestos incluidos** (la landing dice «impuestos incluidos»).
-   - Confirmation modal / redirect: no hace falta, la app ya manda al cliente a `/gracias`.
-4. Copia los ids:
-   - **Store ID**: Settings → Stores.
-   - **Variant ID**: abre el producto → menú «⋯» → *Copy variant ID*.
-5. **Settings → API** → crea una API key.
-6. **Settings → Webhooks → +**:
-   - URL: `https://tunuevavida.eu/api/lemonsqueezy/webhook`
-   - Eventos: `order_created`, `order_refunded`
-   - Signing secret: inventa una cadena larga y guárdala.
-7. Prueba en **Test mode** con la tarjeta `4242 4242 4242 4242` antes de activar el modo real.
+Stripe procesa el cobro; el vendedor es el titular del programa. Stripe Tax calcula el IVA y Stripe Invoicing envía la factura.
+
+- Producto «Tu nueva vida — Programa de 8 semanas» (código fiscal `txcd_20060048`), precio **399 € IVA incluido**, pago único, lookup key **`tnv_programa_8s`** (la app busca el precio por esta clave; para cambiar el precio crea uno nuevo y transfiere la lookup key).
+- Stripe Tax: sede en España y registro de IVA en España activos. Comprobado: 399 € → 329,75 € + 69,25 € de IVA (21 %).
+- Para vender a consumidores de otros países de la UE por encima del umbral, revisar con el asesor el registro OSS y añadirlo en Tax → Registrations.
+- Webhook: `https://tunuevavida.eu/api/stripe/webhook` con `checkout.session.completed`, `checkout.session.async_payment_succeeded` y `charge.refunded`.
+- Para probar con claves de test (sandbox): `STRIPE_ALLOW_TEST_MODE=true` y tarjeta `4242 4242 4242 4242`. Quitar después.
 
 ## 2. Secretos en Cloudflare (Workers → tu-nueva-vida → Settings → Variables and secrets)
 
 | Nombre | Valor |
 |---|---|
-| `LEMONSQUEEZY_API_KEY` | API key del paso 1.5 |
-| `LEMONSQUEEZY_STORE_ID` | Store ID |
-| `LEMONSQUEEZY_VARIANT_ID` | Variant ID |
-| `LEMONSQUEEZY_WEBHOOK_SECRET` | Signing secret del webhook |
+| `STRIPE_SECRET_KEY` | Clave restringida live (`rk_live_…`) o secreta |
+| `STRIPE_WEBHOOK_SECRET` | `whsec_…` del endpoint del webhook |
 | `SITE_URL` | `https://tunuevavida.eu` |
 | `ANTHROPIC_API_KEY` | (ya existente) coach IA |
 | `SUPABASE_SERVICE_ROLE_KEY` | (ya existente) altas automáticas |
 
-Opcional: `LEMONSQUEEZY_CHECKOUT_URL` con un enlace de pago fijo de respaldo si la API falla.
+Permisos mínimos de la clave restringida: escritura en Checkout Sessions; lectura en Prices, Products, Customers, Charges e Invoices.
 
 ## 3. Base de datos (Supabase) — ✅ HECHO el 17/11/2026
 
@@ -100,9 +90,9 @@ Recomendado: que un abogado o asesor revise los textos una vez rellenados.
 
 ## 7. Cómo funciona de punta a punta
 
-1. Landing → botón «Empieza el programa · 399 €» → `/comprar` crea un checkout de Lemon Squeezy.
-2. Pago → webhook `order_created` → se crea la cuenta, el Módulo 1 queda abierto y llega el email para crear la contraseña. Redirección a `/gracias`.
+1. Landing → botón «Empieza el programa · 399 €» → `/comprar` crea una sesión de Stripe Checkout (IVA, NIF opcional y factura automática).
+2. Pago → webhook `checkout.session.completed` → se crea la cuenta, el Módulo 1 queda abierto y llega el email para crear la contraseña. Redirección a `/gracias`.
 3. Cada módulo: vídeo + teoría → ejercicio en la plataforma (autoguardado, dictado por voz) → **Enviar a revisión** → el coach IA aprueba o pide precisar → al aprobar se guarda el entregable y se abre el siguiente módulo. En las semanas 2, 4, 6 y 8 la revisión incluye la revisión de fase.
 4. Semana 8: informe final y check-ins automáticos (semanales o quincenales) durante 90 días.
-5. Reembolso en Lemon Squeezy (garantía 14 días) → webhook `order_refunded` → acceso bloqueado.
+5. Reembolso total en Stripe (garantía 14 días) → webhook `charge.refunded` → acceso bloqueado. Un reembolso parcial no toca el acceso.
 6. Lenguaje de crisis: se pausa el ejercicio, se muestran 024/112 y queda un aviso interno en `/admin`.

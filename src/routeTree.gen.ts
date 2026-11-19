@@ -28,7 +28,7 @@ import { Route as AuthenticatedCoachIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedCoachSeguimientosRouteImport } from './routes/_authenticated/coach/seguimientos'
 import { Route as AuthenticatedModulosModuleIdRouteImport } from './routes/_authenticated/modulos/$moduleId'
 import { Route as AuthenticatedSeguimientosFollowUpIdRouteImport } from './routes/_authenticated/seguimientos/$followUpId'
-import { Route as ApiLemonsqueezyWebhookRouteImport } from './routes/api/lemonsqueezy/webhook'
+import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
 import { Route as AuthenticatedCoachClientesClientIdRouteImport } from './routes/_authenticated/coach/clientes/$clientId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -129,9 +129,9 @@ const AuthenticatedSeguimientosFollowUpIdRoute =
     path: '/seguimientos/$followUpId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const ApiLemonsqueezyWebhookRoute = ApiLemonsqueezyWebhookRouteImport.update({
-  id: '/api/lemonsqueezy/webhook',
-  path: '/api/lemonsqueezy/webhook',
+const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
+  id: '/api/stripe/webhook',
+  path: '/api/stripe/webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedCoachClientesClientIdRoute =
@@ -158,7 +158,7 @@ export interface FileRoutesByFullPath {
   '/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
-  '/api/lemonsqueezy/webhook': typeof ApiLemonsqueezyWebhookRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/coach/': typeof AuthenticatedCoachIndexRoute
   '/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
@@ -178,7 +178,7 @@ export interface FileRoutesByTo {
   '/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
-  '/api/lemonsqueezy/webhook': typeof ApiLemonsqueezyWebhookRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/coach': typeof AuthenticatedCoachIndexRoute
   '/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
@@ -202,7 +202,7 @@ export interface FileRoutesById {
   '/_authenticated/coach/seguimientos': typeof AuthenticatedCoachSeguimientosRoute
   '/_authenticated/modulos/$moduleId': typeof AuthenticatedModulosModuleIdRoute
   '/_authenticated/seguimientos/$followUpId': typeof AuthenticatedSeguimientosFollowUpIdRoute
-  '/api/lemonsqueezy/webhook': typeof ApiLemonsqueezyWebhookRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/coach/': typeof AuthenticatedCoachIndexRoute
   '/_authenticated/coach/clientes/$clientId': typeof AuthenticatedCoachClientesClientIdRoute
@@ -226,7 +226,7 @@ export interface FileRouteTypes {
     | '/coach/seguimientos'
     | '/modulos/$moduleId'
     | '/seguimientos/$followUpId'
-    | '/api/lemonsqueezy/webhook'
+    | '/api/stripe/webhook'
     | '/admin/'
     | '/coach/'
     | '/coach/clientes/$clientId'
@@ -246,7 +246,7 @@ export interface FileRouteTypes {
     | '/coach/seguimientos'
     | '/modulos/$moduleId'
     | '/seguimientos/$followUpId'
-    | '/api/lemonsqueezy/webhook'
+    | '/api/stripe/webhook'
     | '/admin'
     | '/coach'
     | '/coach/clientes/$clientId'
@@ -269,7 +269,7 @@ export interface FileRouteTypes {
     | '/_authenticated/coach/seguimientos'
     | '/_authenticated/modulos/$moduleId'
     | '/_authenticated/seguimientos/$followUpId'
-    | '/api/lemonsqueezy/webhook'
+    | '/api/stripe/webhook'
     | '/_authenticated/admin/'
     | '/_authenticated/coach/'
     | '/_authenticated/coach/clientes/$clientId'
@@ -286,7 +286,7 @@ export interface RootRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
   LegalSlugRoute: typeof LegalSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
-  ApiLemonsqueezyWebhookRoute: typeof ApiLemonsqueezyWebhookRoute
+  ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -424,11 +424,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSeguimientosFollowUpIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/lemonsqueezy/webhook': {
-      id: '/api/lemonsqueezy/webhook'
-      path: '/api/lemonsqueezy/webhook'
-      fullPath: '/api/lemonsqueezy/webhook'
-      preLoaderRoute: typeof ApiLemonsqueezyWebhookRouteImport
+    '/api/stripe/webhook': {
+      id: '/api/stripe/webhook'
+      path: '/api/stripe/webhook'
+      fullPath: '/api/stripe/webhook'
+      preLoaderRoute: typeof ApiStripeWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/coach/clientes/$clientId': {
@@ -501,7 +501,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogSlugRoute: BlogSlugRoute,
   LegalSlugRoute: LegalSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
-  ApiLemonsqueezyWebhookRoute: ApiLemonsqueezyWebhookRoute,
+  ApiStripeWebhookRoute: ApiStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
